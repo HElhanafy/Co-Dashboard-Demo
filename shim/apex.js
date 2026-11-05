@@ -64,6 +64,6 @@
             location.href = m[1].toLowerCase() + '.html' + (h.indexOf('#') > 0 ? h.slice(h.indexOf('#')) : '');
             return;
         }
-        if (/apex_authentication\.logout/.test(h)) { e.preventDefault(); location.href = '../index.html'; }
+        if (/apex_authentication\.logout/.test(h)) { e.preventDefault(); location.href = '../login.html?out=1'; }
     }, true);
 })();

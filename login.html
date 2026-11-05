@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Sign in - Co. Dashboard</title>
+<script>window.DEMO_LOGIN_PAGE = true;</script>
+<script src="theme/theme.js"></script>
+<script src="theme/auth.js"></script>
+<link rel="stylesheet" href="theme/THEME.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px var(--f-ui);color:var(--c-ink);background:var(--c-bg);min-height:100vh}
+.top{position:relative;background:var(--c-grad);color:#fff;padding:42px 16px 90px;text-align:center}
+.top h1{margin:0;font-size:30px;letter-spacing:.5px}.top h1 span{color:var(--c-accent)}.top p{margin:8px 0 0;opacity:.85}
+.lang{position:absolute;top:16px;right:16px;border:1px solid rgba(255,255,255,.5);background:var(--c-accent);color:#fff;border-radius:999px;padding:5px 16px;font:600 13px var(--f-ui);cursor:pointer}.lang:hover{filter:brightness(1.1)}
+[dir=rtl] .lang{right:auto;left:16px}
+.box{max-width:380px;margin:-60px auto 24px;padding:0 16px}
+form{background:var(--c-card);border:1px solid var(--c-line);border-radius:12px;padding:24px}
+form h2{margin:0 0 18px;font-size:17px}
+label{display:block;font-size:12px;font-weight:600;color:var(--c-muted);margin:0 0 6px}
+input{width:100%;font:14px var(--f-ui);color:var(--c-ink);background:var(--c-soft);border:1px solid var(--c-soft-2);border-radius:6px;padding:10px 12px;margin:0 0 14px;outline:none}
+input:focus{border-color:var(--c-brand)}
+button.go{width:100%;font:600 14px var(--f-ui);color:#fff;background:var(--c-brand);border:1px solid var(--c-brand);border-radius:6px;padding:10px;cursor:pointer}
+button.go:hover{background:var(--c-brand-2)}
+.err{min-height:18px;margin:0 0 10px;color:var(--c-neg);font-size:12.5px}
+.ft{text-align:center;color:var(--c-muted);font-size:12px;padding-bottom:24px}
+[dir=rtl] body{font-size:105%}
+</style></head><body>
+<div class="top"><button type="button" class="lang" id="demoLang">عربي</button><h1>Co.<span>Dashboard</span></h1><p data-ar="نسخة عرض لتقارير الإدارة" data-en="Management reports demo">Management reports demo</p></div>
+<div class="box"><form id="f" autocomplete="off">
+<h2 data-ar="تسجيل الدخول" data-en="Sign in">Sign in</h2>
+<label for="u" data-ar="اسم المستخدم" data-en="Username">Username</label><input id="u" autofocus>
+<label for="p" data-ar="كلمة المرور" data-en="Password">Password</label><input id="p" type="password">
+<div class="err" id="e"></div>
+<button type="submit" class="go" data-ar="دخول" data-en="Sign in">Sign in</button>
+</form></div>
+<div class="ft" data-ar="كل الأسماء والأرقام وهمية." data-en="All names and figures are fictitious.">All names and figures are fictitious.</div>
+<script>
+(function(){var L="EN";try{L=localStorage.getItem("demoLang")==="AR"?"AR":"EN"}catch(x){}
+function set(l){var d=document.documentElement,e=document.querySelectorAll("[data-ar]"),i;d.setAttribute("dir",l==="AR"?"rtl":"ltr");d.setAttribute("lang",l==="AR"?"ar":"en");for(i=0;i<e.length;i++)e[i].innerHTML=e[i].getAttribute(l==="AR"?"data-ar":"data-en");document.getElementById("demoLang").textContent=l==="AR"?"English":"عربي";L=l}
+set(L);document.getElementById("demoLang").onclick=function(){var l=L==="AR"?"EN":"AR";try{localStorage.setItem("demoLang",l)}catch(x){}set(l)};
+if(/[?&]out\b/.test(location.search)){try{sessionStorage.removeItem("demoAuth")}catch(x){}}
+document.getElementById("f").onsubmit=function(ev){ev.preventDefault();
+var u=document.getElementById("u").value,p=document.getElementById("p").value;
+if(window.demoAuth&&demoAuth.check(u,p)){location.replace("index.html");return}
+document.getElementById("e").textContent=L==="AR"?"اسم المستخدم أو كلمة المرور غير صحيحة":"Wrong username or password";
+document.getElementById("p").value="";document.getElementById("p").focus()}})();
+</script></body></html>

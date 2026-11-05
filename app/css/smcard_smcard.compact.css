@@ -557,6 +557,7 @@ tr.live td { color: var(--muted) !important; font-style: italic; }
 .ic-filters .sk-bar:first-child { margin-top: 0; }
 .sc-r2 { gap: 10px; }
 .sc-smg { width: 440px; }
+.sc-div { display: flex; gap: 6px; align-items: center; height: 38px; }
 .sc-r2 .ic-run { margin-left: 8px; }
 .sc-r2 .sk-reset { margin-left: 0; }
 .ic-period select { height: 38px; border-color: var(--navy-a25); min-width: 92px; }

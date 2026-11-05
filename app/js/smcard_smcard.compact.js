@@ -10,6 +10,14 @@ return;
 var META = JSON.parse(el.textContent);
 var REPS = META.reps || [];
 var RM = {}; REPS.forEach(function (r) { RM[r[0]] = r; });
+var PS = {}, PL = [];
+REPS.forEach(function (r) { var k = r[6] || r[0], p = PS[k]; if (!p) { p = PS[k] = { k: k, reps: [] }; PL.push(p); } p.reps.push(r); });
+PL.forEach(function (p) {
+p.reps.sort(function (a, b) { return +a[0] - +b[0]; });
+var h = RM[p.k]; p.name = p.k === 'GOV' ? 'GOVERNMENT SECTOR' : h ? h[1] : (p.reps.length > 1 && p.reps[0][3] !== '-' ? p.reps[0][3] : p.reps[0][1]);
+p.one = p.k === 'GOV' || p.reps.every(function (r) { return r[4] === p.reps[0][4]; });
+});
+var CODE = {}; REPS.forEach(function (r) { CODE[r[0]] = PS[r[6] || r[0]]; });
 function esc(s) {
 return String(s === null || s === undefined ? '' : s).replace(/[&<>"]/g, function (m) {
 return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m];
@@ -65,13 +73,14 @@ setPeriodDefaults();
 fYear.addEventListener('change', function () { Y = +fYear.value; if (Y === META.year && +fM2.value > META.month) fM2.value = String(META.month); paintYears(); });
 asOf.textContent = 'Profit nightly ' + (META.asofProfit || '-') + SEP + 'Receivables ' + (META.asofAR || '-') + SEP + 'Collection archive through ' + (META.collThru || '-');
 asOf.classList.add('fresh');
-var SMS = REPS.slice().sort(function (a, b) { return String(a[1]).replace(/^\s+/, '').localeCompare(String(b[1]).replace(/^\s+/, '')); });
-SMS.forEach(function (r) { o = document.createElement('option'); o.value = r[0]; o.textContent = r[1]; fSm.appendChild(o); });
+var SMS = PL.slice().sort(function (a, b) { return String(a.name).replace(/^\s+/, '').localeCompare(String(b.name).replace(/^\s+/, '')); });
+SMS.forEach(function (p) { o = document.createElement('option'); o.value = p.k; o.textContent = p.name; fSm.appendChild(o); });
+var smDivG = document.getElementById('smDivG'), smDiv = document.getElementById('smDiv'), per = null, IN = {};
 var smBtn = document.getElementById('fSmBtn'), smLbl = document.getElementById('fSmLbl'), smMenu = document.getElementById('fSmMenu'),
 smQ = document.getElementById('fSmQ'), smList = document.getElementById('fSmList'), smPick = document.getElementById('smPick');
 if (smList) {
 smList.innerHTML = SMS.map(function (r) {
-return '<div class="ss-option" data-v="' + esc(r[0]) + '">' + esc(r[1]) + '<small>' + esc(String(r[2]).replace(/ REGION$/, '')) + '</small></div>';
+return '<div class="ss-option" data-v="' + esc(r.k) + '">' + esc(r.name) + '<small>' + esc(String(r.reps[0][2]).replace(/ REGION$/, '')) + '</small></div>';
 }).join('');
 var smPlace = function () {
 var rc = smBtn.getBoundingClientRect();
@@ -89,31 +98,48 @@ smQ.addEventListener('keydown', function (e) {
 if (e.key === 'Escape') { smOpen(false); smBtn.focus(); }
 else if (e.key === 'Enter') {
 e.preventDefault();
-for (var i = 0; i < smList.children.length; i++) if (smList.children[i].style.display !== 'none') { pickSm(RM[smList.children[i].getAttribute('data-v')]); smOpen(false); smBtn.focus(); return; }
+for (var i = 0; i < smList.children.length; i++) if (smList.children[i].style.display !== 'none') { pickSm(PS[smList.children[i].getAttribute('data-v')]); smOpen(false); smBtn.focus(); return; }
 }
 });
 smList.addEventListener('click', function (e) {
 var t = e.target; while (t && t !== smList && !(t.getAttribute && t.getAttribute('data-v'))) t = t.parentNode;
 if (!t || t === smList) return;
-pickSm(RM[t.getAttribute('data-v')]); smOpen(false); smBtn.focus();
+pickSm(PS[t.getAttribute('data-v')]); smOpen(false); smBtn.focus();
 });
 smBtn.addEventListener('keydown', function (e) { if (e.key === 'Enter' && sm && !runBtn.disabled && !busy && smMenu.className.indexOf('open') === -1) { e.preventDefault(); runBtn.click(); } });
 document.addEventListener('click', function (e) { if (!smPick.contains(e.target)) smOpen(false); });
 }
-fSm.addEventListener('change', function () { setSm(RM[fSm.value] || null); });
+fSm.addEventListener('change', function () { pickSm(PS[fSm.value] || null); });
 fSm.addEventListener('keydown', function (e) { if (e.key === 'Enter' && sm && !runBtn.disabled && !busy) { e.preventDefault(); runBtn.click(); } });
-function pickSm(r) { if (!r) return; fSm.value = r[0]; setSm(r); }
+function pickSm(p, code) {
+per = p; if (!p) { if (smDivG) smDivG.style.display = 'none'; setSm(null); return; }
+fSm.value = p.k;
+if (smDivG) {
+smDivG.style.display = p.reps.length > 1 ? '' : 'none';
+smDiv.innerHTML = '<button type="button" class="chip mini" data-c="">All</button>' + p.reps.map(function (r) {
+return '<button type="button" class="chip mini" data-c="' + esc(r[0]) + '">' + esc(p.one || r[4] === '-' ? String(r[1]).replace(/^.* - /, '') : r[4]) + '</button>';
+}).join('');
+}
+pickDiv(p.reps.length > 1 ? code || '' : p.reps[0][0]);
+}
+function pickDiv(c) {
+var L = c ? [RM[c]] : per.reps, r = L[0];
+IN = {}; L.forEach(function (x) { IN[x[0]] = 1; });
+if (smDiv) Array.prototype.forEach.call(smDiv.children, function (b) { b.className = 'chip mini' + (b.getAttribute('data-c') === c ? ' on' : ''); });
+setSm(L.length > 1 ? [L.map(function (x) { return x[0]; }).join(','), per.name, r[2], r[3], per.one ? r[4] : L.map(function (x) { return x[4]; }).join(' + '), 0] : [r[0], per.reps.length > 1 ? r[1] : per.name, r[2], r[3], r[4], r[5]]);
+}
+if (smDiv) smDiv.addEventListener('click', function (e) { var b = e.target; if (b && b.hasAttribute && b.hasAttribute('data-c') && per) pickDiv(b.getAttribute('data-c')); });
 function setSm(r) {
 sm = r; D = null; ROWS = null;
 cardHead.style.display = 'none'; kpiPanel.style.display = 'none'; viewChips.style.display = 'none';
 tHead.innerHTML = ''; tBody.innerHTML = ''; tFoot.innerHTML = ''; titleEl.textContent = 'Details'; pfEl.innerHTML = ''; foot.textContent = '';
 canExp(false);
-if (smLbl) { smLbl.textContent = r ? r[1] : 'Select a salesman...'; smBtn.className = 'cls-btn' + (r ? ' picked' : ''); }
+if (smLbl) { smLbl.textContent = per ? per.name : 'Select a salesman...'; smBtn.className = 'cls-btn' + (r ? ' picked' : ''); }
 if (!r) { runBtn.disabled = true; note.textContent = 'Select a salesman, then Run'; badge.textContent = 'Select a salesman'; return; }
 runBtn.disabled = false; note.textContent = 'Press Run to build the card'; badge.textContent = 'Press Run';
 }
 resetBtn.addEventListener('click', function () {
-Y = META.year; setPeriodDefaults(); fSm.value = ''; setSm(null); (smBtn || fSm).focus();
+Y = META.year; setPeriodDefaults(); fSm.value = ''; pickSm(null); (smBtn || fSm).focus();
 });
 runBtn.addEventListener('click', function () {
 if (!sm || busy) return;
@@ -180,15 +206,15 @@ k.names = {}; D.customers.forEach(function (c) { k.names[c[0]] = c[1]; }); D.ar.
 k.xf = {}; k.xin = 0; k.xout = 0;
 D.xfers.forEach(function (x) {
 var p = k.xf[x[1]]; if (!p || x[0] >= p[0]) k.xf[x[1]] = x;
-if (x[0].slice(0, 4) === String(Y)) { if (x[3] === sm[0]) k.xin++; else k.xout++; }
+if (x[0].slice(0, 4) === String(Y)) { if (IN[x[3]]) k.xin++; else k.xout++; }
 });
 return k;
 }
 function xfPick(cc, mode) {
 var x = K.xf[cc];
 if (!x || x[0].slice(0, 4) !== String(Y)) return null;
-if (mode === 'ar' && x[3] === sm[0]) return x;
-if (mode === 'sales' && x[2] === sm[0]) return x;
+if (mode === 'ar' && IN[x[3]]) return x;
+if (mode === 'sales' && IN[x[2]]) return x;
 return null;
 }
 function xfBadge(cc, mode) {
@@ -212,7 +238,7 @@ function periodLabel() { return (M1 === M2 ? MON[M1 - 1] : MON[M1 - 1] + ' - ' +
 function render() {
 K = compute();
 badge.textContent = periodLabel() + (K.live ? ' (current month live)' : '');
-cardL1.innerHTML = '<span class="ic-code">' + esc(sm[0]) + '</span><span class="ic-name">' + esc(sm[1]) + '</span>' +
+cardL1.innerHTML = '<span class="ic-code">' + esc(sm[0].replace(/,/g, ' + ')) + '</span><span class="ic-name">' + esc(sm[1]) + '</span>' +
 '<span class="ic-dv">' + esc(sm[4]) + (sm[5] ? ' ' + sm[5] + '%' : '') + '</span><span class="ic-wh"><bdi>' + esc(sm[2]) + '</bdi></span>';
 var cells = [['Supervisor', esc(sm[3])], ['Period', esc(periodLabel()) + ' <i>' + K.n + ' month' + (K.n > 1 ? 's' : '') + '</i>'],
 ['Active customers', K.cust + ' <i>with sales in the period</i>'], ['Customers with balance', K.arCust + ' <i>today</i>'],
@@ -366,7 +392,7 @@ function doExcel() {
 if (!D || !ROWS) { alert('Run the card first.'); return; }
 if (!window.smExcel) return;
 window.smExcel({
-name: 'Salesman_Card_' + sm[0] + '_' + view + '_' + Y + '_' + M1 + '-' + M2 + '.xlsx',
+name: 'Salesman_Card_' + sm[0].replace(/,/g, '-') + '_' + view + '_' + Y + '_' + M1 + '-' + M2 + '.xlsx',
 sheet: titleEl.textContent.slice(0, 30),
 title: 'Salesman Card - ' + sm[0] + ' ' + sm[1] + ' - ' + sm[2] + ' - ' + titleEl.textContent + ' - ' + periodLabel() + grpTxt(),
 head: ROWS.head, rows: ROWS.rows
@@ -386,11 +412,11 @@ printBtn.addEventListener('click', doPrint);
 var hs = String(window.location.hash || ''), p = {}, r;
 if (hs.length < 2) return;
 hs.slice(1).split('&').forEach(function (kv) { var a = kv.split('='); if (a.length === 2) p[a[0]] = decodeURIComponent(a[1]); });
-if (!p.s || !RM[p.s]) return;
+if (!p.s || !CODE[p.s]) return;
 if (p.y && +p.y >= META.minYear && +p.y <= META.year) { Y = +p.y; fYear.value = p.y; paintYears(); }
 if (p.f) fM1.value = String(Math.max(1, Math.min(12, +p.f)));
 if (p.t) fM2.value = String(Math.max(1, Math.min(12, +p.t)));
-pickSm(RM[p.s]); runBtn.click();
+pickSm(CODE[p.s], CODE[p.s].reps.length > 1 ? p.s : ''); runBtn.click();
 })();
 }
 initSmCard();

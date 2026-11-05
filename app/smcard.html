@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Salesman Card - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/smcard_smcard.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_smcard.js"></script>
+<script src="js/smcard_smcard.xlsx.compact.js"></script>
+</head>
+<body data-alias="SMCARD">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- SMCARD.HTML - Salesman Card page (Static Content region, Seq 20) - 14/09/2026 . filters and unified look 20/10/2026 -->
+<div class="wrap">
+    <!-- Header -->
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">R</div>
+            <div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <h1>Salesman Card</h1>
+                    <div class="period-badge" id="periodBadge">Select a salesman</div>
+                </div>
+                <div class="subtitle">Sales, margin, target, collection and receivables of one salesman in one place</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="actions-row">
+                <!-- a report with cards (HANDOFF item 35 rule): Print Dashboard here prints the cards with the table; Export sits beside the table -->
+                <button type="button" class="btn-print" id="printDashBtn" title="Print the card: header, KPI strips and the table">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Print Dashboard
+                </button>
+            </div>
+            <!-- freshness of the four layers (profit nightly, receivables nightly, collection archive month) -->
+            <div class="asof-line" id="asOfLine"></div>
+        </div>
+    </div>
+
+    <!-- Filters (user 20/10/2026): row 1 = year pills + month range; row 2 = salesman picker by name (no codes, filters as you type) + Run and Reset -->
+    <div class="sk-filters ic-filters">
+        <div class="sk-bar">
+            <div class="filter-group">
+                <label>Year</label>
+                <select id="fYear" class="sc-year" title="Year of the card (newest first)"></select>
+            </div>
+            <div class="filter-group">
+                <label>Months</label>
+                <div class="ic-period">
+                    <select id="fM1" title="First month of the period"></select>
+                    <span class="ic-sep">&#8211;</span>
+                    <select id="fM2" title="Last month of the period"></select>
+                </div>
+            </div>
+        </div>
+        <div class="sk-bar sc-r2">
+            <div class="filter-group sc-smg">
+                <label>Salesman</label>
+                <div class="cls-pick sc-pick" id="smPick">
+                    <button type="button" class="cls-btn" id="fSmBtn" title="Salesmen you are allowed to see, by name"><span id="fSmLbl">Select a salesman...</span><i>&#9662;</i></button>
+                    <select id="fSm" class="cls-sel"><option value="">Select a salesman...</option></select>
+                    <div class="ss-menu" id="fSmMenu"><input type="text" id="fSmQ" placeholder="Type part of the name..." autocomplete="off"><div id="fSmList"></div></div>
+                </div>
+            </div>
+            <button type="button" class="ic-run" id="runBtn" title="Build the card" disabled>&#9654; Run</button>
+            <button type="button" class="sk-reset" id="resetBtn" title="Clear all filters">&#8635; Reset</button>
+        </div>
+    </div>
+
+    <!-- Card header: line 1 name + code + area; line 2 supervisor / division / active customers / open customers -->
+    <div class="panel ic-head" id="cardHead" style="display:none">
+        <div class="ic-l1" id="cardL1"></div>
+        <div class="ic-l2" id="cardL2"></div>
+    </div>
+
+    <!-- KPI rows: sales / target / collection and receivables (cards rendered by SMCARD.JS) -->
+    <div class="sc-kpis" id="kpiPanel" style="display:none">
+        <div class="sc-krow g1">
+            <div class="sc-klbl" title="Invoice salesman at the time of sale (Sales and Profit pages)">Sales &amp; margin <i>SAR, invoice salesman</i></div>
+            <div class="kpi-row" id="kpiSales"></div>
+        </div>
+        <div class="sc-krow g2">
+            <div class="sc-klbl" title="Annual target by class; period target = annual / 12 x months; achievement capped per class (Target page)">Target <i id="kTgNote">SAR, capped per class</i></div>
+            <div class="kpi-row" id="kpiTarget"></div>
+        </div>
+        <div class="sc-krow g3">
+            <div class="sc-klbl" title="Current salesman of the customer (Collection and Receivables pages) - transfers are shown in the tables">Collection &amp; receivables <i>SAR, current salesman of the customer</i></div>
+            <div class="kpi-row" id="kpiColl"></div>
+        </div>
+    </div>
+
+    <!-- One table, the view chips (full row under the title) switch it -->
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">Details</span></h3>
+            </div>
+            <div class="ic-kinds" id="viewChips" style="display:none" title="Choose what the table shows">
+                <button type="button" class="chip mini on" data-v="months">Months</button>
+                <button type="button" class="chip mini" data-v="customers">Customers</button>
+                <button type="button" class="chip mini" data-v="classes">Classes</button>
+                <button type="button" class="chip mini" data-v="coll">Collection</button>
+                <button type="button" class="chip mini" data-v="ar">Open invoices</button>
+            </div>
+            <div class="table-tools">
+                <span class="mv-loading" id="tableNote">Select a salesman, then Run</span>
+                <!-- Export (Excel . PDF of the table shown): the shared control window.jmExport drawn by SMCARD.JS (SHARED_UI = Y) - 20/10/2026 -->
+                <span id="exportBox"></span>
+            </div>
+        </div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll">
+            <table id="cardTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+                <tfoot id="tableFoot"></tfoot>
+            </table>
+        </div>
+        <div class="panel-note" id="tableFootNote"></div>
+    </div>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("smcard")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/smcard_smcard.compact.js"></script>
+</body></html>

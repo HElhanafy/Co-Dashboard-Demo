@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Payroll Sheet - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/payroll_payroll.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_payroll.js"></script>
+<script src="js/payroll_stval_xlsx.compact.js"></script>
+<script src="js/payroll_payroll.fg.compact.js"></script>
+</head>
+<body data-alias="PAYROLL">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<div class="wrap pay-wrap">
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">P</div>
+            <div>
+                <div style="display:flex; align-items:center; gap: 12px; flex-wrap: wrap;">
+                    <h1>Payroll Sheet</h1>
+                    <div class="period-badge" id="periodBadge">Loading...</div>
+                </div>
+                <div class="subtitle">Monthly salaries by payroll group, department and company</div>
+            </div>
+        </div>
+        <div class="header-actions">
+          <div class="actions-row">
+            <a href="home.html" class="btn-reset btn-home">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                Home
+            </a>
+          </div>
+          <div class="asof-line fresh" id="asOfLine">Live data</div>
+        </div>
+    </div>
+
+    <div class="filters pay-filters">
+        <div class="pf-row pf-row1">
+            <div class="filter-group f-show">
+                <label>Show</label>
+                <div class="level-tabs" id="showChips"></div>
+            </div>
+            <div class="filter-group f-year">
+                <label>Year</label>
+                <select id="fYear"></select>
+            </div>
+            <div class="filter-group f-month">
+                <label>Month</label>
+                <select id="fMonth"></select>
+            </div>
+            <div class="filter-group f-co">
+                <label>Company</label>
+                <div class="level-tabs" id="coChips">
+                    <button type="button" class="lvl-btn active" data-co="ALL">All</button>
+                    <button type="button" class="lvl-btn" data-co="Co.">Co.</button>
+                    <button type="button" class="lvl-btn" data-co="ITS">Sister Co.</button>
+                </div>
+            </div>
+            <div class="filter-group f-reset filter-reset">
+                <label>&nbsp;</label>
+                <button type="button" class="btn-reset" id="resetBtn">Reset</button>
+            </div>
+        </div>
+        <div class="pf-row pf-row2">
+            <div class="filter-group f-view">
+                <label>Sheet</label>
+                <div class="level-tabs" id="viewChips">
+                    <button type="button" class="lvl-btn active" data-view="GROUP">By Payroll Group</button>
+                    <button type="button" class="lvl-btn" data-view="DEPT">By Structure</button>
+                </div>
+            </div>
+            <div class="filter-group f-lvl" id="levelGroup">
+                <label>Structure level</label>
+                <div class="level-tabs" id="lvlChips">
+                    <button type="button" class="lvl-btn" data-lvl="CO">Company</button>
+                    <button type="button" class="lvl-btn" data-lvl="L2">Division</button>
+                    <button type="button" class="lvl-btn" data-lvl="L3">Section</button>
+                    <button type="button" class="lvl-btn active" data-lvl="DEPT">Department</button>
+                </div>
+            </div>
+            <div class="filter-group f-rows">
+                <label>Detail</label>
+                <div class="level-tabs" id="rowChips">
+                    <button type="button" class="lvl-btn active" data-rows="EMP">Employee lines</button>
+                    <button type="button" class="lvl-btn" data-rows="SUM">Group totals</button>
+                </div>
+            </div>
+            <div class="filter-group f-emp">
+                <label>Employee <span class="lbl-hint">(number or name)</span></label>
+                <div class="search-select" id="empBox">
+                    <input type="text" id="empInput" placeholder="Search employee..." autocomplete="off">
+                    <button type="button" class="clear-btn" id="empClear" title="Clear" style="display:none;">&times;</button>
+                    <div class="ss-menu" id="empMenu"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="kpi-row pay-kpis" id="kpiRow"></div>
+
+    <div class="panel" id="printTablePanel">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">Payroll sheet</span></h3>
+                <div class="panel-sub" id="tableSub"></div>
+            </div>
+            <div class="table-tools">
+                <span id="exportBox"></span>
+            </div>
+        </div>
+        <div class="level-tabs grp-tabs" id="grpTabs"></div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll" id="sheetBody"></div>
+        <div id="tableLoader" class="table-loader" style="display:none;">Loading payroll...</div>
+    </div>
+</div>
+
+<style>
+/* PAYROLL_LOANS.CSS - region PAYROLL LOANS CSS of page PAYROLL: the loans statement and its window; the table, window and family colours come from PAYROLL.CSS - 03/11/2026 */
+.ln-table tr.ln-row td { cursor: pointer; }
+.ln-table tr.ln-row:hover td { background: var(--navy-a12) !important; }
+.ln-table tr.ln-row .tw { display: inline-flex; width: 18px; height: 18px; border-radius: 6px; align-items: center; justify-content: center; margin-inline-end: 6px; background: var(--navy-a06); color: var(--navy); font-size: 9px; }
+.ln-table tr.ln-row:hover .tw { background: var(--navy); color: #fff; }
+html[dir=rtl] .ln-table tr.ln-row .tw { transform: scaleX(-1); }
+.ln-table td .st-ok, .ln-table td .st-warn, .ln-table td .st-bad { margin-inline-end: 4px; }
+.ln-tabs { padding: 12px 14px 10px; }
+.ln-tabs .level-tabs { display: inline-flex; }
+@media print { .ln-tabs { display: none !important; } }
+.ln-cap { font: 700 12px var(--font-head); color: var(--navy); letter-spacing: .06em; text-transform: uppercase; padding: 12px 14px 6px; }
+html[dir=rtl] .ln-cap { letter-spacing: 0; font-size: 13px; }
+#payLw { z-index: 999; }   /* the shared entry window (z 1000) opens above it */
+#payLw .pgw-body { padding-bottom: 8px; }
+.ln-ent { color: var(--pink); font-family: var(--font-mono); font-weight: 600; text-decoration: none; border-bottom: 1px dashed var(--pink); }
+/* a loan opens its payments: the type reads as a link, the chosen loan stays lit */
+.ln-table tr.ln-loan td { cursor: pointer; }
+.ln-table tr.ln-loan:hover td { background: var(--navy-a06) !important; }
+.ln-table tr.ln-loan .ln-type { color: var(--navy); font-weight: 600; border-bottom: 1px dashed var(--pink); }
+.ln-table tr.ln-sel td { background: rgba(34,184,207,0.08) !important; }
+.ln-table tr.ln-sel .ln-type { color: var(--pink); border-bottom-style: solid; }
+.ln-hint { padding: 12px 14px; color: var(--muted); font-size: 12.5px; }
+#payLw .pay-table { margin: 0; }
+/* portrait paper for the loans (named page; body.ln-print is set by PAYROLL_LOANS.JS on beforeprint) */
+@page lnp { size: A4 portrait; margin: 10mm 9mm 11mm; }
+@media print { body.ln-print, body.ln-print .wrap, body.ln-print #payLw { page: lnp; } }
+/* the employee window printed alone: its title block on top, the buttons off */
+@media print {
+    #payLw { display: none !important; }
+    body.plw-printing > *:not(#payLw) { display: none !important; }
+    body.plw-printing #payLw { position: static !important; display: block !important; background: #fff !important; padding: 0 !important; overflow: visible !important; }
+    body.plw-printing #payLw .pgw-box { box-shadow: none !important; max-width: none !important; padding: 0 !important; background: #fff !important; }
+    body.plw-printing #payLw .pgw-top { display: none !important; }
+    body.plw-printing #payLw .pgw-body { border: 0 !important; border-radius: 0 !important; overflow: visible !important; }
+    body.plw-printing #payLw .pgw-ph { display: block !important; text-align: center; padding: 0 0 8px; }
+    /* the statement on portrait paper: no group, count or notes; larger figures */
+    .ln-np { display: none !important; }
+    #printTablePanel table.ln-table { font-size: 10px !important; }
+    #printTablePanel table.ln-table th, #printTablePanel table.ln-table td { padding: 3px 5px !important; }
+    #printTablePanel table.ln-table th { font-size: 9.5px !important; }
+    /* the employee's PDF: the loans table alone, large and clear - it is sent to the employee (user 03/11/2026) */
+    #payLw .ln-pays, #payLw .ln-hint { display: none !important; }
+    .ln-table .tw { display: none !important; }
+    #payLw .pay-table { font-size: 12px !important; }
+    #payLw .pay-table th, #payLw .pay-table td { padding: 6px 8px !important; line-height: 1.3 !important; }
+    #payLw .pay-table th { font-size: 11px !important; }
+    #payLw .pay-table tr.total-row td { font-size: 13px !important; }
+    #payLw .pw-t { font-size: 22px !important; }
+    #payLw .pw-m { font-size: 14px !important; }
+    #payLw .pw-sc { font-size: 13px !important; color: var(--text) !important; font-weight: 600; margin-top: 4px; }
+    #payLw .st-ok, #payLw .st-warn, #payLw .st-bad { font-size: 10px !important; padding: 1px 6px !important; }
+    #payLw .ln-type { border: 0 !important; }
+}
+
+</style>
+<style>
+/* PAYROLL_DEMO.CSS - demo only: no refunded Saudi salaries in the demo (a live-company case, user 04/11/2026) - hide its legend item and footer box */
+.k-saudi, .pay-footer > .pf-box:nth-child(2) { display: none !important; }
+
+</style>
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("payroll")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/payroll_payroll_loans.compact.js"></script>
+<script src="js/payroll_payroll.compact.js"></script>
+</body></html>

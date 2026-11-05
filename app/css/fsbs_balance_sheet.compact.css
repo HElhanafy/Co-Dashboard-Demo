@@ -1,0 +1,91 @@
+.kpi-card.kpi-gp::before  { background: linear-gradient(180deg, var(--navy), #5a63c8); }
+.kpi-card.kpi-op::before  { background: linear-gradient(180deg, #5a63c8, var(--pink)); }
+.kpi-card.kpi-dp::before  { background: #d97706; }
+.kpi-card.kpi-dp .kpi-value { color: #b45309; }
+.kpi-card.kpi-net::before { background: var(--pink); }
+.kpi-card.kpi-net .kpi-value { color: var(--pink); }
+#fsExtraFilters { display: none; }
+.bs-recon {
+background: var(--panel);
+border: 1px solid var(--border);
+border-radius: 12px;
+margin-bottom: 14px;
+overflow: hidden;
+}
+.bsr-head {
+background: var(--box-bg);
+border-bottom: 1px solid var(--navy-a25);
+color: var(--navy);
+font-size: 10.5px;
+font-weight: 700;
+letter-spacing: .08em;
+text-transform: uppercase;
+padding: 8px 16px;
+}
+.bsr-body {
+display: flex;
+align-items: stretch;
+flex-wrap: wrap;
+gap: 14px;
+padding: 12px 16px;
+}
+.bsr-item {
+flex: 0 0 auto;
+min-width: 210px;
+border-left: 3px solid var(--navy-dim);
+padding-left: 12px;
+}
+.bsr-t {
+font-size: 10.5px;
+font-weight: 700;
+letter-spacing: .08em;
+text-transform: uppercase;
+color: var(--muted);
+}
+.bsr-v {
+font-family: var(--font-head);
+font-variant-numeric: tabular-nums;
+font-weight: 600;
+font-size: 14.5px;
+color: var(--text);
+margin-top: 3px;
+}
+.bsr-d {
+font-family: var(--font-head);
+font-variant-numeric: tabular-nums;
+font-size: 12px;
+margin-top: 3px;
+font-weight: 700;
+}
+.bsr-d.ok   { color: var(--good); }
+.bsr-d.warn { color: var(--warn); }
+.bsr-d.bad  { color: var(--bad); }
+.bsr-s {
+font-size: 11px;
+color: var(--muted);
+margin-top: 2px;
+}
+.bsr-note {
+flex: 1 1 260px;
+align-self: center;
+font-size: 11.5px;
+line-height: 1.5;
+color: var(--muted);
+border-right: 1px dashed var(--border);
+padding-right: 14px;
+}
+tr.bs-check td {
+border-top: 2px solid var(--border) !important;
+color: var(--muted);
+font-size: 11.5px;
+letter-spacing: .4px;
+}
+tr.bs-check td.val.neg { color: var(--bad); font-weight: 600; }
+@media print {
+.bs-recon { border: 1px solid #ccd !important; break-inside: avoid; }
+.bsr-head { font-size: 8px !important; padding: 3px 10px !important; }
+.bsr-body { padding: 5px 10px !important; gap: 10px !important; }
+.bsr-v { font-size: 10.5px !important; }
+.bsr-d, .bsr-t, .bsr-s { font-size: 8.5px !important; }
+.bsr-note { display: none !important; }
+}

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trial Balance - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/tb_tb.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_tb.js"></script>
+<script src="../shim/srv_fs.js"></script>
+<script src="js/tb_tb.fg.compact.js"></script>
+</head>
+<body data-alias="TB">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- TB.HTML (demo copy: live region with the panel note neutralised) - static region of page TB: header with Print Dashboard, period and cost filters, balance card, table panel with the shared Export control - 15/10/2026 -->
+<div class="wrap">
+    <!-- Header -->
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">T</div>
+            <div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <h1>Trial Balance</h1>
+                    <div class="period-badge" id="periodBadge">Loading...</div>
+                </div>
+                <div class="subtitle">General Ledger balances &mdash; drill down the chart of accounts</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="actions-row">
+                <!-- the unified Refresh button (SIDEBAR.JS, row TB in DASH_REFRESH_JOBS) is injected here as the first child; the as-of line below is filled by TB.JS -->
+                <button type="button" class="btn-print" id="printDashBtn" title="Print the full dashboard">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Print Dashboard
+                </button>
+            </div>
+            <div class="asof-line" id="asOfLine"></div>
+        </div>
+    </div>
+
+    <!-- Filters: period + closing balance card -->
+    <div class="filters-row1">
+        <div class="filters filters-period">
+            <div class="filter-group">
+                <label>Year</label>
+                <select id="fYear"></select>
+            </div>
+            <div class="filter-group">
+                <label>From Month</label>
+                <select id="fFrom"></select>
+            </div>
+            <div class="filter-group">
+                <label>To Month</label>
+                <select id="fTo"></select>
+            </div>
+            <div class="filter-group filter-reset">
+                <label>&nbsp;</label>
+                <button type="button" class="btn-reset" id="resetBtn">Reset</button>
+            </div>
+        </div>
+        <div class="bal-card">
+            <div class="label" id="balLbl">CLOSING BALANCE</div>
+            <div class="value" id="balVal">-</div>
+            <div class="sub" id="balSub"></div>
+        </div>
+    </div>
+
+    <!-- Filters: account statement + cost centers -->
+    <div class="filters filters-cost">
+        <div class="filter-group filter-acct">
+            <label>Account Statement <span class="lbl-hint">(type to search)</span></label>
+            <div class="search-select" id="fAccBox">
+                <input type="text" id="fAccInp" placeholder="Pick an account for its ledger statement" autocomplete="off">
+                <button type="button" class="clear-btn" id="fAccClr" style="display:none">&times;</button>
+                <div class="ss-menu" id="fAccMenu"></div>
+            </div>
+        </div>
+        <div class="filter-group">
+            <label>Cost Center 1</label>
+            <select id="fC1"><option value="">All Cost Centers</option></select>
+        </div>
+        <div class="filter-group">
+            <label>Cost Center 2 (A)</label>
+            <select id="fC2A"><option value="">All Groups</option></select>
+        </div>
+        <div class="filter-group">
+            <label>Cost Center 2 (B) <span class="lbl-hint">(multi-select)</span></label>
+            <div class="ms-box" id="fC2BBox">
+                <button type="button" class="ms-btn" id="fC2BBtn">All Details</button>
+                <div class="ss-menu" id="fC2BMenu"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scope strip -->
+    <div class="scope-bar" id="scopeBar"></div>
+
+    <!-- Table -->
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">Trial Balance</span></h3>
+                <div class="panel-sub" id="tableSub"></div>
+            </div>
+            <div class="table-tools">
+                <button type="button" class="btn-back" id="backBtn" style="display:none">&#8592; Back</button>
+                <!-- Export (Excel . PDF): drawn by the shared control window.jmExport from TB.JS -->
+                <span id="exportBox"></span>
+            </div>
+        </div>
+        <div class="crumb-row">
+            <div class="crumbs" id="crumbs"></div>
+            <div class="level-tabs" id="levelTabs"></div>
+        </div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll">
+            <table>
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="panel-note" id="tbNote">Opening = cumulative balance since inception (the January 2025 opening entry included).</div>
+    </div>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("tb")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/tb_tb.compact.js"></script>
+</body></html>

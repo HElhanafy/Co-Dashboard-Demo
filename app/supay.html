@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supplier Payables - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/supay_supay.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_supay.js"></script>
+<script src="../shim/srv_poarr.js"></script>
+<script src="js/supay_supay.fg.compact.js"></script>
+<script src="js/supay_supay.inv.compact.js"></script>
+</head>
+<body data-alias="SUPAY">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- SUPAY.HTML - Supplier Payables page (Static Content region, Seq 20). markup only - the rules live in SUPAY.CSS - 25/09/2026 -->
+<div class="wrap">
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">S</div>
+            <div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <h1>Supplier Payables</h1>
+                    <div class="period-badge" id="periodBadge">Loading</div>
+                </div>
+                <div class="subtitle">What we owe each supplier by purchase order and the month it falls due - orders not yet received and invoices already in the warehouse</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="actions-row">
+                <!-- Export (Excel . PDF of the level shown): the shared control window.jmExport drawn by SUPAY.JS (SHARED_UI = Y); no dashboard print (as POARR, user 20/10/2026) -->
+                <span id="exportBox"></span>
+            </div>
+            <div class="asof-line" id="asOfLine"></div>
+        </div>
+    </div>
+
+    <div class="sp-bar">
+        <div class="sk-filters ic-filters po-f">
+            <div class="po-row">
+                <div class="filter-group">
+                    <label title="Purchase orders dated inside the period, as the system report">Order date</label>
+                    <div class="po-per">
+                        <div class="ic-period">
+                            <input type="date" id="fFrom" title="First order date">
+                            <span class="ic-sep">&#8211;</span>
+                            <input type="date" id="fTo" title="Last order date">
+                        </div>
+                        <button type="button" class="ic-run" id="runBtn" title="Load the report for the dates on the left">&#9654; Run</button>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label title="Order dates ending today">Quick range</label>
+                    <div class="sk-chips po-quick" id="quickChips"></div>
+                </div>
+                <div class="filter-group po-grow">
+                    <label>Supplier</label>
+                    <div class="search-select">
+                        <input type="text" id="fSup" placeholder="Filter by supplier name or code..." autocomplete="off">
+                    </div>
+                </div>
+            </div>
+            <div class="po-line2">
+                <div class="filter-group">
+                    <label title="Orders = not received yet. Invoices = received in the warehouse (order closed)">Show</label>
+                    <div class="sk-chips" id="showChips"></div>
+                </div>
+                <!-- Currency and Reset at the right end, under the supplier search (user 20/10/2026) -->
+                <div class="filter-group sp-right">
+                    <label title="Every figure is in SAR; USD at the fixed peg 3.75">Currency</label>
+                    <div class="sk-chips" id="curChips"></div>
+                </div>
+                <div class="filter-group">
+                    <label>&nbsp;</label>
+                    <button type="button" class="po-reset sp-reset" id="resetBtn" title="Reset the filters">&#8635; Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sp-kpis" id="spKpi" style="display:none"></div>
+
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px">
+        <div class="table-header-row">
+            <div><h3><span class="dot"></span> <span id="tableTitle">Payables by supplier and due month</span></h3></div>
+            <div class="table-tools">
+                <span class="mv-loading" id="tableNote">Loading...</span>
+            </div>
+        </div>
+        <div class="sp-ptitle" id="spTitle"></div>
+        <div class="table-scroll">
+            <table id="spTable"></table>
+        </div>
+    </div>
+    <div class="panel po-lv" id="supPanel" style="display:none"></div>
+    <div class="panel po-lv" id="invPanel" style="display:none"></div>
+    <div class="panel po-lv" id="ordPanel" style="display:none"></div>
+    <div class="panel po-lv" id="poPanel" style="display:none"></div>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/supay_supay.compact.js"></script>
+</body></html>

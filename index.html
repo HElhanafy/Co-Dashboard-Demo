@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Co. Dashboard</title>
+<script src="theme/theme.js"></script>
+<link rel="stylesheet" href="theme/THEME.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font:14px var(--f-ui);color:var(--c-ink);background:var(--c-bg);min-height:100vh}
+.top{background:var(--c-grad);color:#fff;padding:42px 16px 70px;text-align:center}
+.top h1{margin:0;font-size:30px;letter-spacing:.5px}.top h1 span{color:var(--c-accent)}.top p{margin:8px 0 0;opacity:.85}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;max-width:980px;margin:-44px auto 0;padding:0 16px 32px}
+.card{background:var(--c-card);border:1px solid var(--c-line);border-radius:12px;padding:20px;text-decoration:none;color:inherit;display:block;position:relative;transition:transform .15s,border-color .15s}
+a.card:hover{transform:translateY(-3px);border-color:var(--c-brand)}
+.ic{width:44px;height:44px;border-radius:10px;background:var(--c-soft);color:var(--c-brand);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.card h2{margin:0 0 6px;font-size:17px}.card p{margin:0;color:var(--c-muted);font-size:13px;line-height:1.5}
+.card .go{margin-top:14px;color:var(--c-brand);font-weight:600;font-size:13px}
+.card.soon{opacity:.6;cursor:default}.card.soon .ic{background:#eef0f4;color:var(--c-muted)}
+.tag{position:absolute;top:14px;right:14px;font-size:11px;padding:3px 9px;border-radius:12px;background:var(--c-accent-soft);border:1px solid var(--c-accent);color:var(--c-ink)}
+.ft{text-align:center;color:var(--c-muted);font-size:12px;padding-bottom:24px}
+.lang{position:absolute;top:16px;right:16px;border:1px solid rgba(255,255,255,.5);background:var(--c-accent);color:#fff;border-radius:999px;padding:5px 16px;font:600 13px var(--f-ui);cursor:pointer}.lang:hover{filter:brightness(1.1)}.top{position:relative}[dir=rtl] .lang{right:auto;left:16px}[dir=rtl] .tag{right:auto;left:14px}[dir=rtl] body,[dir=rtl] .card p{font-size:105%}
+</style></head><body>
+<div class="top"><button type="button" class="lang" id="demoLang">عربي</button><h1>Co.<span>Dashboard</span></h1><p data-ar="نسخة عرض لتقارير الإدارة · اختر مجال النشاط" data-en="Management reports demo · choose your industry">Management reports demo · choose your industry</p></div>
+<div class="grid">
+<a class="card" href="app/home.html" data-ind="medical"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></div>
+<h2 data-ar="الطبي والأدوية" data-en="Medical &amp; Pharma">Medical &amp; Pharma</h2><p data-ar="المستشفيات والصيدليات، أصناف بتشغيلات وتواريخ صلاحية، المبيعات والذمم والمخزون والموردون والحسابات." data-en="Hospitals and pharmacies, items with lots and expiry, sales, receivables, stock, suppliers and accounts.">Hospitals and pharmacies, items with lots and expiry, sales, receivables, stock, suppliers and accounts.</p><div class="go" data-ar="افتح العرض &larr;" data-en="Open demo &rarr;">Open demo &rarr;</div></a>
+<a class="card" href="app/home.html" data-ind="trading"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h18l-2 12H5z"/><path d="M8 7a4 4 0 0 1 8 0"/></svg></div>
+<h2 data-ar="التجارة والتوزيع" data-en="Trading &amp; Distribution">Trading &amp; Distribution</h2><p data-ar="تجار التجزئة والموزعون، بضائع بالفئات، المبيعات والذمم والمخزون والمشتريات والحسابات." data-en="Retailers and distributors, goods by category, sales, receivables, stock, purchasing and accounts.">Retailers and distributors, goods by category, sales, receivables, stock, purchasing and accounts.</p><div class="go" data-ar="افتح العرض &larr;" data-en="Open demo &rarr;">Open demo &rarr;</div></a>
+<div class="card soon"><span class="tag" data-ar="قريباً" data-en="Coming soon">Coming soon</span><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="13" height="9"/><path d="M15 10h4l3 3v3h-7"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg></div>
+<h2 data-ar="النقل والخدمات اللوجستية" data-en="Transport &amp; Logistics">Transport &amp; Logistics</h2><p data-ar="الرحلات والأسطول وربحية الخدمات." data-en="Trips, fleet and service profitability.">Trips, fleet and service profitability.</p></div>
+<div class="card soon"><span class="tag" data-ar="قريباً" data-en="Coming soon">Coming soon</span><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V10l7-5 7 5v11M10 21v-6h4v6"/></svg></div>
+<h2 data-ar="المقاولات" data-en="Contracting">Contracting</h2><p data-ar="المشاريع والمستخلصات والمواد." data-en="Projects, progress billing and materials.">Projects, progress billing and materials.</p></div>
+</div>
+<div class="ft" data-ar="كل الأسماء والأرقام وهمية." data-en="All names and figures are fictitious.">All names and figures are fictitious.</div>
+<script>
+(function(){var a=document.querySelectorAll('a.card');for(var i=0;i<a.length;i++)a[i].onclick=function(){try{localStorage.setItem('demoIndustry',this.getAttribute('data-ind'))}catch(e){}}})();
+(function(){var L="EN";try{L=localStorage.getItem("demoLang")==="AR"?"AR":"EN"}catch(e){}function set(l){var d=document.documentElement,e=document.querySelectorAll("[data-ar]"),i;d.setAttribute("dir",l==="AR"?"rtl":"ltr");d.setAttribute("lang",l==="AR"?"ar":"en");for(i=0;i<e.length;i++)e[i].innerHTML=e[i].getAttribute(l==="AR"?"data-ar":"data-en");document.getElementById("demoLang").textContent=l==="AR"?"English":"عربي";L=l}set(L);document.getElementById("demoLang").onclick=function(){var l=L==="AR"?"EN":"AR";try{localStorage.setItem("demoLang",l)}catch(e){}set(l)}})();
+</script></body></html>

@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Financial Statements - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_fs.js"></script>
+</head>
+<body data-alias="FS">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<style>
+:root, html[data-theme="light"] {
+--bg: #f7f8fb;
+--amber: var(--warn);
+--slate: #4a6fa5;
+--shadow: 0 4px 14px rgba(26, 31, 54, 0.06);
+}
+#co-home-wrapper {
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+background-color: var(--bg);
+background-image:
+radial-gradient(circle at 10% 90%, var(--navy-a06), transparent 30%),
+radial-gradient(circle at 90% 10%, rgba(34,184,207,0.03), transparent 30%);
+color: var(--text);
+display: flex;
+flex-direction: column;
+min-height: 100vh;
+margin: 0;
+padding: 0;
+}
+.home-main {
+flex-grow: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 20px;
+margin-top: 6vh;
+animation: homeFadeIn 0.5s ease both;
+}
+@keyframes homeFadeIn {
+from { opacity: 0; transform: translateY(12px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+.welcome-text {
+text-align: center;
+margin-bottom: 44px;
+}
+.welcome-greet {
+font-family: 'Segoe UI', 'Tahoma', sans-serif;
+font-size: 17px;
+font-weight: 300;
+letter-spacing: 0.5px;
+color: var(--muted);
+margin: 0 0 2px 0;
+}
+.welcome-name {
+font-family: 'Segoe UI', 'Tahoma', sans-serif;
+font-size: 34px;
+font-weight: 500;
+letter-spacing: 0.2px;
+color: var(--text);
+margin: 0 0 12px 0;
+line-height: 1.2;
+}
+.welcome-text p {
+font-size: 14px;
+font-weight: 300;
+color: var(--muted);
+margin: 0;
+letter-spacing: 0.2px;
+}
+.section-label {
+width: 100%;
+max-width: 980px;
+font-size: 12px;
+font-weight: 700;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(--muted);
+margin: 0 0 14px 4px;
+display: flex;
+align-items: center;
+gap: 12px;
+}
+.section-label::after {
+content: '';
+flex: 1;
+height: 1px;
+background: var(--border);
+}
+.cards-grid + .section-label {
+margin-top: 36px;
+}
+.cards-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+gap: 18px;
+width: 100%;
+max-width: 980px;
+}
+.hub-card {
+position: relative;
+background: var(--panel);
+border: 1px solid var(--border);
+border-radius: 14px;
+padding: 20px 22px;
+text-decoration: none;
+display: flex;
+flex-direction: row;
+align-items: center;
+gap: 16px;
+box-shadow: var(--shadow);
+transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+cursor: pointer;
+overflow: hidden;
+animation: homeFadeIn 0.5s ease both;
+}
+.hub-card:nth-child(2) { animation-delay: 0.06s; }
+.hub-card:nth-child(3) { animation-delay: 0.12s; }
+.hub-card:nth-child(4) { animation-delay: 0.18s; }
+.hub-card:nth-child(5) { animation-delay: 0.24s; }
+.hub-card:nth-child(6) { animation-delay: 0.30s; }
+.hub-card:hover {
+transform: translateY(-4px);
+}
+.card-icon {
+width: 50px;
+height: 50px;
+border-radius: 12px;
+display: flex;
+align-items: center;
+justify-content: center;
+transition: 0.3s ease;
+flex-shrink: 0;
+}
+.card-body {
+flex: 1;
+min-width: 0;
+}
+.card-title {
+font-family: 'Segoe UI', 'Tahoma', sans-serif;
+font-size: 16px;
+font-weight: 500;
+color: var(--text);
+margin: 0 0 3px 0;
+}
+.card-desc {
+font-size: 12.5px;
+color: var(--muted);
+margin: 0;
+line-height: 1.4;
+}
+.card-arrow {
+color: var(--muted);
+opacity: 0;
+transform: translateX(-6px);
+transition: opacity 0.2s ease, transform 0.2s ease;
+flex-shrink: 0;
+}
+.hub-card:hover .card-arrow {
+opacity: 1;
+transform: translateX(0);
+}
+.card-navy { border-left: 4px solid var(--co-navy); }
+.card-navy .card-icon { background: var(--navy-a12); color: var(--co-navy); }
+.card-navy:hover { border-color: var(--co-navy); box-shadow: 0 10px 28px var(--navy-a25); }
+.card-navy:hover .card-icon { background: var(--co-navy); color: #fff; transform: scale(1.05) rotate(-4deg); }
+.card-navy:hover .card-arrow { color: var(--co-navy); }
+.card-pink { border-left: 4px solid var(--co-pink); }
+.card-pink .card-icon { background: rgba(34,184,207,0.10); color: var(--co-pink); }
+.card-pink:hover { border-color: var(--co-pink); box-shadow: 0 10px 28px rgba(34,184,207,0.18); }
+.card-pink:hover .card-icon { background: var(--co-pink); color: #fff; transform: scale(1.05) rotate(4deg); }
+.card-pink:hover .card-arrow { color: var(--co-pink); }
+.card-purple { border-left: 4px solid var(--purple); }
+.card-purple .card-icon { background: rgba(123, 79, 176, 0.12); color: var(--purple); }
+.card-purple:hover { border-color: var(--purple); box-shadow: 0 10px 28px rgba(123, 79, 176, 0.20); }
+.card-purple:hover .card-icon { background: var(--purple); color: #fff; transform: scale(1.05); }
+.card-purple:hover .card-arrow { color: var(--purple); }
+.card-amber { border-left: 4px solid var(--amber); }
+.card-amber .card-icon { background: rgba(181, 118, 42, 0.12); color: var(--amber); }
+.card-amber:hover { border-color: var(--amber); box-shadow: 0 10px 28px rgba(181, 118, 42, 0.20); }
+.card-amber:hover .card-icon { background: var(--amber); color: #fff; transform: scale(1.05); }
+.card-amber:hover .card-arrow { color: var(--amber); }
+.card-slate { border-left: 4px solid var(--slate); }
+.card-slate .card-icon { background: rgba(74, 111, 165, 0.12); color: var(--slate); }
+.card-slate:hover { border-color: var(--slate); box-shadow: 0 10px 28px rgba(74, 111, 165, 0.20); }
+.card-slate:hover .card-icon { background: var(--slate); color: #fff; transform: scale(1.05); }
+.card-slate:hover .card-arrow { color: var(--slate); }
+@media (max-width: 640px) {
+.home-main { margin-top: 3vh; }
+.welcome-name { font-size: 26px; }
+.cards-grid { grid-template-columns: 1fr; }
+}
+.card-title { margin: 0 0 2px 0; }
+.card-desc {
+direction: rtl;
+text-align: right;
+font-family: 'Segoe UI', 'Tahoma', sans-serif;
+font-size: 13.5px;
+font-weight: 600;
+color: var(--co-navy);
+opacity: 0.72;
+line-height: 1.5;
+white-space: nowrap;
+}
+.hub-card.is-soon .card-desc { color: #8a90b8; opacity: 1; }
+.fs-board-back {
+display: inline-flex; align-items: center; gap: 6px;
+margin-bottom: 18px;
+padding: 7px 13px;
+border: 1px solid var(--border, var(--border));
+border-radius: 8px;
+color: var(--muted);
+font-size: 13px;
+font-weight: 600;
+text-decoration: none;
+transition: .2s;
+}
+.fs-board-back:hover {
+border-color: var(--co-pink);
+color: var(--co-pink);
+text-decoration: none;
+}
+.hub-card.is-soon {
+cursor: default;
+opacity: 0.55;
+border-left-color: #c6cae4;
+}
+.hub-card.is-soon:hover {
+transform: none;
+box-shadow: none;
+border-color: var(--border);
+border-left-color: #c6cae4;
+}
+.hub-card.is-soon .card-icon { background: #eef0f7; color: #9aa0bd; }
+.hub-card.is-soon:hover .card-icon { background: #eef0f7; color: #9aa0bd; transform: none; }
+.hub-card.is-soon .card-arrow { display: none; }
+.soon-tag {
+margin-left: 8px;
+padding: 2px 7px;
+border-radius: 20px;
+background: #eef0f7;
+color: #8a90b8;
+font-size: 9.5px;
+font-weight: 700;
+letter-spacing: .05em;
+vertical-align: middle;
+}
+
+</style>
+<!-- FS_HUB.HTML - demo copy of the markup region FS HUB prints (HUB PAGE/FS_HUB_SQL.sql, access granted) -->
+<div id="co-home-wrapper">
+<main class="home-main">
+  <a href="home.html" class="fs-board-back"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Home</a>
+  <div class="welcome-text">
+    <div class="welcome-greet">Finance Module</div>
+    <h2 class="welcome-name">Financial Statements</h2>
+    <p>Audited layout, live from the general ledger. Select a statement to open it with its own filters and drill-down.</p>
+  </div>
+  <div class="section-label">Statements</div>
+  <div class="cards-grid">
+<a href="fsis.html" class="hub-card card-navy">
+  <div class="card-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+  </div>
+  <div class="card-body">
+    <h3 class="card-title">Income Statement</h3>
+    <p class="card-desc">قائمة الدخل</p>
+  </div>
+  <div class="card-arrow">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </div>
+</a>
+<a href="fsbs.html" class="hub-card card-pink">
+  <div class="card-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><rect x="7" y="9" width="4" height="8"></rect><rect x="14" y="5" width="4" height="12"></rect></svg>
+  </div>
+  <div class="card-body">
+    <h3 class="card-title">Balance Sheet</h3>
+    <p class="card-desc">قائمة المركز المالي</p>
+  </div>
+  <div class="card-arrow">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </div>
+</a>
+<div class="hub-card is-soon card-purple">
+  <div class="card-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+  </div>
+  <div class="card-body">
+    <h3 class="card-title">Cash Flow<span class="soon-tag">SOON</span></h3>
+    <p class="card-desc">قائمة التدفقات النقدية</p>
+  </div>
+  <div class="card-arrow">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </div>
+</div>
+<div class="hub-card is-soon card-amber">
+  <div class="card-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+  </div>
+  <div class="card-body">
+    <h3 class="card-title">Changes in Equity<span class="soon-tag">SOON</span></h3>
+    <p class="card-desc">قائمة التغيرات في حقوق الملكية</p>
+  </div>
+  <div class="card-arrow">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+  </div>
+</div>
+  </div>
+</main>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+</body></html>

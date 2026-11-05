@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Price List - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/prices_prices.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_prices.js"></script>
+<script src="js/prices_prices_xlsx.compact.js"></script>
+</head>
+<body data-alias="PRICES">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- PRICES.HTML - Region Static Content Seq 20 (Blank with Attributes), page PRICES: header, filters (STOCK shape) with the view switch Default unit / All units / Changes, table - 15/09/2026 -->
+<div class="wrap">
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">P</div>
+            <div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <h1>Price List</h1>
+                    <div class="period-badge" id="periodBadge">Loading...</div>
+                </div>
+                <div class="subtitle">Retail sale price of every item, by its default unit or by every unit, with the last price change; the Changes view lists every price change in a period</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="actions-row">
+                <!-- Export (Excel . PDF): the shared control window.jmExport drawn by PRICES.JS (page 0 regions, SHARED_UI = Y); without it the two old buttons are drawn - 20/10/2026 -->
+                <span id="exportBox"></span>
+            </div>
+            <div class="asof-line" id="asOfLine"></div>
+        </div>
+    </div>
+
+    <!-- Filters (20/10/2026, STOCK pattern): the card spans the table width; main block = row 1 class (STVAL picker) + the period and Run (Changes view only),
+         row 2 the item search, row 3 the Show chips; a fixed side box beside it holds the view switch and Reset as equal stacked buttons -->
+    <div class="sk-filters">
+        <div class="sk-top">
+            <div class="sk-main">
+                <div class="sk-row1 sk-bar">
+                    <div class="filter-group sk-class">
+                        <label>Item Class</label>
+                        <div class="cls-pick" id="clsPick">
+                            <button type="button" class="cls-btn" id="fClassBtn" title="Choose a class"><span id="fClassLbl">All Classes</span><i>&#9662;</i></button>
+                            <select id="fClass" class="cls-sel"><option value="">All Classes</option></select>
+                            <div class="ss-menu" id="fClassMenu"><input type="text" id="fClassQ" placeholder="Type to filter the classes..." autocomplete="off"><div id="fClassList"></div></div>
+                        </div>
+                    </div>
+                    <!-- period: Changes view only -->
+                    <div class="filter-group pl-period" id="fromGroup" style="display:none">
+                        <label>Changes From</label>
+                        <div class="sk-step"><input type="date" id="fFrom"></div>
+                    </div>
+                    <div class="filter-group pl-period" id="toGroup" style="display:none">
+                        <label>Changes To (inclusive)</label>
+                        <div class="sk-step"><input type="date" id="fTo"></div>
+                    </div>
+                    <div class="filter-group pl-period" id="runGroup" style="display:none">
+                        <button type="button" class="btn-run" id="runBtn" title="Load the price changes of the period">&#9654; Run</button>
+                    </div>
+                </div>
+                <div class="sk-row2">
+                    <div class="filter-group sk-grow">
+                        <label>Item</label>
+                        <div class="search-select">
+                            <input type="text" id="fItem" placeholder="Type a code or part of the name - pick from the list or keep typing to filter..." autocomplete="off">
+                            <button type="button" class="clear-btn" id="fItemClr" style="display:none">&times;</button>
+                            <div class="ss-menu" id="itemMenu" style="display:none"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sk-line">
+                    <span class="sk-lbl" title="Narrow the list">Show</span>
+                    <div class="sk-chips" id="showChips"></div>
+                </div>
+            </div>
+            <div class="sk-side">
+                <label>View</label>
+                <!-- equal stacked buttons (STOCK pattern 20/10/2026): Default unit . All units . Changes, then Reset -->
+                <div class="ic-seg ic-stack" id="viewSeg">
+                    <button type="button" class="on" data-v="def" title="One row per item: the price of its default unit">Default unit</button>
+                    <button type="button" data-v="all" title="One row per unit of every item">All units</button>
+                    <button type="button" data-v="log" title="Every price change in a period, newest first">Changes</button>
+                </div>
+                <button type="button" class="sk-reset" id="resetBtn" title="Clear all filters">&#8635; Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">Price List</span></h3>
+            </div>
+            <div class="table-tools">
+                <button type="button" class="btn-view" id="toggleAllBtn" title="Collapse or expand all class groups">Collapse all</button>
+            </div>
+        </div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll">
+            <table>
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="panel-note" id="tableNote"></div>
+    </div>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("prices")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/prices_prices.compact.js"></script>
+</body></html>

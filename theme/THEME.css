@@ -1,0 +1,18 @@
+/* THEME.css - Co. Dashboard demo colour tokens; change a palette here only (24/10/2026) */
+[data-palette="ocean"]{--c-brand:#0f4c81;--c-brand-2:#1b6fae;--c-accent:#00a3a3}
+[data-palette="slate"]{--c-brand:#243b53;--c-brand-2:#3e5c76;--c-accent:#e8a33d}
+[data-palette="plum"]{--c-brand:#3b2a6b;--c-brand-2:#5a3f9e;--c-accent:#ef6f5e}
+[data-palette="forest"]{--c-brand:#1d4d3a;--c-brand-2:#2f6f55;--c-accent:#c9a227}
+:root,[data-palette="midnight"]{--c-brand:#111c3a;--c-brand-2:#26386b;--c-accent:#22b8cf}
+[data-palette="burgundy"]{--c-brand:#5c1f2e;--c-brand-2:#80304a;--c-accent:#d4a373}
+[data-palette="graphite"]{--c-brand:#2b2f36;--c-brand-2:#4a5160;--c-accent:#7cb342}
+[data-palette="royal"]{--c-brand:#1e3a8a;--c-brand-2:#2f55c4;--c-accent:#f97316}
+[data-palette="teal"]{--c-brand:#0b5d5e;--c-brand-2:#14807f;--c-accent:#e85d75}
+:root{
+--c-ink:#1a1f36;--c-muted:#6f7590;--c-line:#dde1ec;--c-bg:#f7f8fb;--c-card:#fff;
+--c-pos:#1e7a45;--c-neg:#b4232f;--c-warn:#a8590a;
+--c-soft:color-mix(in srgb,var(--c-brand) 9%,#fff);
+--c-soft-2:color-mix(in srgb,var(--c-brand) 22%,#fff);
+--c-accent-soft:color-mix(in srgb,var(--c-accent) 14%,#fff);
+--c-grad:linear-gradient(120deg,var(--c-brand),var(--c-brand-2));
+--f-ui:"Segoe UI",Tahoma,Arial,sans-serif}

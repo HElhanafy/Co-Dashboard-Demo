@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Income Statement - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/fsis_fs_core.compact.part1.css">
+<link rel="stylesheet" href="css/fsis_fs_core.compact.part2.css">
+<link rel="stylesheet" href="css/fsis_income_statement.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_fsis.js"></script>
+<script src="../shim/srv_fs.js"></script>
+<script src="js/fsis_fs_core.fg.compact.js"></script>
+</head>
+<body data-alias="FSIS">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- FS_CORE.HTML - the shell of the financial statement pages (page 0 region FS CORE HTML, condition: page in FSIS / FSBS / FSCF / FSEQ): header with Print Dashboard,
+     KPI cards, period filters, the statement's own filters slot, scope line, table panel with the shared Export control; FS_CORE.JS fills it from the registered statement - 15/10/2026 -->
+<div class="wrap">
+    <!-- Header -->
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark" id="dashMark">F</div>
+            <div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <h1 id="dashTitle">Financial Statements</h1>
+                    <div class="period-badge" id="periodBadge">Loading...</div>
+                </div>
+                <div class="subtitle" id="dashSub">&nbsp;</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="actions-row">
+                <!-- Refresh Data: injected here by SIDEBAR.JS (unified button, DASH_REFRESH_JOBS row per page) since 11/09/2026 -->
+                <button type="button" class="btn-print" id="printDashBtn" title="Print the full statement">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Print Dashboard
+                </button>
+                <a href="fs.html" class="btn-hub" title="Back to the financial statements board">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Statements
+                </a>
+            </div>
+            <div class="asof-line" id="asOfLine"></div>
+        </div>
+    </div>
+
+    <!-- KPI cards: built by the core from cfg.kpis of the registered statement -->
+    <div class="kpi-row" id="kpiRow"></div>
+
+    <!-- Filters row 1: period panel (core) -->
+    <div class="filters-row1">
+        <div class="filters fs-period">
+            <div class="filter-group">
+                <label>Year From</label>
+                <select id="fYF"></select>
+            </div>
+            <div class="filter-group">
+                <label>Year To</label>
+                <select id="fYT"></select>
+            </div>
+            <div class="filter-group">
+                <label>Month From</label>
+                <select id="fMF"></select>
+            </div>
+            <div class="filter-group">
+                <label>Month To</label>
+                <select id="fMT"></select>
+            </div>
+            <div class="filter-group">
+                <label>Comparison <span class="lbl-hint">(columns)</span></label>
+                <select id="fCmp"></select>
+            </div>
+            <div class="filter-group filter-reset">
+                <label>&nbsp;</label>
+                <button type="button" class="btn-reset" id="resetBtn">Reset</button>
+            </div>
+        </div>
+        <!-- optional card beside the period panel: the statement fills it
+             (system-type filter on the reconciliation page, for example) -->
+        <div id="fsFilterCard"></div>
+    </div>
+
+    <!-- Filters row 2: filled by the statement (empty for the balance sheet) -->
+    <div id="fsExtraFilters"></div>
+
+    <!-- Extra panels the statement may need (reconciliation card, ...) -->
+    <div id="fsExtraPanel"></div>
+
+    <!-- Scope strip -->
+    <div class="scope-bar" id="scopeBar"></div>
+
+    <!-- Statement / drill table -->
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">&nbsp;</span></h3>
+                <div class="panel-sub" id="tableSub"></div>
+            </div>
+            <div class="table-tools">
+                <button type="button" class="btn-back" id="backBtn" style="display:none">&#8592; Back</button>
+                <!-- Export (Excel . PDF): drawn by the shared control window.jmExport from FS_CORE.JS -->
+                <span id="exportBox"></span>
+            </div>
+        </div>
+        <div class="crumb-row">
+            <div class="crumbs" id="crumbs"></div>
+        </div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll">
+            <table id="fsTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="panel-note" id="fsNote"></div>
+    </div>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("fsis")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/fsis_fs_core.compact.js"></script>
+<script src="js/fsis_income_statement.compact.js"></script>
+</body></html>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profit Analysis - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/profit_profit.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_profit.js"></script>
+<script src="js/profit_profit.fg.compact.js"></script>
+</head>
+<body data-alias="PROFIT">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- PROFIT.HTML - region of page PROFIT in the SALES look (PROFIT_PREVIEW.html): one year, no Columns switch, chart panel, shared Export control - 30/09/2026 -->
+<div class="wrap">
+    <!-- Header -->
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">P</div>
+            <div>
+                <div style="display:flex; align-items:center; gap: 12px; flex-wrap: wrap;">
+                    <h1>Profitability Analysis</h1>
+                    <div class="period-badge" id="periodBadge">Loading...</div>
+                </div>
+                <div class="subtitle">Margin performance by Division, Area, Salesman, Customer and Item</div>
+            </div>
+        </div>
+        <div class="header-actions">
+          <div class="actions-row">
+            <!-- no Refresh button any more: frozen months + the live current month from the shared archive (30/09/2026) -->
+            <button type="button" class="btn-print" id="printDashBtn" title="Print the full dashboard">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Print Dashboard
+            </button>
+            <a href="home.html" class="btn-reset" style="text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 13px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Home
+            </a>
+          </div>
+          <div class="asof-line fresh" id="asOfLine">Live data</div>
+        </div>
+    </div>
+
+    <!-- Filters Bar: one year, months from-to, customer jump (dimensions are handled by drill navigation) -->
+    <div class="filters">
+        <div class="filter-group filter-year">
+            <label>Year</label>
+            <select id="filterYear"></select>
+        </div>
+        <div class="filter-group">
+            <label>Months</label>
+            <div class="rng"><select id="filterMonthFrom"></select><span>to</span><select id="filterMonthTo"></select></div>
+        </div>
+        <div class="filter-group filter-cust">
+            <label>Customer Jump <span class="lbl-hint">(type 2+ chars)</span></label>
+            <div class="search-select" id="custBox">
+                <input type="text" id="custInput" placeholder="Search customer..." autocomplete="off">
+                <button type="button" class="clear-btn" id="custClear" title="Clear" style="display:none;">&times;</button>
+                <div class="ss-menu" id="custMenu"></div>
+            </div>
+        </div>
+        <div class="filter-group filter-reset">
+            <label>&nbsp;</label>
+            <button type="button" class="btn-reset" id="resetBtn">Reset</button>
+        </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-row" id="kpiContainer">
+        <!-- Dynamic KPIs injected by PROFIT.JS -->
+    </div>
+
+    <!-- Chart: net sales, cost and gross profit per month of the scope, margin under the month (profitChart in Function and Global) -->
+    <div class="chart-panel" id="chartPanel">
+        <div class="ch-head"><h4 id="chTitle">Net sales, cost and gross profit by month</h4><div class="ch-legend" id="chLegend"></div></div>
+        <svg id="chSvg" viewBox="0 0 1100 200" preserveAspectRatio="none"></svg>
+    </div>
+
+    <!-- Detail Table Panel -->
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px;">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">Profitability Breakdown</span></h3>
+                <div class="panel-sub" id="tableSub">Ranked by gross profit</div>
+            </div>
+            <div class="table-tools">
+                <!-- Drill capsules (rebuilt by JS per drill scope) -->
+                <div class="level-tabs" id="levelTabs">
+                    <button type="button" class="lvl-btn active" data-level="DEPT">Division</button>
+                    <button type="button" class="lvl-btn" data-level="AREA">Area</button>
+                    <button type="button" class="lvl-btn" data-level="SUP">Supervisor</button>
+                    <button type="button" class="lvl-btn" data-level="CLASS">Class</button>
+                </div>
+                <button type="button" class="btn-back" id="backBtn" style="display:none">&#8592; Back</button>
+                <!-- Export (Excel . PDF): drawn by the shared control window.jmExport from PROFIT.JS -->
+                <span id="exportBox"></span>
+            </div>
+        </div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll">
+            <table>
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div id="tableLoader" class="table-loader" style="display:none;">Loading detail data...</div>
+    </div>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("profit")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/profit_profit.compact.js"></script>
+</body></html>

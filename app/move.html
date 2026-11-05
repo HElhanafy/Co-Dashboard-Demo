@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Item Movement - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/move_move.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_move.js"></script>
+<script src="js/move_move.fg.compact.js"></script>
+</head>
+<body data-alias="MOVE">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<div class="wrap">
+<div class="dash-header">
+<div class="brand">
+<div class="mark">M</div>
+<div>
+<div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+<h1>Item Movement Analysis</h1>
+<div class="mv-hdrcol">
+<div class="vw-seg mv-mode" id="mvMode" style="display:none">
+<button type="button" class="vw-b on" data-m="q">Quantity</button>
+<button type="button" class="vw-b" data-m="c">Cost</button>
+</div>
+<div class="period-badge" id="periodBadge">Loading...</div>
+</div>
+</div>
+</div>
+</div>
+<div class="header-actions">
+<div class="actions-row">
+<span id="exportBox"></span>
+<button type="button" class="btn-print btn-excel" id="excelBtn" style="display:none" title="Export the current table to Excel">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+<polyline points="14 2 14 8 20 8"></polyline>
+<line x1="9" y1="13" x2="15" y2="19"></line>
+<line x1="15" y1="13" x2="9" y2="19"></line>
+</svg>
+Export Excel
+</button>
+<button type="button" class="btn-print" id="printTableBtn" style="display:none" title="Print or save as PDF">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<polyline points="6 9 6 2 18 2 18 9"></polyline>
+<path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+<rect x="6" y="14" width="12" height="8"></rect>
+</svg>
+Print / PDF
+</button>
+</div>
+<div class="asof-line" id="asOfLine"></div>
+</div>
+</div>
+<div class="sk-filters mv-filters" id="mvQtyFilters">
+<div class="mv-top">
+<div class="mv-main">
+<div class="mv-r1">
+<div class="filter-group">
+<label>Period</label>
+<div class="mv-period">
+<input type="date" id="fFrom" title="Start of the period">
+<span class="mv-sep">&#8211;</span>
+<span class="mv-to" id="fTo" title="The report always ends today (last movements load), so the balance equation holds"></span>
+</div>
+</div>
+<div class="filter-group">
+<label>Quick range</label>
+<div class="sk-chips mv-quick" id="quickChips"></div>
+</div>
+<div class="filter-group">
+<label>Item Class</label>
+<div class="cls-pick" id="clsPick">
+<button type="button" class="cls-btn" id="fClassBtn" title="Choose a class"><span id="fClassLbl">All Classes</span><i>&#9662;</i></button>
+<select id="fClass" class="cls-sel"><option value="">All Classes</option></select>
+<div class="ss-menu" id="fClassMenu"><input type="text" id="fClassQ" placeholder="Type to filter the classes..." autocomplete="off"><div id="fClassList"></div></div>
+</div>
+</div>
+<button type="button" class="sk-reset" id="resetBtn" title="Clear all filters">&#8635; Reset</button>
+</div>
+<div class="mv-r1b">
+<div class="filter-group">
+<label>Item</label>
+<div class="search-select">
+<input type="text" id="fItem" placeholder="Code or name..." autocomplete="off">
+<button type="button" class="clear-btn" id="fItemClr" style="display:none">&times;</button>
+<div class="ss-menu" id="itemMenu" style="display:none"></div>
+</div>
+</div>
+<div class="filter-group">
+<label>Customer</label>
+<div class="search-select">
+<input type="text" id="fCust" placeholder="Code or name..." autocomplete="off">
+<button type="button" class="clear-btn" id="fCustClr" style="display:none">&times;</button>
+<div class="ss-menu" id="custMenu" style="display:none"></div>
+</div>
+</div>
+</div>
+<div class="mv-r2">
+<span class="sk-lbl" title="Company, or one branch: sales by the customer area on the invoice, stock by the branch warehouses">Scope</span>
+<div class="sk-chips" id="scopeChips"></div>
+<div class="mv-x"><div class="sk-chips sk-sut" id="sutChips" title="Hide the surgical suture classes from the table, Excel and print"></div>
+<div class="sk-chips" id="rvChips" title="Only the orders marked with a pink dot: intermittent items or a capped one-off month - check them before ordering"></div></div><span></span>
+<button type="button" class="mv-more" id="moreBtn" title="Pattern, dead stock and expiry filters">More filters</button>
+</div>
+</div>
+</div>
+<div class="mv-r2 mv-r3" id="patLine" style="display:none">
+<span class="sk-lbl" title="Movement pattern over the last 12 months (one at a time, click again to clear)">Pattern</span>
+<div class="sk-chips sk-pat" id="patChips"></div>
+<span class="sk-lbl" title="Items with no sale in the last 1, 3 or 6 months, counted from today">Dead stock</span>
+<div class="mv-dual">
+<div class="sk-chips sk-dead" id="deadChips"></div>
+<span class="sk-lbl" title="Only items with stock expiring within 90 days, and show that column">Expiry</span>
+<div class="sk-chips sk-exp" id="expChips"></div>
+</div>
+<span></span>
+</div>
+<div class="mv-active" id="activeLine" style="display:none"></div>
+</div>
+<div class="sk-filters mv-filters mv-cost" id="mvCostFilters" style="display:none">
+<div class="mv-r1">
+<div class="filter-group">
+<label>Period</label>
+<div class="mv-period">
+<input type="date" id="mvcFrom" title="Start of the period (values before it = opening)">
+<span class="mv-sep">&#8211;</span>
+<input type="date" id="mvcTo" title="End of the period, any date up to today: pick a posted month end to compare with the ledger">
+</div>
+</div>
+<div class="filter-group">
+<label>Quick range</label>
+<div class="sk-chips mv-quick" id="mvcQuick"></div>
+</div>
+<div class="filter-group">
+<label>Item Class</label>
+<select id="mvcClass"><option value="">All Classes</option></select>
+</div>
+<button type="button" class="sk-reset" id="mvcReset" title="Month to date, Company, all classes">&#8635; Reset</button>
+</div>
+<div class="mv-r2">
+<span class="sk-lbl" title="Company, or one branch: stock and purchases by the branch warehouses, sales by the customer area on the invoice">Scope</span>
+<div class="sk-chips" id="mvcScope"></div>
+<span></span>
+</div>
+</div>
+<div class="cv-strip" id="mvCostStrip" style="display:none"></div>
+<div class="panel" id="mvCostPanel" style="display:none;margin-bottom:16px">
+<div class="table-header-row">
+<div>
+<h3><span class="dot"></span> <span class="mv-path" id="mvcTitle">Item Movement &mdash; Cost</span></h3>
+</div>
+<div class="table-tools">
+<span class="mv-loading" id="mvcNote" style="display:none">Loading...</span>
+<span class="cv-note" id="mvcHint">click a class to open its items</span>
+<button type="button" class="btn-back" id="mvcBack" style="display:none">&#8592; Back</button>
+</div>
+</div>
+<div class="print-filters" id="mvcPF"></div>
+<div class="table-scroll">
+<table>
+<thead id="mvcHead"></thead>
+<tbody id="mvcBody"></tbody>
+</table>
+</div>
+</div>
+<style>
+.dash-header { overflow: visible; }
+.dash-header::before { border-radius: 14px; }
+.mv-hdrcol { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.mv-mode .vw-b { height: 38px; padding: 0 18px; font-size: 13px; font-weight: 600; }
+.mv-mode .vw-b[data-m=c].on, .mv-mode .vw-b[data-m=c].on:hover { background: var(--pink); color: #fff; }
+.mv-mode .vw-b[data-m=c]:not(.on):hover { color: var(--pink); }
+.mv-hdrcol .period-badge { min-height: 30px; display: inline-flex; align-items: center; box-sizing: border-box; }
+#mvcQuick .sk-chip[data-k="3M"].on { background: var(--purple); border-color: var(--purple); }
+#mvcQuick .sk-chip[data-k="6M"].on { background: #1a8f8a; border-color: #1a8f8a; }
+#mvcQuick .sk-chip[data-k="YTD"].on { background: var(--pink); border-color: var(--pink); }
+#mvcQuick .sk-chip[data-k="12M"].on { background: var(--good); border-color: var(--good); }
+#mvcScope .sk-chip[data-k="CEN"].on { background: var(--pink); border-color: var(--pink); }
+#mvcScope .sk-chip[data-k="DHB"].on { background: var(--purple); border-color: var(--purple); }
+#mvcScope .sk-chip[data-k="WST"].on { background: var(--good); border-color: var(--good); }
+#mvcScope .sk-chip[data-k="EST"].on { background: var(--warn); border-color: var(--warn); }
+#mvcScope .sk-chip[data-k="NTH"].on { background: #1a8f8a; border-color: #1a8f8a; }
+#mvcQuick .sk-chip.on .ck:hover, #mvcScope .sk-chip.on .ck:hover { color: #fff; }
+.mv-cost .mv-r1 { grid-template-columns: 340px auto 250px 1fr; }
+#mvCostFilters .filter-group label { font-size: 10.5px; color: var(--navy); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+body.mv-cost .mv-filters:not(.mv-cost), body.mv-cost #printTablePanel, body.mv-cost #drillPanel { display: none !important; }
+#mvCostPanel thead th { color: var(--navy); font-weight: 700; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+padding: 10px 12px; background: #e7e8eb; border-bottom: 1px solid rgba(17,28,58,0.25); cursor: default; white-space: nowrap; line-height: 1.25; }
+#mvCostPanel thead th:hover { color: var(--navy); }
+#mvCostPanel thead th.num { font-family: inherit; font-size: 10.5px; font-weight: 700; }
+#mvCostPanel tbody td { padding: 9px 12px; }
+#mvCostPanel tbody tr:nth-child(even) { background: #fafbfe; }
+#mvCostPanel .num { font-family: var(--font-head); font-weight: 500; font-size: 12.5px; font-variant-numeric: tabular-nums; }
+#mvCostPanel tbody tr.total-row td { font-weight: 700; background: rgba(17,28,58,0.06) !important; border-top: 2px solid var(--pink); }
+.mv-path { font: 500 13px var(--font-body); color: var(--muted); display: inline-flex; align-items: center; gap: 8px; }
+.mv-path b { color: var(--navy); font-weight: 600; }
+.mv-path .sep { color: var(--navy-dim); }
+.mv-path a { color: var(--navy); cursor: pointer; text-decoration: none; }
+.mv-path a:hover { text-decoration: underline; }
+.cv-note { font: 400 12px var(--font-body); color: var(--muted); }
+#mvCostPanel td.cls { font-weight: 600; color: var(--navy); cursor: pointer; white-space: nowrap; }
+#mvCostPanel td.cls:hover { text-decoration: underline; }
+#mvCostPanel td.cd { font-family: Consolas, monospace; font-size: 12.5px; white-space: nowrap; }
+#mvCostPanel td.dsc { max-width: 420px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#mvCostPanel td.neg { color: var(--bad); }
+#mvCostPanel td.pos { color: #1b8a5a; }
+#mvCostPanel tr.res td { color: var(--muted); font-style: italic; }
+.cv-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 14px; }
+.cv-box { border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; background: var(--panel); }
+.cv-box .l { font: 600 11px var(--font-body); letter-spacing: .4px; text-transform: uppercase; color: var(--muted); }
+.cv-box .v { font: 600 20px var(--font-head); color: var(--navy); margin-top: 4px; }
+.cv-box .s { font: 400 12px var(--font-body); color: var(--muted); margin-top: 3px; }
+.cv-box.op { border-top: 4px solid var(--navy); }
+.cv-box.pu { border-top: 4px solid var(--purple); }
+.cv-box.sa { border-top: 4px solid var(--pink); }
+.cv-box.cl { border-top: 4px solid #1b8a5a; }
+@media (max-width: 1100px) { .cv-strip { grid-template-columns: 1fr 1fr; } .mv-cost .mv-r1 { grid-template-columns: 1fr 1fr; } }
+@media print {
+body.mv-pcost .wrap > #printTablePanel, #mvcBack, #mvcHint, #mvcNote { display: none !important; }
+body.print-mode-table, body.print-mode-table #t_PageBody, body.print-mode-table .t-Body, body.print-mode-table .t-Body-main, body.print-mode-table .t-Body-content,
+body.print-mode-table .t-Body-contentInner, body.print-mode-table .container, body.print-mode-table .row, body.print-mode-table .col, body.print-mode-table .t-Region,
+body.print-mode-table .t-Region-body, body.print-mode-table form#wwvFlowForm, body.print-mode-table .wrap, body.mv-pcost #mvCostStrip
+{ padding-top: 0 !important; margin-top: 0 !important; }
+@page { margin: 8mm 10mm 10mm; }
+body.print-mode-table .wrap > #printTablePanel { padding: 0 !important; margin: 0 !important; border: none !important; box-shadow: none !important; }
+#printTablePanel .table-header-row, #printTablePanel .print-filters { display: none !important; }
+#printTablePanel .pr { display: table-cell !important; color: #555 !important; }
+#printTablePanel th, #printTablePanel td { padding: 3px 4px !important; }
+#printTablePanel th:first-child, #printTablePanel td:first-child { width: 1% !important; white-space: nowrap; }
+#printTablePanel tr.grp-row td:first-child { width: auto !important; }
+#printTablePanel td.c-name { width: auto !important; min-width: 220px !important; }
+#printTablePanel thead tr:last-child th { white-space: normal !important; line-height: 1.15 !important; vertical-align: bottom; }
+#printTablePanel thead tr:last-child th:first-child { white-space: nowrap !important; }
+body.print-mode-table.mv-pcost .wrap > #mvCostPanel { display: block !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+body.print-mode-table.mv-pcost .wrap > #mvCostStrip { display: grid !important; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 0 0 10px; }
+#mvCostStrip .cv-box { border: 1px solid #ccd !important; border-top: 4px solid var(--navy) !important; border-radius: 8px; padding: 8px 14px; box-shadow: none;
+background: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid; }
+#mvCostStrip .cv-box.pu { border-top-color: var(--purple) !important; }
+#mvCostStrip .cv-box.sa { border-top-color: var(--pink) !important; }
+#mvCostStrip .cv-box.cl { border-top-color: #1b8a5a !important; }
+#mvCostStrip .cv-box .l { font-size: 8.5px; color: #555; letter-spacing: .06em; }
+#mvCostStrip .cv-box .v { font-size: 17px; color: var(--navy); margin-top: 3px; }
+#mvCostStrip .cv-box .s { font-size: 9px; color: #555; margin-top: 2px; }
+#mvCostPanel .table-scroll { overflow: visible !important; }
+#mvCostPanel table { width: 100% !important; table-layout: auto !important; font-size: 10px !important; border: 1px solid #c6c9d0 !important; border-collapse: collapse !important; }
+#mvCostPanel thead { display: table-header-group !important; }
+#mvCostPanel thead th { position: static !important; background: #e7e8eb !important; color: var(--navy) !important; border: 1px solid #c6c9d0 !important;
+font-size: 8.5px !important; padding: 5px 7px !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+#mvCostPanel tbody td { color: #000 !important; border: 1px solid #c9cdde !important; background: #fff !important; padding: 4px 7px !important; line-height: 1.25; }
+#mvCostPanel tbody tr:nth-child(even) td { background: #f7f8fc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+#mvCostPanel tr { break-inside: avoid; page-break-inside: avoid; }
+#mvCostPanel th, #mvCostPanel td { white-space: nowrap; }
+#mvCostPanel td.cls { color: #000 !important; }
+#mvCostPanel td.cd { font-size: 9.5px; }
+#mvCostPanel td.dsc { max-width: none !important; white-space: normal !important; }
+#mvCostPanel td.num { font-size: 10px !important; font-variant-numeric: tabular-nums; }
+#mvCostPanel td.neg { color: #c14a44 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+#mvCostPanel td.pos { color: #2f9463 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+#mvCostPanel tr.res td { color: #555 !important; }
+#mvCostPanel tr.total-row td { font-weight: 700 !important; background: #e7e8eb !important; border-top: 2px solid var(--c-accent) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+#mvCostPanel tr.total-row { break-before: avoid-page !important; page-break-before: avoid !important; }
+body.print-mode-table.mv-pcost .wrap > #mvcPTitle { display: block !important; margin: 0 0 10px; padding: 0 0 6px; border-bottom: 1px solid #c6c9d0; }
+#mvcPTitle .pt-h { font-family: var(--font-head); font-size: 14px; font-weight: 600; color: #000; }
+#mvcPTitle .pt-h b { color: var(--c-brand); font-weight: 700; }
+#mvcPTitle .pt-s { font-size: 9.5px; color: #333; margin-top: 3px; }
+#mvcPTitle .pt-c { font-size: 9px; color: #555; margin-top: 2px; font-style: italic; }
+#mvCostPanel .print-filters { display: none !important; }
+}
+#mvPop{position:fixed;inset:0;z-index:900;background:rgba(26,31,54,.45);display:flex;align-items:center;justify-content:center;padding:2vh 2vw}
+#mvPop .pp-box{background:#fff;border-radius:14px;width:96vw;max-width:1800px;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden}
+#mvPop .pp-hd{display:flex;align-items:flex-start;gap:12px;padding:16px 20px 10px}
+#mvPop .pp-hd h3{margin:0;font:600 15px var(--font-head);color:var(--navy);flex:1 1 auto;min-width:0}
+#mvPop .pp-hd small{display:block;margin-top:4px;font:400 12px var(--font-body);color:var(--muted)}
+#mvPop .pp-tools{display:flex;gap:8px;flex:0 0 auto}
+#mvPop .pp-bar{padding:4px 20px 12px}
+#mvPop .pp-sc{overflow:auto;padding:0 20px;margin-bottom:16px;flex:1 1 auto}
+#mvPop table{width:100%;border-collapse:collapse;font-size:12.5px}
+#mvPop thead th{position:sticky;top:0;z-index:1;background:#e7e8eb;color:var(--navy);font-weight:700;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;padding:9px 10px;white-space:nowrap;text-align:left}
+#mvPop th.num,#mvPop td.num{text-align:right}
+#mvPop td{padding:7px 10px;border-bottom:1px solid rgba(26,31,54,.10);white-space:nowrap}
+#mvPop td.c-name{max-width:320px;overflow:hidden;text-overflow:ellipsis}
+#mvPop td.c-tot{font-weight:700;background:#f3f4fa}
+#mvPop tr.total-row td{font-weight:700;border-top:0;background:#e9ebf6 !important;position:sticky;bottom:0;z-index:2;box-shadow:inset 0 2px 0 var(--pink),0 -4px 8px rgba(26,31,54,.06)}
+#mvPop tr.total-row td.c-tot{background:#dfe2f2 !important}
+#mvPop tr.mv-hl td{background:rgba(17,28,58,.08);font-weight:600}
+#mvSec{position:absolute;z-index:800;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 10px 30px rgba(26,31,54,.18);padding:12px 14px}
+#mvSec h4{margin:0 0 8px;font:700 10.5px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--navy)}
+#mvSec .sc-r{display:flex;flex-wrap:wrap;gap:8px;max-width:760px}
+#mvSec .sc-b{border:1px solid var(--border);border-radius:10px;padding:6px 12px;min-width:96px}
+#mvSec .sc-b span{display:block;font-size:11.5px;color:var(--muted)}
+#mvSec .sc-b b{font:600 14px var(--font-body);color:var(--text)}
+#mvSec .sc-b i{display:block;height:3px;background:var(--navy);border-radius:2px;margin-top:4px}
+#mvSec .sc-b.t{border-color:var(--navy);background:#e7e8eb}
+#mvSec .sc-b em{display:block;font-style:normal;font-size:11px;color:#c14a44}#mvSec .sc-b.od{border-color:#e8b4b1}#mvSec .sc-b.od b{color:#c14a44}#mvSec .sc-b.od i{background:#c14a44}#mvPop .pp-bar:empty{display:none}
+#mvQtyFilters { padding: 18px 18px 14px; }
+#mvQtyFilters .mv-top { display: flex; gap: 18px; align-items: flex-start; }
+#mvQtyFilters .mv-main { flex: 1 1 auto; min-width: 0; }
+#mvQtyFilters .filter-group { display: flex; flex-direction: column; gap: 6px; }
+#mvQtyFilters .filter-group label { margin: 0; line-height: 14px; }
+#mvQtyFilters .mv-r1 { grid-template-columns: auto auto 300px 1fr auto; justify-content: start; gap: 10px 26px; }
+#mvQtyFilters .mv-r1b { gap: 10px 18px; margin-top: 14px; }
+#mvQtyFilters .mv-r1 select, #mvQtyFilters .mv-r1b .search-select input, #mvQtyFilters .mv-period input[type=date], #mvQtyFilters .mv-to, #mvQtyFilters .cls-btn { height: 38px; border-radius: 10px; }
+#mvQtyFilters .mv-r2 { grid-template-columns: auto auto auto 1fr auto; margin-top: 14px; padding-top: 14px; }
+#mvQtyFilters .mv-quick { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; border-radius: 11px; background: var(--panel2); border: 1px solid rgba(17,28,58,0.08); }
+#mvQtyFilters .mv-quick .sk-chip { border: 0; background: transparent; border-radius: 8px; }
+#mvQtyFilters .mv-quick .sk-chip .ck { padding: 7px 15px; font-size: 13px; font-weight: 500; color: var(--text); }
+#mvQtyFilters .mv-quick .sk-chip:not(.on) .ck:hover { color: var(--pink); }
+#mvQtyFilters .mv-quick .sk-chip.on { background: var(--pink); }
+#mvQtyFilters .mv-quick .sk-chip.on .ck { color: #fff; font-weight: 600; }
+#sutChips { margin-left: 4px; }
+#scopeChips, #sutChips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; background: none; border: 0; }
+#scopeChips .sk-chip, #sutChips .sk-chip { --c: var(--navy); --w: rgba(17,28,58,0.06); border: 1px solid color-mix(in srgb, var(--c) 30%, #fff); background: var(--w); border-radius: 10px; transition: background .12s, border-color .12s; }
+#scopeChips .sk-chip .ck, #sutChips .sk-chip .ck { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 600; color: var(--c); }
+#scopeChips .sk-chip:not(.on):hover, #sutChips .sk-chip:not(.on):hover { border-color: var(--c); }
+#scopeChips .sk-chip.on, #sutChips .sk-chip.on { background: var(--c); border-color: var(--c); }
+#scopeChips .sk-chip.on .ck, #sutChips .sk-chip.on .ck, #scopeChips .sk-chip.on .ck:hover, #sutChips .sk-chip.on .ck:hover { color: #fff; }
+#scopeChips .ck-CEN { --c: #d6177f; --w: rgba(214,23,127,0.06); }
+#scopeChips .ck-DHB { --c: #7b4fb0; --w: rgba(123,79,176,0.07); }
+#scopeChips .ck-WST { --c: #2f8a57; --w: rgba(47,138,87,0.07); }
+#scopeChips .ck-EST { --c: #c77a12; --w: rgba(199,122,18,0.07); }
+#scopeChips .ck-NTH { --c: #1a8f8a; --w: rgba(26,143,138,0.07); }
+#sutChips .sk-chip { --c: #c0306f; --w: rgba(192,48,111,0.05); border-style: dashed; }
+#sutChips .sk-chip.on { border-style: solid; }
+#sutChips .sk-chip .ck:before { content: '\2702'; margin-right: 2px; font-size: 12px; opacity: .7; }
+#mvQtyFilters .mv-r3 { margin-top: 14px; padding: 12px 16px; border: 1px solid rgba(17,28,58,0.10); border-radius: 12px; background: linear-gradient(180deg, #f8f9fd, #fdfbfd); }
+#mvQtyFilters .mv-r3 .sk-chips { gap: 2px; padding: 3px; border-radius: 11px; background: #fff; border: 1px solid rgba(17,28,58,0.10); }
+#mvQtyFilters .mv-r3 .sk-chip { border: 0; border-radius: 8px; }
+#mvQtyFilters .mv-r3 .sk-chip:not(.on) { background: transparent; }
+#mvQtyFilters .mv-r3 .sk-chip .ck { padding: 6px 13px; font-size: 12.5px; }
+#mvQtyFilters .mv-active { margin-top: 12px; }
+#mvQtyFilters, #mvQtyFilters input, #mvQtyFilters button, #mvQtyFilters .sk-chip { font-family: var(--font-body); }
+#mvQtyFilters .filter-group label, #mvQtyFilters .sk-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--navy); line-height: 14px; }
+#mvQtyFilters .mv-r2 .sk-lbl, #mvQtyFilters .mv-r3 .sk-lbl { line-height: 38px; padding-top: 0; }
+#mvQtyFilters .mv-period input[type=date], #mvQtyFilters .mv-to, #mvQtyFilters .cls-btn, #mvQtyFilters .search-select input,
+#mvQtyFilters .sk-chip .ck, #mvQtyFilters .mv-r3 .sk-chip .ck { font-size: 13px !important; font-weight: 500; }
+#mvQtyFilters .mv-period input[type=date], #mvQtyFilters .cls-btn { color: var(--text); }
+#mvQtyFilters .mv-to { color: var(--muted); }
+#mvQtyFilters .cls-btn.picked, #mvQtyFilters .sk-chip.on .ck { font-weight: 600; }
+#mvQtyFilters .sk-reset, #mvQtyFilters .mv-more { height: 38px; border-radius: 10px; font-size: 13px; font-weight: 600; padding: 0 16px; }
+#mvQtyFilters .mv-r1 .sk-reset { grid-column: 5; justify-self: end; display: inline-flex; align-items: center; gap: 6px; }
+#mvQtyFilters .mv-active, #mvQtyFilters .mv-active .af, #mvQtyFilters .mv-active .clr { font-size: 11.5px; }
+@media (max-width: 1100px) { #mvQtyFilters .mv-r1 { grid-template-columns: 1fr 1fr; } #mvQtyFilters .mv-r1 .sk-reset { grid-column: auto; } #mvQtyFilters .mv-r2 { grid-template-columns: auto 1fr; } }
+#printTablePanel .pr { display: none; }
+.mv-x { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+#rvChips { display: flex; gap: 6px; }
+#rvChips .sk-chip { --c: #c8136f; border: 1px solid color-mix(in srgb, var(--c) 30%, #fff); background: rgba(200,19,111,0.05); border-radius: 10px; }
+#rvChips .sk-chip .ck { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 600; color: var(--c); gap: 7px; }
+#rvChips .sk-chip .ck:after { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--pink); }
+#rvChips .sk-chip:not(.on):hover { border-color: var(--c); }
+#rvChips .sk-chip.on { background: var(--c); border-color: var(--c); }
+#rvChips .sk-chip.on .ck { color: #fff; }
+#rvChips .sk-chip.on .ck:after { background: #fff; }
+#tableBody td.c-prop.rv:not(.z):after { content: ''; display: inline-block; width: 6px; height: 6px; margin-left: 5px; border-radius: 50%; background: var(--pink); vertical-align: 2px; }
+#tableBody td.mv-pc{cursor:pointer}#tableBody td.c-on.od{color:#c14a44;font-weight:700}
+@media print{body.mv-ppop>*:not(#mvPop){display:none!important}
+body.mv-ppop #mvPop{position:static;background:none;padding:0;display:block}
+body.mv-ppop #mvPop .pp-box{box-shadow:none;max-height:none;width:auto;border-radius:0;display:block}
+body.mv-ppop #mvPop .pp-sc{overflow:visible;padding:0}
+body.mv-ppop #mvPop .pp-tools,body.mv-ppop #mvPop .pp-bar{display:none!important}
+body.mv-ppop #mvPop table{font-size:9px}body.mv-ppop #mvPop thead{display:table-header-group}
+body.mv-ppop #mvPop th,body.mv-ppop #mvPop td{padding:3px 4px!important;position:static!important}
+@page{margin:8mm 10mm 10mm}
+body.mv-ppop #mvPop .pp-hd{padding:0 0 6px!important}
+body.mv-ppop #mvPop .pp-hd h3{font-size:12px!important;color:#000!important}
+body.mv-ppop #mvPop .pp-hd h3:before{content:'Co. Dashboard \2014  ';color:var(--c-brand);font-weight:700}
+body.mv-ppop #mvPop .pp-hd small{font-size:8.5px!important;color:#444!important}
+body.mv-ppop #mvPop table{width:100%;border:1px solid #c6c9d0}
+body.mv-ppop #mvPop th,body.mv-ppop #mvPop td,body.mv-ppop #mvPop td.num,body.mv-ppop #mvPop .pat{font-size:9px!important}
+body.mv-ppop #mvPop thead th{background:#e7e8eb!important;color:var(--c-brand)!important;border:1px solid #c6c9d0!important;letter-spacing:.02em;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body.mv-ppop #mvPop tbody td{color:#000!important;border:1px solid #c9cdde!important;background:#fff!important}
+body.mv-ppop #mvPop tbody tr:nth-child(even) td{background:#f7f8fc!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body.mv-ppop #mvPop td.z{color:#b5bac6!important}
+body.mv-ppop #mvPop tr.total-row td{background:#e7e8eb!important;box-shadow:none!important;border-top:2px solid var(--c-accent)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body.mv-ppop #mvPop tr{break-inside:avoid}}
+</style>
+<div class="panel" id="printTablePanel" style="margin-bottom:16px">
+<div class="table-header-row">
+<div>
+<h3><span class="dot"></span> <span id="tableTitleText">Item Movement</span></h3>
+</div>
+<div class="table-tools">
+<span class="mv-loading" id="tableNote">Loading...</span>
+<button type="button" class="btn-view" id="toggleAllBtn" title="Collapse or expand all class groups">Collapse all</button>
+</div>
+</div>
+<div class="table-scroll">
+<table>
+<thead id="tableHead"></thead>
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+<script>
+window.mvClsPick = function (fClass, CLASSES, CLN, onSet, render) {
+var btn = document.getElementById('fClassBtn'), lbl = document.getElementById('fClassLbl'), menu = document.getElementById('fClassMenu'),
+qin = document.getElementById('fClassQ'), list = document.getElementById('fClassList'), pick = document.getElementById('clsPick'), m;
+function set(v) { fClass.value = v; onSet(v); if (btn) { lbl.textContent = v ? (CLN[v] || v) : 'All Classes'; btn.className = 'cls-btn' + (v ? ' picked' : ''); } }
+if (!btn) return set;
+m = '<div class="ss-option" data-c="">All Classes</div>';
+CLASSES.forEach(function (c) { m += '<div class="ss-option" data-c="' + mvXmlEsc(c.c) + '"><span class="ss-code">' + mvXmlEsc(c.c) + '</span> ' + mvXmlEsc(c.n) + '</div>'; });
+list.innerHTML = m;
+function open(o) { menu.className = 'ss-menu' + (o ? ' open' : ''); menu.style.display = o ? 'block' : 'none'; if (o) { qin.value = ''; filt(); qin.focus(); } }
+function filt() { var q = qin.value.toUpperCase(), L = list.children, i; for (i = 0; i < L.length; i++) L[i].style.display = !q || L[i].textContent.toUpperCase().indexOf(q) !== -1 ? '' : 'none'; }
+function choose(v) { set(v); open(false); render(); }
+btn.addEventListener('click', function () { open(menu.style.display !== 'block'); });
+qin.addEventListener('input', filt);
+qin.addEventListener('keydown', function (e) {
+var L = Array.prototype.filter.call(list.children, function (x) { return x.style.display !== 'none'; }), cur = -1, i;
+for (i = 0; i < L.length; i++) if (L[i].className.indexOf('active') !== -1) cur = i;
+if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && L.length) {
+e.preventDefault();
+cur = e.key === 'ArrowDown' ? (cur + 1) % L.length : (cur <= 0 ? L.length - 1 : cur - 1);
+for (i = 0; i < list.children.length; i++) list.children[i].className = 'ss-option';
+L[cur].className = 'ss-option active'; if (L[cur].scrollIntoView) L[cur].scrollIntoView({ block: 'nearest' });
+} else if (e.key === 'Enter' && L.length) { e.preventDefault(); choose(L[cur === -1 ? 0 : cur].getAttribute('data-c')); }
+else if (e.key === 'Escape') open(false);
+});
+list.addEventListener('click', function (e) {
+var t = e.target.closest ? e.target.closest('.ss-option') : null;
+if (t) choose(t.getAttribute('data-c'));
+});
+document.addEventListener('click', function (e) { if (!pick.contains(e.target)) open(false); });
+return set;
+};
+</script>
+
+<style>
+.mv-how { justify-self: end; height: 38px; padding: 0 16px; border-radius: 10px; border: 1px solid rgba(17,28,58,0.35); background: var(--panel); color: var(--navy);
+font: 600 13px var(--font-body); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.mv-how:before { content: 'i'; width: 17px; height: 17px; border-radius: 50%; border: 1.5px solid currentColor; display: inline-grid; place-items: center;
+font: 700 11px Georgia, serif; font-style: italic; }
+.mv-how:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+#mvHelp, #mvHelpAr { display: none; }
+#mvPop .hp { max-width: 1120px; margin: 0 auto; padding: 4px 4px 22px; font: 400 14px/1.75 var(--font-body); color: var(--text); }
+#mvPop .hp-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 14px; padding: 12px 18px; border-radius: 12px;
+background: linear-gradient(90deg, #e7e8eb, #f8f1f6); }
+#mvPop .hp-top p { margin: 0; font-weight: 600; color: var(--navy); }
+#mvPop .hp-lang { height: 32px; padding: 0 14px; border-radius: 10px; border: 1px solid rgba(17,28,58,0.35); background: var(--panel); color: var(--navy);
+font: 600 13px var(--font-body); cursor: pointer; flex: none; }
+#mvPop .hp-lang:hover { background: var(--navy); color: #fff; border-color: var(--navy); }
+#mvPop .hp-s { border: 1px solid rgba(17,28,58,0.12); border-radius: 12px; padding: 14px 18px 12px; background: #fff; }
+#mvPop .hp-s + .hp-s, #mvPop .hp-s + .hp-g, #mvPop .hp-g { margin-top: 12px; }
+#mvPop .hp-g { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+#mvPop .hp-g .hp-s { margin: 0; }
+#mvPop .hp h4 { margin: 0 0 8px; display: flex; align-items: center; gap: 8px; font: 700 12px var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--navy); }
+#mvPop .hp h4 i { width: 22px; height: 22px; border-radius: 50%; background: var(--navy); color: #fff; display: inline-grid; place-items: center; font: 700 11px var(--font-body); font-style: normal; flex: none; }
+#mvPop .hp p { margin: 0 0 6px; }
+#mvPop .hp .f { margin: 8px 0 10px; padding: 12px 16px; border-radius: 10px; background: #e7e8eb; color: var(--navy); font-weight: 600; font-size: 15px; text-align: center; }
+#mvPop .hp .f b { color: var(--pink); padding: 0 6px; }
+#mvPop .hp ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+#mvPop .hp li { position: relative; padding-left: 16px; }
+#mvPop .hp li:before { content: ''; position: absolute; left: 2px; top: .7em; width: 6px; height: 6px; border-radius: 50%; background: var(--purple); }
+#mvPop .hp li b, #mvPop .hp p b { color: var(--navy); }
+#mvPop .hp code { font: 600 12px var(--font-mono, Consolas, monospace); background: #f3f4fa; padding: 1px 6px; border-radius: 5px; color: var(--navy); white-space: nowrap; direction: ltr; unicode-bidi: isolate; }
+#mvPop .hp .dt { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--pink); vertical-align: 1px; }
+#mvPop .hp .red { color: #c14a44; font-weight: 700; }
+#mvPop .hp .muted { color: var(--muted); font-size: 13px; }
+#mvPop .hp[dir=rtl] { font-size: 15px; line-height: 1.9; text-align: right; }
+#mvPop .hp[dir=rtl] h4 { letter-spacing: 0; font-size: 14px; }
+#mvPop .hp[dir=rtl] li { padding-left: 0; padding-right: 16px; }
+#mvPop .hp[dir=rtl] li:before { left: auto; right: 2px; top: .85em; }
+@media (max-width: 900px) { #mvPop .hp-g { grid-template-columns: 1fr; } }
+@media print {
+body.mv-ppop #mvPop .hp { max-width: none; padding: 0; }
+body.mv-ppop #mvPop .hp, body.mv-ppop #mvPop .hp p, body.mv-ppop #mvPop .hp li, body.mv-ppop #mvPop .hp-top p { font-size: 9.5px !important; line-height: 1.45 !important; }
+body.mv-ppop #mvPop .hp p { margin: 0 0 3px; }
+body.mv-ppop #mvPop .hp ul { gap: 2px; }
+body.mv-ppop #mvPop .hp h4 { font-size: 10.5px !important; margin-bottom: 3px; }
+body.mv-ppop #mvPop .hp h4 i { width: 15px; height: 15px; font-size: 9px; }
+body.mv-ppop #mvPop .hp .f { font-size: 10.5px !important; padding: 5px 10px; margin: 4px 0 5px; }
+body.mv-ppop #mvPop .hp code { font-size: 9px !important; padding: 0 4px; }
+body.mv-ppop #mvPop .hp .muted { font-size: 9px !important; margin: 0; }
+body.mv-ppop #mvPop .hp * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body.mv-ppop #mvPop .hp-lang { display: none; }
+body.mv-ppop #mvPop .hp-top { padding: 4px 10px; margin-bottom: 6px; }
+body.mv-ppop #mvPop .hp-s { break-inside: avoid; padding: 6px 12px 5px; border-radius: 8px; }
+body.mv-ppop #mvPop .hp-g { grid-template-columns: 1fr 1fr !important; gap: 6px; }
+body.mv-ppop #mvPop .hp-s + .hp-s, body.mv-ppop #mvPop .hp-s + .hp-g { margin-top: 6px; }
+body.mv-ppop #mvPop .pp-hd { padding-bottom: 2px !important; }
+}
+</style>
+<div id="mvHelpAr" data-title="&#1603;&#1610;&#1601; &#1578;&#1615;&#1581;&#1587;&#1576; &#1603;&#1605;&#1610;&#1577; &#1575;&#1604;&#1591;&#1604;&#1576;"><div class="hp" dir="rtl">
+<div class="hp-top"><p>&#1588;&#1585;&#1581; &#1605;&#1582;&#1578;&#1589;&#1585; &#1604;&#1593;&#1605;&#1608;&#1583;&#1610; &#1575;&#1604;&#1591;&#1604;&#1576; &#1601;&#1610; &#1575;&#1604;&#1578;&#1602;&#1585;&#1610;&#1585;: &#1605;&#1606; &#1571;&#1610;&#1606; &#1610;&#1571;&#1578;&#1610; &#1575;&#1604;&#1585;&#1602;&#1605;&#1548; &#1608;&#1603;&#1610;&#1601; &#1610;&#1615;&#1587;&#1578;&#1593;&#1605;&#1604; &#1601;&#1610; &#1602;&#1585;&#1575;&#1585; &#1575;&#1604;&#1588;&#1585;&#1575;&#1569;.</p><button type="button" class="hp-lang" data-lang="en">English</button></div>
+<div class="hp-s">
+<h4><i>1</i>&#1605;&#1575;&#1584;&#1575; &#1606;&#1591;&#1604;&#1576;</h4>
+<p>&#1593;&#1605;&#1608;&#1583; <code>ORDER (3M COVER)</code> &#1607;&#1608; &#1575;&#1604;&#1603;&#1605;&#1610;&#1577; &#1575;&#1604;&#1578;&#1610; &#1578;&#1615;&#1591;&#1604;&#1576; <b>&#1575;&#1604;&#1610;&#1608;&#1605;</b> &#1581;&#1578;&#1609; &#1604;&#1575; &#1610;&#1606;&#1601;&#1583; &#1575;&#1604;&#1589;&#1606;&#1601; &#1602;&#1576;&#1604; &#1608;&#1589;&#1608;&#1604; &#1575;&#1604;&#1588;&#1581;&#1606;&#1577;&#1548; &#1579;&#1605; &#1610;&#1576;&#1602;&#1609; &#1605;&#1606;&#1607; &#1605;&#1575; &#1610;&#1603;&#1601;&#1610; 3 &#1571;&#1588;&#1607;&#1585; &#1576;&#1593;&#1583; &#1608;&#1589;&#1608;&#1604;&#1607;&#1575;. &#1608;&#1593;&#1605;&#1608;&#1583; <code>ORDER (6M COVER)</code> &#1605;&#1579;&#1604;&#1607; &#1604;&#1578;&#1594;&#1591;&#1610;&#1577; 6 &#1571;&#1588;&#1607;&#1585;.</p>
+<div class="f">&#1603;&#1605;&#1610;&#1577; &#1575;&#1604;&#1591;&#1604;&#1576; <b>=</b> &#1575;&#1604;&#1581;&#1575;&#1580;&#1577; <b>&minus;</b> &#1575;&#1604;&#1585;&#1589;&#1610;&#1583; &#1575;&#1604;&#1589;&#1575;&#1604;&#1581; &#1604;&#1604;&#1576;&#1610;&#1593; <b>&minus;</b> &#1575;&#1604;&#1603;&#1605;&#1610;&#1575;&#1578; &#1575;&#1604;&#1602;&#1575;&#1583;&#1605;&#1577;</div>
+<p class="muted">&#1604;&#1575; &#1578;&#1602;&#1604; &#1593;&#1606; &#1575;&#1604;&#1589;&#1601;&#1585;: &#1575;&#1604;&#1588;&#1585;&#1591;&#1577; &#171;&#8212;&#187; &#1578;&#1593;&#1606;&#1610; &#1571;&#1606;&#1607; &#1604;&#1575; &#1581;&#1575;&#1580;&#1577; &#1604;&#1604;&#1591;&#1604;&#1576; &#1575;&#1604;&#1570;&#1606;. &#1602;&#1601; &#1576;&#1575;&#1604;&#1605;&#1572;&#1588;&#1585; &#1593;&#1604;&#1609; &#1571;&#1610; &#1603;&#1605;&#1610;&#1577; &#1591;&#1604;&#1576; &#1604;&#1578;&#1585;&#1609; &#1581;&#1587;&#1575;&#1576;&#1607;&#1575; &#1576;&#1575;&#1604;&#1578;&#1601;&#1589;&#1610;&#1604;.</p>
+</div>
+<div class="hp-s">
+<h4><i>2</i>&#1575;&#1604;&#1581;&#1575;&#1580;&#1577;</h4>
+<div class="f">&#1575;&#1604;&#1581;&#1575;&#1580;&#1577; <b>=</b> &#1575;&#1604;&#1576;&#1610;&#1593; &#1575;&#1604;&#1588;&#1607;&#1585;&#1610; <b>&times;</b> (&#1605;&#1583;&#1577; &#1578;&#1608;&#1585;&#1610;&#1583; &#1575;&#1604;&#1605;&#1608;&#1585;&#1583; + 3 &#1571;&#1608; 6 &#1571;&#1588;&#1607;&#1585; &#1578;&#1594;&#1591;&#1610;&#1577;) <b>+</b> &#1605;&#1582;&#1586;&#1608;&#1606; &#1575;&#1604;&#1571;&#1605;&#1575;&#1606;</div>
+<ul>
+<li><b>&#1575;&#1604;&#1576;&#1610;&#1593; &#1575;&#1604;&#1588;&#1607;&#1585;&#1610;:</b> &#1589;&#1575;&#1601;&#1610; &#1575;&#1604;&#1605;&#1576;&#1610;&#1593;&#1575;&#1578; &#1576;&#1593;&#1583; &#1575;&#1604;&#1605;&#1585;&#1578;&#1580;&#1593;&#1575;&#1578; &#1604;&#1570;&#1582;&#1585; 12 &#1588;&#1607;&#1585;&#1575;&#1611; &#1605;&#1603;&#1578;&#1605;&#1604;&#1575;&#1611;&#1548; &#1608;&#1604;&#1575; &#1610;&#1583;&#1582;&#1604; &#1575;&#1604;&#1588;&#1607;&#1585; &#1575;&#1604;&#1580;&#1575;&#1585;&#1610;. &#1575;&#1604;&#1571;&#1588;&#1607;&#1585; &#1575;&#1604;&#1571;&#1582;&#1610;&#1585;&#1577; &#1608;&#1586;&#1606;&#1607;&#1575; &#1571;&#1603;&#1576;&#1585;: 50% &#1604;&#1570;&#1582;&#1585; 3 &#1571;&#1588;&#1607;&#1585;&#1548; &#1608;30% &#1604;&#1604;&#1579;&#1604;&#1575;&#1579;&#1577; &#1602;&#1576;&#1604;&#1607;&#1575;&#1548; &#1608;20% &#1604;&#1604;&#1587;&#1578;&#1577; &#1575;&#1604;&#1571;&#1602;&#1583;&#1605;. &#1608;&#1575;&#1604;&#1588;&#1607;&#1585; &#1575;&#1604;&#1584;&#1610; &#1610;&#1586;&#1610;&#1583; &#1593;&#1604;&#1609; 3 &#1571;&#1590;&#1593;&#1575;&#1601; &#1575;&#1604;&#1605;&#1593;&#1578;&#1575;&#1583; &#1604;&#1604;&#1589;&#1606;&#1601; &#1610;&#1615;&#1581;&#1587;&#1576; &#1593;&#1606;&#1583; 3 &#1571;&#1590;&#1593;&#1575;&#1601; &#1601;&#1602;&#1591;&#1548; &#1581;&#1578;&#1609; &#1604;&#1575; &#1578;&#1606;&#1601;&#1582; &#1591;&#1604;&#1576;&#1610;&#1577; &#1575;&#1587;&#1578;&#1579;&#1606;&#1575;&#1574;&#1610;&#1577; &#1608;&#1575;&#1581;&#1583;&#1577; &#1575;&#1604;&#1571;&#1585;&#1602;&#1575;&#1605;.</li>
+<li><b>&#1605;&#1583;&#1577; &#1578;&#1608;&#1585;&#1610;&#1583; &#1575;&#1604;&#1605;&#1608;&#1585;&#1583;:</b> &#1593;&#1583;&#1583; &#1575;&#1604;&#1571;&#1610;&#1575;&#1605; &#1605;&#1606; &#1571;&#1605;&#1585; &#1575;&#1604;&#1588;&#1585;&#1575;&#1569; &#1581;&#1578;&#1609; &#1608;&#1589;&#1608;&#1604; &#1575;&#1604;&#1588;&#1581;&#1606;&#1577;&#1548; &#1604;&#1570;&#1582;&#1585; &#1605;&#1608;&#1585;&#1583; &#1575;&#1587;&#1578;&#1615;&#1604;&#1605; &#1605;&#1606;&#1607; &#1575;&#1604;&#1589;&#1606;&#1601;&#1548; &#1605;&#1606;&#1584; 2023. &#1606;&#1571;&#1582;&#1584; &#1575;&#1604;&#1605;&#1583;&#1577; &#1575;&#1604;&#1578;&#1610; &#1578;&#1589;&#1604; &#1582;&#1604;&#1575;&#1604;&#1607;&#1575; 4 &#1588;&#1581;&#1606;&#1575;&#1578; &#1605;&#1606; &#1603;&#1604; 5&#1548; &#1581;&#1578;&#1609; &#1610;&#1583;&#1582;&#1604; &#1575;&#1604;&#1578;&#1571;&#1582;&#1610;&#1585; &#1575;&#1604;&#1605;&#1593;&#1578;&#1575;&#1583;. &#1593;&#1604;&#1609; &#1605;&#1587;&#1578;&#1608;&#1609; &#1575;&#1604;&#1588;&#1585;&#1603;&#1577;: 101 &#1610;&#1608;&#1605; &#1601;&#1610; &#1575;&#1604;&#1593;&#1575;&#1583;&#1577;&#1548; &#1608;130 &#1610;&#1608;&#1605;&#1575;&#1611; &#1604;&#1600; 4 &#1588;&#1581;&#1606;&#1575;&#1578; &#1605;&#1606; &#1603;&#1604; 5. &#1575;&#1604;&#1605;&#1608;&#1585;&#1583; &#1575;&#1604;&#1584;&#1610; &#1604;&#1607; &#1571;&#1602;&#1604; &#1605;&#1606; 3 &#1588;&#1581;&#1606;&#1575;&#1578; &#1610;&#1571;&#1582;&#1584; 130 &#1610;&#1608;&#1605;&#1575;&#1611;.</li>
+<li><b>&#1575;&#1604;&#1578;&#1594;&#1591;&#1610;&#1577;:</b> 3 &#1571;&#1608; 6 &#1571;&#1588;&#1607;&#1585; &#1576;&#1593;&#1583; &#1608;&#1589;&#1608;&#1604; &#1575;&#1604;&#1588;&#1581;&#1606;&#1577;&#1548; &#1608;&#1607;&#1605;&#1575; &#1593;&#1605;&#1608;&#1583;&#1575; &#1575;&#1604;&#1591;&#1604;&#1576;.</li>
+<li><b>&#1605;&#1582;&#1586;&#1608;&#1606; &#1575;&#1604;&#1571;&#1605;&#1575;&#1606;:</b> &#1603;&#1605;&#1610;&#1577; &#1573;&#1590;&#1575;&#1601;&#1610;&#1577; &#1576;&#1602;&#1583;&#1585; &#1578;&#1584;&#1576;&#1584;&#1576; &#1576;&#1610;&#1593; &#1575;&#1604;&#1589;&#1606;&#1601; &#1605;&#1606; &#1588;&#1607;&#1585; &#1604;&#1570;&#1582;&#1585; &#1608;&#1591;&#1608;&#1604; &#1605;&#1583;&#1577; &#1575;&#1604;&#1578;&#1608;&#1585;&#1610;&#1583;&#1548; &#1576;&#1581;&#1610;&#1579; &#1578;&#1605;&#1585; 9 &#1571;&#1588;&#1607;&#1585; &#1605;&#1606; &#1603;&#1604; 10 &#1576;&#1604;&#1575; &#1606;&#1602;&#1589;.</li>
+</ul>
+</div>
+<div class="hp-g">
+<div class="hp-s">
+<h4><i>3</i>&#1575;&#1604;&#1585;&#1589;&#1610;&#1583; &#1608;&#1575;&#1604;&#1603;&#1605;&#1610;&#1575;&#1578; &#1575;&#1604;&#1602;&#1575;&#1583;&#1605;&#1577;</h4>
+<ul>
+<li><b>&#1575;&#1604;&#1585;&#1589;&#1610;&#1583; (STOCK):</b> &#1585;&#1589;&#1610;&#1583; &#1575;&#1604;&#1610;&#1608;&#1605; &#1605;&#1606; &#1575;&#1604;&#1578;&#1588;&#1594;&#1610;&#1604;&#1575;&#1578; &#1594;&#1610;&#1585; &#1575;&#1604;&#1605;&#1606;&#1578;&#1607;&#1610;&#1577; &#1575;&#1604;&#1589;&#1604;&#1575;&#1581;&#1610;&#1577; &#1601;&#1610; &#1605;&#1587;&#1578;&#1608;&#1583;&#1593;&#1575;&#1578; &#1575;&#1604;&#1606;&#1591;&#1575;&#1602; &#1575;&#1604;&#1605;&#1582;&#1578;&#1575;&#1585;. &#1575;&#1590;&#1594;&#1591; &#1593;&#1604;&#1610;&#1607; &#1604;&#1578;&#1585;&#1575;&#1607; &#1581;&#1587;&#1576; &#1575;&#1604;&#1605;&#1587;&#1578;&#1608;&#1583;&#1593;.</li>
+<li><b>&#1575;&#1604;&#1602;&#1575;&#1583;&#1605; (ON ORDER):</b> &#1571;&#1608;&#1575;&#1605;&#1585; &#1575;&#1604;&#1588;&#1585;&#1575;&#1569; &#1575;&#1604;&#1605;&#1601;&#1578;&#1608;&#1581;&#1577;&#1548; &#1575;&#1604;&#1605;&#1591;&#1604;&#1608;&#1576; + &#1605;&#1575; &#1601;&#1610; &#1575;&#1604;&#1580;&#1605;&#1575;&#1585;&#1603;. <span class="red">&#1575;&#1604;&#1571;&#1581;&#1605;&#1585;</span> &#1571;&#1605;&#1585; &#1578;&#1580;&#1575;&#1608;&#1586; &#1588;&#1607;&#1585; &#1608;&#1589;&#1608;&#1604;&#1607;: &#1578;&#1571;&#1603;&#1583; &#1605;&#1606; &#1575;&#1604;&#1605;&#1588;&#1578;&#1585;&#1610;&#1575;&#1578; &#1571;&#1606;&#1607; &#1605;&#1575; &#1586;&#1575;&#1604; &#1602;&#1575;&#1574;&#1605;&#1575;&#1611;.</li>
+<li><b>&#1593;&#1585;&#1590; &#1575;&#1604;&#1601;&#1585;&#1593;:</b> &#1610;&#1571;&#1582;&#1584; &#1575;&#1604;&#1601;&#1585;&#1593; &#1606;&#1589;&#1610;&#1576;&#1607; &#1605;&#1606; &#1571;&#1608;&#1575;&#1605;&#1585; &#1575;&#1604;&#1588;&#1585;&#1603;&#1577; &#1576;&#1581;&#1587;&#1576; &#1581;&#1589;&#1578;&#1607; &#1605;&#1606; &#1605;&#1576;&#1610;&#1593;&#1575;&#1578; &#1575;&#1604;&#1589;&#1606;&#1601; &#1601;&#1610; &#1575;&#1604;&#1601;&#1578;&#1585;&#1577;.</li>
+</ul>
+</div>
+<div class="hp-s">
+<h4><i>4</i>&#1575;&#1604;&#1591;&#1604;&#1576;&#1575;&#1578; &#1575;&#1604;&#1578;&#1610; &#1578;&#1581;&#1578;&#1575;&#1580; &#1605;&#1585;&#1575;&#1580;&#1593;&#1577;</h4>
+<p>&#1575;&#1604;&#1606;&#1602;&#1591;&#1577; &#1575;&#1604;&#1608;&#1585;&#1583;&#1610;&#1577; <span class="dt"></span> &#1576;&#1580;&#1608;&#1575;&#1585; &#1603;&#1605;&#1610;&#1577; &#1575;&#1604;&#1591;&#1604;&#1576;&#1548; &#1608;&#1603;&#1576;&#1587;&#1608;&#1604;&#1577; <b>To review</b>&#1548; &#1578;&#1593;&#1606;&#1610; &#1589;&#1606;&#1601;&#1575;&#1611; &#1605;&#1578;&#1602;&#1591;&#1593; &#1575;&#1604;&#1576;&#1610;&#1593; &#1571;&#1608; &#1588;&#1607;&#1585;&#1575;&#1611; &#1601;&#1610;&#1607; &#1591;&#1604;&#1576;&#1610;&#1577; &#1575;&#1587;&#1578;&#1579;&#1606;&#1575;&#1574;&#1610;&#1577;.</p>
+<ul>
+<li>&#1575;&#1601;&#1578;&#1581; &#1593;&#1605;&#1604;&#1575;&#1569; &#1575;&#1604;&#1589;&#1606;&#1601; &#1576;&#1575;&#1604;&#1590;&#1594;&#1591; &#1593;&#1604;&#1609; &#1575;&#1587;&#1605;&#1607; &#1602;&#1576;&#1604; &#1575;&#1604;&#1591;&#1604;&#1576;.</li>
+<li>&#1575;&#1604;&#1571;&#1589;&#1606;&#1575;&#1601; &#1575;&#1604;&#1580;&#1583;&#1610;&#1583;&#1577; (N) &#1608;&#1575;&#1604;&#1605;&#1608;&#1587;&#1605;&#1610;&#1577; &#1578;&#1581;&#1578;&#1575;&#1580; &#1571;&#1610;&#1590;&#1575;&#1611; &#1581;&#1603;&#1605; &#1575;&#1604;&#1605;&#1585;&#1575;&#1580;&#1593;.</li>
+</ul>
+</div>
+<div class="hp-s">
+<h4><i>5</i>&#1605;&#1575; &#1604;&#1575; &#1610;&#1583;&#1582;&#1604; &#1601;&#1610; &#1575;&#1604;&#1581;&#1587;&#1575;&#1576;</h4>
+<ul>
+<li>&#1575;&#1604;&#1605;&#1608;&#1587;&#1605;&#1610;&#1577;: &#1610;&#1615;&#1601;&#1578;&#1585;&#1590; &#1571;&#1606; &#1575;&#1604;&#1576;&#1610;&#1593; &#1605;&#1578;&#1602;&#1575;&#1585;&#1576; &#1593;&#1604;&#1609; &#1605;&#1583;&#1575;&#1585; &#1575;&#1604;&#1587;&#1606;&#1577;.</li>
+<li>&#1581;&#1583;&#1608;&#1583; &#1573;&#1593;&#1575;&#1583;&#1577; &#1575;&#1604;&#1591;&#1604;&#1576; &#1601;&#1610; &#1576;&#1591;&#1575;&#1602;&#1577; &#1575;&#1604;&#1589;&#1606;&#1601;.</li>
+<li>&#1575;&#1604;&#1578;&#1588;&#1594;&#1610;&#1604;&#1575;&#1578; &#1575;&#1604;&#1602;&#1585;&#1610;&#1576;&#1577; &#1605;&#1606; &#1575;&#1604;&#1575;&#1606;&#1578;&#1607;&#1575;&#1569;: &#1578;&#1615;&#1581;&#1587;&#1576; &#1585;&#1589;&#1610;&#1583;&#1575;&#1611; &#1581;&#1578;&#1609; &#1578;&#1606;&#1578;&#1607;&#1610;.</li>
+<li>&#1605;&#1608;&#1575;&#1593;&#1610;&#1583; &#1608;&#1589;&#1608;&#1604; &#1575;&#1604;&#1571;&#1608;&#1575;&#1605;&#1585; &#1575;&#1604;&#1605;&#1601;&#1578;&#1608;&#1581;&#1577;: &#1603;&#1604; &#1571;&#1605;&#1585; &#1605;&#1601;&#1578;&#1608;&#1581; &#1610;&#1615;&#1582;&#1589;&#1605; &#1605;&#1607;&#1605;&#1575; &#1578;&#1571;&#1582;&#1585;.</li>
+</ul>
+</div>
+<div class="hp-s">
+<h4><i>6</i>&#1575;&#1604;&#1578;&#1581;&#1583;&#1610;&#1579; &#1608;&#1575;&#1604;&#1608;&#1581;&#1583;&#1575;&#1578;</h4>
+<ul>
+<li>&#1575;&#1604;&#1576;&#1610;&#1593; &#1575;&#1604;&#1588;&#1607;&#1585;&#1610; &#1608;&#1605;&#1583;&#1577; &#1575;&#1604;&#1578;&#1608;&#1585;&#1610;&#1583; &#1608;&#1605;&#1582;&#1586;&#1608;&#1606; &#1575;&#1604;&#1571;&#1605;&#1575;&#1606; &#1578;&#1615;&#1581;&#1587;&#1576; &#1603;&#1604; &#1604;&#1610;&#1604;&#1577;.</li>
+<li>&#1575;&#1604;&#1585;&#1589;&#1610;&#1583; &#1608;&#1575;&#1604;&#1603;&#1605;&#1610;&#1575;&#1578; &#1575;&#1604;&#1602;&#1575;&#1583;&#1605;&#1577; &#1581;&#1610;&#1577; &#1604;&#1581;&#1592;&#1577; &#1601;&#1578;&#1581; &#1575;&#1604;&#1578;&#1602;&#1585;&#1610;&#1585;.</li>
+<li>&#1603;&#1604; &#1575;&#1604;&#1603;&#1605;&#1610;&#1575;&#1578; &#1576;&#1608;&#1581;&#1583;&#1577; &#1575;&#1604;&#1589;&#1606;&#1601; &#1575;&#1604;&#1575;&#1601;&#1578;&#1585;&#1575;&#1590;&#1610;&#1577;.</li>
+</ul>
+</div>
+</div>
+</div></div>
+<div id="mvHelp" data-title="How the order quantity is calculated"><div class="hp">
+<div class="hp-top"><p>A short guide to the two ORDER columns: where the number comes from and how to use it in a purchase decision.</p><button type="button" class="hp-lang" data-lang="ar">&#1593;&#1585;&#1576;&#1610;</button></div>
+<div class="hp-s">
+<h4><i>1</i>What to order</h4>
+<p><code>ORDER (3M COVER)</code> is the quantity to order <b>today</b> so the item does not run out before the shipment arrives, and then lasts 3 months after it arrives. <code>ORDER (6M COVER)</code> is the same for 6 months.</p>
+<div class="f">ORDER <b>=</b> NEED <b>&minus;</b> STOCK <b>&minus;</b> ON ORDER</div>
+<p class="muted">Never below zero: a dash means there is nothing to order now. Hover an order quantity to see its own calculation.</p>
+</div>
+<div class="hp-s">
+<h4><i>2</i>Need</h4>
+<div class="f">NEED <b>=</b> Sales per month <b>&times;</b> (supplier lead time + 3 or 6 months cover) <b>+</b> safety stock</div>
+<ul>
+<li><b>Sales per month:</b> net sales (after returns) of the last 12 complete months; the current month is not used. Recent months weigh more: 50% the last 3 months, 30% the 3 before them, 20% the oldest 6. A month above 3 times the item's usual month counts at 3 times only, so one exceptional order does not inflate the figures.</li>
+<li><b>Supplier lead time:</b> days from the purchase order to the arrival of the shipment, for the last supplier the item was received from, since 2023. We take the time within which 4 shipments out of 5 arrived, so the usual delays are included. Company-wide: 101 days usually, 130 days for 4 shipments out of 5. A supplier with fewer than 3 shipments takes 130 days.</li>
+<li><b>Cover:</b> 3 or 6 months after the shipment arrives (the two ORDER columns).</li>
+<li><b>Safety stock:</b> an extra quantity sized to how much the item's monthly sales vary and to the length of the lead time, so that 9 months out of 10 pass without a shortage.</li>
+</ul>
+</div>
+<div class="hp-g">
+<div class="hp-s">
+<h4><i>3</i>Stock and on order</h4>
+<ul>
+<li><b>STOCK:</b> today's stock of lots that have not expired, in the warehouses of the selected scope. Click it to see it by warehouse.</li>
+<li><b>ON ORDER:</b> open purchase orders, required + at customs. <span class="red">Red</span> = an order past its arrival month: check with purchasing that it is still valid.</li>
+<li><b>Branch view:</b> the branch takes its share of the company orders, by its share of the item's sales in the period.</li>
+</ul>
+</div>
+<div class="hp-s">
+<h4><i>4</i>Orders to review</h4>
+<p>A <span class="dt"></span> pink dot beside an order quantity, and the <b>To review</b> pill, mark an intermittent item or a month with an exceptional order.</p>
+<ul>
+<li>Open the item's customers (click its name) before ordering.</li>
+<li>New items (N) and seasonal items also need the reviewer's judgement.</li>
+</ul>
+</div>
+<div class="hp-s">
+<h4><i>5</i>Not included</h4>
+<ul>
+<li>Seasonality: sales are assumed even through the year.</li>
+<li>Reorder limits on the item card.</li>
+<li>Lots expiring soon: they count as stock until they expire.</li>
+<li>Arrival dates of open orders: every open order is deducted, however late.</li>
+</ul>
+</div>
+<div class="hp-s">
+<h4><i>6</i>Refresh and units</h4>
+<ul>
+<li>Sales per month, lead time and safety stock are recalculated every night.</li>
+<li>Stock and on order are live when the report opens.</li>
+<li>All quantities are in the item's default unit.</li>
+</ul>
+</div>
+</div>
+</div></div>
+<script>
+(function () {
+function add() {
+var r = document.getElementById('resetBtn');
+if (!r || !window.mvShell) { setTimeout(add, 200); return; }
+if (document.getElementById('howBtn')) return;
+var b = document.createElement('button');
+b.type = 'button'; b.id = 'howBtn'; b.className = 'mv-how'; b.textContent = 'How it is calculated';
+b.title = 'How the order quantity (ORDER columns) is calculated';
+r.parentNode.insertBefore(b, r);
+function show(S, lang) {
+var src = document.getElementById(lang === 'en' ? 'mvHelp' : 'mvHelpAr'), box = document.querySelector('#mvPop .pp-sc');
+S.t.textContent = src.getAttribute('data-title');
+S.t.parentNode.style.direction = lang === 'en' ? 'ltr' : 'rtl';
+box.innerHTML = src.innerHTML;
+try { localStorage.setItem('mvHelpLang', lang); } catch (e) {}
+box.querySelector('[data-lang]').onclick = function () { show(S, this.getAttribute('data-lang')); };
+}
+b.onclick = function () {
+var S = mvShell(''), lang = 'ar';
+try { lang = localStorage.getItem('mvHelpLang') || 'ar'; } catch (e) {}
+S.n.textContent = 'Item Movement - ORDER (3M COVER) | ORDER (6M COVER)';
+S.b.style.display = 'none';
+show(S, lang);
+};
+}
+add();
+})();
+</script>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("move")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/move_move.compact.js"></script>
+</body></html>

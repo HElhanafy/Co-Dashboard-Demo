@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Palette Preview</title>
+<script src="theme.js"></script>
+<link rel="stylesheet" href="THEME.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font:13px var(--f-ui);color:var(--c-ink);background:var(--c-bg)}
+.pick{display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap;align-items:center}
+.pick b{margin-right:6px}.pick button{border:1px solid var(--c-line);background:#fff;border-radius:16px;padding:5px 14px;cursor:pointer;font:inherit}
+.pick button.on{background:var(--c-brand);color:#fff;border-color:var(--c-brand)}
+.app{display:flex;min-height:520px;margin:0 16px 16px;border:1px solid var(--c-line);border-radius:10px;overflow:hidden;background:#fff}
+.sb{width:190px;background:var(--c-brand);color:#fff;padding:12px 0;flex:none}
+.sb .lg{font-weight:700;padding:4px 16px 14px;font-size:15px}.sb .lg span{color:var(--c-accent)}
+.sb a{display:block;padding:7px 16px;color:#ffffffcc;text-decoration:none}.sb a.on{background:#ffffff1f;color:#fff;border-left:3px solid var(--c-accent)}
+.mn{flex:1;min-width:0}
+.hd{background:var(--c-grad);color:#fff;padding:14px 18px}.hd h1{margin:0;font-size:17px}.hd p{margin:3px 0 0;opacity:.8;font-size:12px}
+.bd{padding:14px 18px}
+.kp{display:flex;gap:10px;flex-wrap:wrap}.k{border:1px solid var(--c-line);border-radius:8px;padding:9px 12px;min-width:140px;border-top:3px solid var(--c-brand)}
+.k:nth-child(2){border-top-color:var(--c-accent)}.k s{display:block;text-decoration:none;color:var(--c-muted);font-size:11px}.k b{font-size:17px}
+.pl{display:flex;gap:6px;margin:12px 0;flex-wrap:wrap}.pl span{padding:4px 11px;border-radius:14px;background:var(--c-soft);color:var(--c-brand);font-weight:600}
+.pl span.on{background:var(--c-brand);color:#fff}.pl span.ac{background:var(--c-accent-soft);color:var(--c-ink);border:1px solid var(--c-accent)}
+table{border-collapse:collapse;width:100%}th{background:var(--c-soft);color:var(--c-brand);text-align:left;padding:7px 8px;border-bottom:2px solid var(--c-soft-2)}
+td{padding:6px 8px;border-bottom:1px solid var(--c-line)}td.n{text-align:right}
+.cap{display:inline-block;width:18px;height:18px;line-height:16px;text-align:center;border-radius:50%;border:1px solid var(--c-soft-2);color:var(--c-brand);margin-right:6px;font-size:11px}
+.pos{color:var(--c-pos)}.neg{color:var(--c-neg)}tr.t td{font-weight:700;background:var(--c-soft)}
+.bt{margin-top:12px;display:flex;gap:8px}.bt button{border:0;border-radius:6px;padding:7px 14px;font:inherit;cursor:pointer;background:var(--c-brand);color:#fff}
+.bt button.g{background:#fff;color:var(--c-brand);border:1px solid var(--c-soft-2)}
+@media(max-width:640px){.sb{display:none}.app{margin:0 8px 8px}}
+</style></head><body>
+<div class="pick"><b>Palette:</b><button data-p="ocean">Ocean</button><button data-p="slate">Slate &amp; Amber</button><button data-p="plum">Plum &amp; Coral</button><button data-p="forest">Forest &amp; Gold</button><button data-p="midnight">Midnight &amp; Cyan</button><button data-p="burgundy">Burgundy &amp; Sand</button><button data-p="graphite">Graphite &amp; Lime</button><button data-p="royal">Royal &amp; Orange</button><button data-p="teal">Teal &amp; Rose</button></div>
+<div class="app"><nav class="sb"><div class="lg">Co.<span>Dashboard</span></div>
+<a class="on">Home</a><a>Sales Analysis</a><a>Profit Analysis</a><a>Receivables</a><a>Stock Balances</a><a>Trial Balance</a></nav>
+<div class="mn"><div class="hd"><h1>Sales Analysis</h1><p>Co. Dashboard · 2026 · as of 24/10/2026</p></div>
+<div class="bd"><div class="kp"><div class="k"><s>Net sales</s><b>12,480,300</b></div><div class="k"><s>Gross profit</s><b>3,915,220</b></div><div class="k"><s>Overdue</s><b class="neg">842,110</b></div></div>
+<div class="pl"><span class="on">2026</span><span>2025</span><span>2024</span><span class="ac">Q3</span><span>Rep 01</span></div>
+<table><tr><th>Salesman</th><th class="n">Sales</th><th class="n">Growth</th></tr>
+<tr><td><span class="cap">&rsaquo;</span>Rep 01</td><td class="n">2,310,400</td><td class="n pos">+8.2%</td></tr>
+<tr><td><span class="cap">&rsaquo;</span>Rep 02</td><td class="n">1,905,770</td><td class="n neg">-3.1%</td></tr>
+<tr><td><span class="cap">&rsaquo;</span>Rep 03</td><td class="n">1,644,020</td><td class="n pos">+1.4%</td></tr>
+<tr class="t"><td>Total</td><td class="n">5,860,190</td><td class="n pos">+2.6%</td></tr></table>
+<div class="bt"><button>Export</button><button class="g">Print</button></div></div></div></div>
+<script>
+(function(){var bs=document.querySelectorAll('.pick button'),h=document.documentElement;
+function mark(){for(var i=0;i<bs.length;i++)bs[i].className=bs[i].getAttribute('data-p')===h.getAttribute('data-palette')?'on':''}
+for(var i=0;i<bs.length;i++)bs[i].onclick=function(){var p=this.getAttribute('data-p');h.setAttribute('data-palette',p);try{localStorage.setItem('demoPalette',p)}catch(e){}mark()};mark()})();
+</script></body></html>

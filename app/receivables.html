@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Receivables & Collection - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/receivables_receivables.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_receivables.js"></script>
+<script src="js/receivables_receivables.fg.compact.js"></script>
+</head>
+<body data-alias="RECEIVABLES">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- RECEIVABLES.HTML - region of page RECEIVABLES in the unified SALES look: header in one line, Print Dashboard + shared Export, drill capsules with the Supervisor level - 04/10/2026 -->
+<div class="wrap">
+    <!-- Header -->
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">R</div>
+            <div>
+                <div style="display:flex; align-items:center; gap: 12px; flex-wrap: wrap;">
+                    <h1>Receivables &amp; Collection</h1>
+                    <div class="period-badge" id="periodBadge">Loading...</div>
+                </div>
+                <div class="subtitle">Open invoices, aging and collections by Division, Area, Supervisor, Salesman and Customer</div>
+            </div>
+        </div>
+        <div class="header-actions">
+          <div class="actions-row">
+            <!-- the unified Refresh button (SIDEBAR.JS) is injected here as the first child; it also fills the empty as-of line -->
+            <button type="button" class="btn-print" id="printDashBtn" title="Print the full dashboard">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                    <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Print Dashboard
+            </button>
+          </div>
+          <div class="asof-line" id="asOfLine"></div>
+        </div>
+    </div>
+
+    <!-- Filters Bar: customer search (wide), collections period, Apply, Reset (dimensions are handled by drill navigation) -->
+    <div class="filters">
+        <div class="filter-group filter-cust">
+            <label>Customer <span class="lbl-hint">(type to search, arrows and Enter to pick)</span></label>
+            <div class="search-select" id="fCustBox">
+                <input type="text" id="fCustInp" placeholder="All Customers" autocomplete="off">
+                <button type="button" class="clear-btn" id="fCustClr" title="Clear" style="display:none;">&times;</button>
+                <div class="ss-menu" id="fCustMenu"></div>
+            </div>
+        </div>
+        <div class="filter-group">
+            <label>Collections From</label>
+            <input type="text" id="fD1" placeholder="DD/MM/YYYY" autocomplete="off">
+        </div>
+        <div class="filter-group">
+            <label>Collections To</label>
+            <input type="text" id="fD2" placeholder="DD/MM/YYYY" autocomplete="off">
+        </div>
+        <div class="filter-group">
+            <label>&nbsp;</label>
+            <button type="button" class="btn-view" id="collApplyBtn" title="Reload collections for the chosen period">Apply Period</button>
+        </div>
+        <div class="filter-group filter-reset">
+            <label>&nbsp;</label>
+            <button type="button" class="btn-reset" id="resetBtn">Reset</button>
+        </div>
+    </div>
+
+    <!-- KPI Row -->
+    <div class="kpi-row" id="kpiContainer">
+        <!-- Dynamic KPIs injected by RECEIVABLES.JS -->
+    </div>
+
+    <!-- Header block of a drill scope or a customer: replaces the cards and the aging panel there (painted by RECEIVABLES.JS) -->
+    <div class="hb" id="scopeBox" style="display:none"></div>
+
+    <!-- Aging bar of the top level, under the cards (painted by RECEIVABLES.JS) -->
+    <div class="panel ag-panel" id="agingBox"></div>
+
+    <!-- Detail Table Panel -->
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px;">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">Receivables Aging</span></h3>
+                <div class="panel-sub" id="tableSub"></div>
+            </div>
+            <div class="table-tools">
+                <!-- Drill capsules (shown or hidden by JS per drill scope) -->
+                <div class="level-tabs" id="levelTabs">
+                    <button type="button" class="lvl-btn" data-level="DIV">Division</button>
+                    <button type="button" class="lvl-btn" data-level="AREA">Area</button>
+                    <button type="button" class="lvl-btn active" data-level="SUP">Supervisor</button>
+                    <button type="button" class="lvl-btn" data-level="RTN">Returned Chq</button>
+                    <button type="button" class="lvl-btn" data-level="INV">Invoices</button>
+                </div>
+                <button type="button" class="btn-view" id="invOdBtn" style="display:none" title="Show overdue invoices only">Overdue Only</button>
+                <button type="button" class="btn-back" id="backBtn" style="display:none">&#8592; Back</button>
+                <!-- Export (Excel . PDF): drawn by the shared control window.jmExport from RECEIVABLES.JS -->
+                <span id="exportBox"></span>
+            </div>
+        </div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll">
+            <table>
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("receivables")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/receivables_receivables.compact.js"></script>
+</body></html>

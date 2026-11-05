@@ -1,0 +1,5 @@
+Co. Dashboard - management reports demo
+
+Open index.html in Chrome or Edge (double-click), choose an industry and browse the reports.
+Everything runs inside the browser from these files; no server, database or internet is needed.
+All company, customer, salesman, supplier and item names and all figures are fictitious.

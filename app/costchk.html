@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cost Check - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/costchk_costchk.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_costchk.js"></script>
+<script src="../shim/srv_itcard.js"></script>
+<script src="js/costchk_costchk.global.compact.js"></script>
+</head>
+<body data-alias="COSTCHK">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- COSTCHK.HTML - Cost Check page (Static Content region, Seq 20) - 13/09/2026 . unified header, fonts and colours 20/10/2026 (filter layout unchanged by user decision) -->
+<div class="wrap">
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">C</div>
+            <div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <h1>Cost Check</h1>
+                    <div class="period-badge" id="periodBadge">Loading</div>
+                </div>
+                <div class="subtitle">Lines costed off the cost they should carry, company wide</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="actions-row">
+                <!-- Export (Excel . PDF): the shared control window.jmExport drawn by COSTCHK.JS (page 0 regions, SHARED_UI = Y); without it the two old buttons are drawn - 20/10/2026 -->
+                <span id="exportBox"></span>
+            </div>
+            <div class="asof-line" id="asOfLine"></div>
+        </div>
+    </div>
+
+    <!-- Filters: one row (item text filter, period, min diff, Run, Reset); then rule chips and warehouse chips -->
+    <div class="sk-filters ic-filters">
+        <div class="cc-row">
+            <div class="filter-group cc-item ic-item">
+                <label>Item</label>
+                <div class="search-select">
+                    <input type="text" id="fItem" placeholder="Filter the list by item code or name..." autocomplete="off">
+                    <button type="button" class="clear-btn" id="fItemClr" style="display:none">&times;</button>
+                    <div class="ss-menu" id="itemMenu" style="display:none"></div>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Period</label>
+                <div class="ic-period">
+                    <input type="date" id="fFrom" title="Start of the period (default: start of the loaded window)">
+                    <span class="ic-sep">&#8211;</span>
+                    <input type="date" id="fTo" title="End of the period (default: today)">
+                </div>
+            </div>
+            <div class="ic-btns">
+                <button type="button" class="ic-run" id="runBtn" title="Load the report">&#9654; Run</button>
+                <button type="button" class="sk-reset" id="resetBtn" title="Reset the filters">&#8635; Reset</button>
+            </div>
+        </div>
+        <div class="ic-line" id="ruleLine" style="display:none">
+            <span class="sk-lbl" title="Which check flagged the line">Rule</span>
+            <div class="sk-chips ic-lots" id="ruleChips"></div>
+        </div>
+        <div class="ic-line" id="storeLine" style="display:none">
+            <span class="sk-lbl" title="Warehouse of the flagged line">Warehouse</span>
+            <div class="sk-chips ic-stores" id="storeChips"></div>
+        </div>
+    </div>
+
+    <!-- KPI head -->
+    <div class="panel ic-head" id="cardHead" style="display:none">
+        <div class="ic-l1" id="cardL1"></div>
+        <div class="ic-l2" id="cardL2"></div>
+    </div>
+
+    <!-- Lots table -->
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">Lots with mis-costed lines</span></h3>
+            </div>
+            <div class="table-tools">
+                <span class="mv-loading" id="tableNote">Loading...</span>
+            </div>
+        </div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll">
+            <table id="lotsTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+                <tfoot id="tableFoot"></tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Lines of one lot (replaces the lots table, Back returns) -->
+    <div class="panel" id="docPanel" style="display:none;margin-bottom:16px">
+        <div class="table-header-row">
+            <div class="ic-crumb">
+                <button type="button" class="btn-back" id="docBack">&#8592; Back</button>
+                <span id="docCrumb"></span>
+            </div>
+            <div class="table-tools">
+                <span class="mv-loading" id="docNote"></span>
+            </div>
+        </div>
+        <div class="ic-dochead" id="docHead"></div>
+        <div class="print-filters" id="docPrintFilters"></div>
+        <div class="table-scroll">
+            <table id="docTable">
+                <thead id="docTHead"></thead>
+                <tbody id="docBody"></tbody>
+                <tfoot id="docFoot"></tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Level 3: movement card of the lot in one warehouse (same data and rules as the item card), Back returns to the lines -->
+    <div class="panel" id="mvPanel" style="display:none;margin-bottom:16px">
+        <div class="table-header-row">
+            <div class="ic-crumb">
+                <button type="button" class="btn-back" id="mvBack">&#8592; Back</button>
+                <span id="mvCrumb"></span>
+            </div>
+            <div class="table-tools">
+                <span class="mv-loading" id="mvNote"></span>
+            </div>
+        </div>
+        <div class="ic-dochead" id="mvHead"></div>
+        <div class="print-filters" id="mvPrintFilters"></div>
+        <div class="table-scroll">
+            <table id="mvTable">
+                <thead id="mvTHead"></thead>
+                <tbody id="mvBody"></tbody>
+                <tfoot id="mvFoot"></tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Level 4: one document, Back returns to the card (or to the lines) -->
+    <div class="panel" id="vcPanel" style="display:none;margin-bottom:16px">
+        <div class="table-header-row">
+            <div class="ic-crumb">
+                <button type="button" class="btn-back" id="vcBack">&#8592; Back</button>
+                <span id="vcCrumb"></span>
+            </div>
+            <div class="table-tools">
+                <span class="mv-loading" id="vcNote"></span>
+            </div>
+        </div>
+        <div class="ic-dochead" id="vcHead"></div>
+        <div class="print-filters" id="vcPrintFilters"></div>
+        <div class="table-scroll">
+            <table id="vcTable">
+                <thead id="vcTHead"></thead>
+                <tbody id="vcBody"></tbody>
+                <tfoot id="vcFoot"></tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("costchk")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/costchk_costchk.compact.js"></script>
+</body></html>

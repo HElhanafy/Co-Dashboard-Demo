@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stock Value - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/stval_stval.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_stval.js"></script>
+<script src="../shim/srv_stock.js"></script>
+<script src="js/stval_stval_xlsx.compact.js"></script>
+</head>
+<body data-alias="STVAL">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- STVAL.HTML - Region Static Content Seq 20 (Blank with Attributes), page STVAL: header, value card, filters (STOCK shape) with single-scope chips, table, <style> of item 37 (01/10/2026: unified Export, residue line, management PDF, unified fonts and labels) -->
+<div class="wrap">
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">V</div>
+            <div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <h1>Stock Value</h1>
+                    <div class="period-badge" id="periodBadge">Loading...</div>
+                </div>
+                <div class="subtitle">Quantity and cost on hand by item and lot, valued at the lot average cost in each warehouse (system method), up to and including the selected date</div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="actions-row">
+                <!-- Refresh button: injected by the unified SIDEBAR JS (DASH_REFRESH_JOBS row STVAL) -->
+                <!-- Export (Excel . PDF): the shared control window.jmExport (Global Page, alias STVAL in its condition); the two old buttons
+                     stay hidden and come back only when the control is missing (01/10/2026) -->
+                <span id="exportBox"></span>
+                <button type="button" class="btn-print btn-excel" id="excelBtn" style="display:none" title="Export the current table to Excel">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="9" y1="13" x2="15" y2="19"></line>
+                        <line x1="15" y1="13" x2="9" y2="19"></line>
+                    </svg>
+                    Export Excel
+                </button>
+                <button type="button" class="btn-print" id="printTableBtn" style="display:none" title="Print or save as PDF">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                        <rect x="6" y="14" width="12" height="8"></rect>
+                    </svg>
+                    Print / PDF
+                </button>
+            </div>
+            <div class="asof-line" id="asOfLine"></div>
+        </div>
+    </div>
+
+    <!-- Value card (user 15/09): one card, the Items total and the Lots total side by side with the match status, and a cost-issue warning -->
+    <div class="sv-cards" id="valueCards">
+        <div class="sv-card sv-main">
+            <div class="sv-lbl">Inventory value at cost</div>
+            <div class="sv-pair">
+                <div class="sv-half" id="halfItems"><span class="sv-k">Items (average cost)</span><span class="sv-val" id="valItems">&#8212;</span></div>
+                <div class="sv-eq" id="valStatus" title="The two totals must be equal to the fils">&#8212;</div>
+                <div class="sv-half" id="halfLots"><span class="sv-k">Lots (actual lot cost)</span><span class="sv-val" id="valLots">&#8212;</span></div>
+            </div>
+        </div>
+        <!-- Accounts card (user 15/09): company scope only - collapsed = the ledger total vs the module total; click = per-account table -->
+        <div class="sv-card sv-gl" id="glCard" style="display:none" title="Click to show or hide the comparison by account">
+            <div class="sv-glhead" id="glHead">
+                <div class="sv-lbl">Accounts (general ledger) vs inventory module <span id="glScope"></span></div>
+                <div class="sv-pair sv-glsum">
+                    <div class="sv-half"><span class="sv-k">Ledger 1103* (posted)</span><span class="sv-val" id="glLedger">&#8212;</span></div>
+                    <div class="sv-eq" id="glStatus">&#8212;</div>
+                    <div class="sv-half"><span class="sv-k">Inventory module</span><span class="sv-val" id="glModule">&#8212;</span></div>
+                    <span class="sv-tw" id="glTw">&#9660;</span>
+                </div>
+            </div>
+        </div>
+        <!-- the comparison by account opens as a full-width row under the two cards (user 15/09) -->
+        <div class="sv-card sv-gldetail" id="glDetail" style="display:none">
+            <div class="table-scroll">
+                <table class="sv-gltab">
+                    <thead><tr><th>ACCOUNT</th><th>NAME</th><th>WAREHOUSES</th><th class="num">LEDGER BALANCE</th><th class="num">INVENTORY VALUE</th><th class="num">DIFFERENCE</th></tr></thead>
+                    <tbody id="glBody"></tbody>
+                </table>
+            </div>
+            <div class="sv-sub" id="glNote">Compare at a posted month end: <button type="button" class="sv-link" id="glMonthEnd">set the date to the last month end</button></div>
+        </div>
+    </div>
+
+    <!-- Filters: STOCK shape (main block + side box), then single-scope chips: Company / branches > warehouses (STOCK Lots view) -->
+    <div class="sk-filters">
+        <div class="sk-top">
+            <div class="sk-main">
+                <div class="sk-row1">
+                    <div class="filter-group sk-date">
+                        <label>Till Date (inclusive)</label>
+                        <div class="sk-step">
+                            <input type="date" id="fDate">
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Warehouse Type</label>
+                        <select id="fType"><option value="">All Types</option></select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Item Class</label>
+                        <!-- class picker as POARR (01/10/2026): the hidden select keeps the value, the menu under the button always opens downwards and filters as you type -->
+                        <div class="cls-pick" id="clsPick">
+                            <button type="button" class="cls-btn" id="fClassBtn" title="Choose a class"><span id="fClassLbl">All Classes</span><i>&#9662;</i></button>
+                            <select id="fClass" class="cls-sel"><option value="">All Classes</option></select>
+                            <div class="ss-menu" id="fClassMenu"><input type="text" id="fClassQ" placeholder="Type to filter the classes..." autocomplete="off"><div id="fClassList"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sk-row2">
+                    <div class="filter-group sk-grow">
+                        <label>Item</label>
+                        <div class="search-select">
+                            <input type="text" id="fItem" placeholder="Type a code or part of the name - pick from the list or keep typing to filter..." autocomplete="off">
+                            <button type="button" class="clear-btn" id="fItemClr" style="display:none">&times;</button>
+                            <div class="ss-menu" id="itemMenu" style="display:none"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="sk-side">
+                <label>View</label>
+                <div class="ic-seg" id="viewSeg">
+                    <button type="button" class="on" data-v="items" title="One row per item: quantity, average unit cost and value in the selected scope">Items</button>
+                    <button type="button" data-v="lots" title="One row per lot: quantity, lot unit cost and value in the selected scope">Lots</button>
+                </div>
+                <button type="button" class="sk-reset" id="resetBtn" title="Clear all filters">&#8635; Reset</button>
+            </div>
+        </div>
+        <div class="sk-line">
+            <span class="sk-lbl" title="Company, or one branch (same branches as the balances report)">Branches</span>
+            <div class="sk-chips" id="branchChips"></div>
+        </div>
+        <div class="sk-line sk-sub" id="storeGroup" style="display:none">
+            <span class="sk-lbl" title="All warehouses of the branch, or one warehouse">Warehouses</span>
+            <div class="sk-chips" id="storeChips"></div>
+        </div>
+        <!-- check chips (user 15/09): All / cost above the sale price / cost issue -->
+        <div class="sk-line sk-chk">
+            <span class="sk-lbl" title="Filter the table to the items that need attention">Check</span>
+            <div class="sk-chips" id="checkChips"></div>
+        </div>
+    </div>
+
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">Stock Value</span></h3>
+            </div>
+            <div class="table-tools">
+                <button type="button" class="btn-back" id="backBtn" style="display:none">&#8592; Back</button>
+                <button type="button" class="btn-view" id="toggleAllBtn" title="Collapse or expand all class groups">Collapse all</button>
+            </div>
+        </div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll">
+            <table>
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div class="panel-note" id="tableNote"></div>
+    </div>
+</div>
+<style>
+/* item 37 (01/10/2026) rules live here: the Inline CSS field is at 30.8K of 32K (same precedent as MOVE cost view) */
+/* unified font: numbers in Segoe UI with tabular digits (rule 30/09); codes, lots and account numbers stay Consolas */
+.sv-val, .sv-eq, td.c-val, td.c-cost, td.c-price, td.num, td.c-exp, .sv-gltab td.num, td.num .qb { font-family: var(--font-head); font-variant-numeric: tabular-nums; }
+.sv-val { font-weight: 600; letter-spacing: -0.01em; }
+/* header laid out by the screen (user 01/10/2026, design basic): title block and actions stay on one line at any width - the long
+   subtitle wraps inside its block instead of pushing the buttons under it; below 900px the actions drop under the title, full width */
+.dash-header { flex-wrap: nowrap; align-items: center; }
+.brand { flex: 1 1 auto; min-width: 0; }
+.brand > div { min-width: 0; }
+.subtitle { overflow-wrap: anywhere; }
+.header-actions { flex: 0 0 auto; }
+@media (max-width: 900px) { .dash-header { flex-wrap: wrap; } .header-actions { align-items: flex-start; width: 100%; } }
+/* the Export menu drops below the header: the header no longer clips its overflow; the stripes keep the rounded corners */
+.dash-header { overflow: visible; }
+.dash-header::before { border-radius: 14px; }
+/* filter labels in the unified small-caps navy style */
+.sk-filters .filter-group label, .sk-side label { font-size: 10.5px; color: var(--navy); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.sk-lbl { color: var(--navy); }
+.sk-chk .sk-lbl { color: var(--bad); }
+.sk-sub .sk-lbl { color: var(--purple); }
+/* one colour per branch chip when lit (Company stays navy) */
+#branchChips .sk-chip[data-p="707070070000"].on { background: var(--pink); border-color: var(--pink); }
+#branchChips .sk-chip[data-p="101030010000"].on { background: var(--purple); border-color: var(--purple); }
+#branchChips .sk-chip[data-p="102010010000"].on { background: var(--good); border-color: var(--good); }
+#branchChips .sk-chip[data-p="103010010000"].on { background: var(--warn); border-color: var(--warn); }
+#branchChips .sk-chip[data-p="104010010000"].on { background: #1a8f8a; border-color: #1a8f8a; }
+#branchChips .sk-chip[data-p="105010010000"].on { background: #2f6fb5; border-color: #2f6fb5; }
+#branchChips .sk-chip[data-p$="020010000"].on { background: #5a61a8; border-color: #5a61a8; }
+#branchChips .sk-chip.on .ck:hover { color: #fff; }
+/* class picker (as POARR): button + menu that opens downwards under it, with a filter box */
+.cls-pick { position: relative; width: 100%; }
+.cls-sel { display: none; }
+.cls-btn { width: 100%; height: 38px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 10px; border-radius: 8px; border: 1px solid rgba(17,28,58,0.22); background: var(--panel); color: var(--text); font: 400 13px var(--font-body); cursor: pointer; text-align: left; }
+.cls-btn:hover { border-color: var(--navy); }
+.cls-btn.picked { font-weight: 600; color: var(--navy); }
+.cls-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cls-btn i { font-style: normal; color: var(--muted); font-size: 11px; flex: none; }
+#fClassMenu { max-height: 340px; }
+#fClassMenu input { display: block; width: calc(100% - 16px); margin: 2px 8px 6px; height: 32px; box-sizing: border-box; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; font: 400 13px var(--font-body); outline: none; background: var(--panel2); }
+#fClassMenu input:focus { border-color: var(--navy); background: #fff; }
+#fClassList .ss-option .ss-code { min-width: 44px; }
+/* Hide sutures chip (class 1001, as POARR): pink when lit, independent of the check filter */
+.sk-chip.ck-sut { border-color: rgba(34,184,207,0.45); }
+.sk-chip.ck-sut:hover, .sk-chip.ck-sut .ck:hover { border-color: var(--pink); color: var(--pink); }
+.sk-chip.ck-sut.on { border-color: var(--pink); background: var(--pink); color: #fff; }
+.sk-chip.ck-sut.on .ck:hover { color: #fff; }
+/* table in the unified style of the new reports (PROFIT 30/09, MOVE cost 01/10): navy small-caps heads, Segoe numbers, pink line over the total */
+#printTablePanel thead th { color: var(--navy); font-weight: 700; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; padding: 10px 12px; background: #e7e8eb; border-bottom: 1px solid rgba(17,28,58,0.25); white-space: nowrap; line-height: 1.25; font-family: var(--font-body); }
+#printTablePanel thead th:hover { color: var(--navy); }
+#printTablePanel thead th.num { font-family: var(--font-body); font-size: 10.5px; font-weight: 700; }
+#printTablePanel tbody td { padding: 9px 12px; }
+#printTablePanel td.c-val, #printTablePanel td.c-cost, #printTablePanel td.c-price, #printTablePanel td.num { font-weight: 500; font-size: 12.5px; }
+#printTablePanel td.c-val { font-weight: 600; }
+tr.sv-total td { border-top: 2px solid var(--pink) !important; }
+/* zero-quantity residue: one line above the total in both views (user 30/09: Items = Lots = Inventory module) */
+tr.sv-res td { color: var(--muted); font-style: italic; background: #fafbfe !important; border-top: 1px dashed rgba(17,28,58,0.30) !important; }
+tr.sv-res td.c-val { color: var(--muted); font-weight: 600; }
+tr.sv-res td .n { font-style: normal; font-weight: 600; color: var(--navy); }
+/* ---- management PDF (rule 28, coloured sheet as MOVE cost 01/10): title block, the two boxes, the accounts table when open, then the table ---- */
+@media print {
+    @page { size: A4 landscape; margin: 12mm;
+            @top-right { content: "Co. Dashboard"; font: 8px sans-serif; color: #999; }
+            @bottom-right { content: "Page " counter(page) " of " counter(pages); font: 8px sans-serif; color: #555; } }
+    body.sv-pdf, body.sv-pdf #t_PageBody, body.sv-pdf .t-Body, body.sv-pdf .t-Body-main, body.sv-pdf .t-Body-content, body.sv-pdf .t-Body-contentInner,
+    body.sv-pdf .container, body.sv-pdf .row, body.sv-pdf .col, body.sv-pdf .t-Region, body.sv-pdf .t-Region-body, body.sv-pdf form#wwvFlowForm, body.sv-pdf .wrap
+    { padding-top: 0 !important; margin-top: 0 !important; }
+    body.sv-pdf .wrap > .dash-header, body.sv-pdf .sk-filters, body.sv-pdf .print-filters, body.sv-pdf .print-title-row, body.sv-pdf .table-header-row, body.sv-pdf .panel-note, body.sv-pdf .sv-sub, body.sv-pdf .sv-tw { display: none !important; }
+    body.print-mode-table.sv-pdf .wrap > #svPTitle { display: block !important; margin: 0 0 10px; padding: 0 0 6px; border-bottom: 1px solid #c6c9d0; }
+    #svPTitle .pt-h { font-family: var(--font-head); font-size: 14px; font-weight: 600; color: #000; }
+    #svPTitle .pt-h b { color: var(--c-brand); font-weight: 700; }
+    #svPTitle .pt-s { font-size: 9.5px; color: #333; margin-top: 3px; }
+    #svPTitle .pt-c { font-size: 9px; color: #555; margin-top: 2px; font-style: italic; }
+    body.print-mode-table.sv-pdf .wrap > .sv-cards { display: grid !important; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 10px; }
+    body.sv-pdf .sv-card { border: 1px solid #ccd !important; border-top: 4px solid var(--navy) !important; border-radius: 8px; padding: 8px 14px !important; box-shadow: none; background: #fff !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid; }
+    body.sv-pdf .sv-card:before { display: none; }
+    body.sv-pdf .sv-card.sv-gl { border-top-color: var(--good) !important; cursor: default; }
+    body.sv-pdf .sv-card.sv-gldetail { grid-column: 1 / -1; padding: 0 !important; border: none !important; }
+    body.sv-pdf .sv-lbl { font-size: 8.5px; color: #555; letter-spacing: .06em; }
+    body.sv-pdf .sv-glhead .sv-lbl span { font-size: 8.5px; color: #333; }
+    body.sv-pdf .sv-pair { margin-top: 6px; gap: 10px; }
+    body.sv-pdf .sv-half { border: 1px solid #dde1ec; background: #fff; padding: 6px 10px; }
+    body.sv-pdf .sv-half .sv-k { font-size: 8.5px; color: #555; }
+    body.sv-pdf .sv-val { font-size: 17px; color: var(--navy); }
+    body.sv-pdf .sv-eq { font-size: 9.5px; padding: 4px 9px; animation: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body.sv-pdf .sv-eq.bad { background: #c14a44 !important; color: #fff !important; }
+    body.sv-pdf .sv-eq.ok { background: #e3f3ea !important; color: #2f9463 !important; }
+    body.sv-pdf .sv-eq small { display: inline; margin-left: 5px; font-size: 8px; }
+    body.sv-pdf .sv-gltab { font-size: 9.5px; border: 1px solid #c6c9d0; border-radius: 0; border-collapse: collapse; }
+    body.sv-pdf .sv-gltab thead th { background: #e7e8eb !important; color: var(--navy) !important; border: 1px solid #c6c9d0 !important; font-size: 8.5px; padding: 4px 7px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body.sv-pdf .sv-gltab td { border: 1px solid #c9cdde !important; padding: 3px 7px; color: #000 !important; }
+    body.sv-pdf .sv-gltab td.d-ok { color: #2f9463 !important; }
+    body.sv-pdf .sv-gltab td.d-bad { color: #c14a44 !important; }
+    body.sv-pdf .sv-gltab tr.tot td { background: #e7e8eb !important; font-weight: 700; border-top: 2px solid var(--c-accent) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body.sv-pdf #printTablePanel { border: none !important; box-shadow: none !important; padding: 0 !important; }
+    body.sv-pdf #printTablePanel .table-scroll { overflow: visible !important; }
+    body.sv-pdf #printTablePanel table { width: 100% !important; table-layout: auto !important; font-size: 10px !important; border: 1px solid #c6c9d0 !important; border-collapse: collapse !important; }
+    body.sv-pdf #printTablePanel thead { display: table-header-group !important; }
+    body.sv-pdf #printTablePanel thead th { position: static !important; background: #e7e8eb !important; color: var(--navy) !important; border: 1px solid #c6c9d0 !important;
+        font-size: 8.5px !important; padding: 5px 7px !important; text-align: left; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body.sv-pdf #printTablePanel thead th.num { text-align: right; }
+    body.sv-pdf #printTablePanel tbody td { color: #000 !important; border: 1px solid #c9cdde !important; background: #fff !important; padding: 4px 7px !important; line-height: 1.25; font-size: 10px; }
+    body.sv-pdf #printTablePanel tbody tr:nth-child(even) td { background: #f7f8fc !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body.sv-pdf #printTablePanel tr { break-inside: avoid; page-break-inside: avoid; }
+    body.sv-pdf #printTablePanel th, body.sv-pdf #printTablePanel td { white-space: nowrap; }
+    body.sv-pdf #printTablePanel td.c-name { white-space: normal !important; max-width: none !important; }
+    body.sv-pdf #printTablePanel td:first-child { width: auto !important; padding-left: 7px !important; }
+    body.sv-pdf #printTablePanel td.c-code { font-size: 9.5px; }
+    body.sv-pdf #printTablePanel td.c-val, body.sv-pdf #printTablePanel td.c-cost, body.sv-pdf #printTablePanel td.c-price, body.sv-pdf #printTablePanel td.num { font-variant-numeric: tabular-nums; }
+    body.sv-pdf #printTablePanel tr.grp-row td { background: #dfe3f0 !important; color: var(--c-brand) !important; font-weight: 700 !important; border-top: 1px solid #c6c9d0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body.sv-pdf #printTablePanel tr.grp-row td .cnt { color: #555; opacity: 1; }
+    body.sv-pdf #printTablePanel tr.grp-row .tw { display: none; }
+    body.sv-pdf #printTablePanel tr.child-row.hidden { display: none !important; }
+    body.sv-pdf #printTablePanel tr.lot-sum td { background: #eef0f7 !important; font-weight: 700 !important; }
+    body.sv-pdf #printTablePanel tr.cost-off td.c-cost, body.sv-pdf #printTablePanel tr.cost-off td.c-val { color: #b5762a !important; font-weight: 700; }
+    body.sv-pdf #printTablePanel tr.price-off td.c-cost, body.sv-pdf #printTablePanel tr.price-off td.c-price { color: #c14a44 !important; font-weight: 700; }
+    body.sv-pdf #printTablePanel tr.sv-res td { color: #555 !important; font-style: italic; }
+    body.sv-pdf #printTablePanel tr.sv-total td { font-weight: 700 !important; background: #e7e8eb !important; border-top: 2px solid var(--c-accent) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body.sv-pdf #printTablePanel tr.sv-total { break-before: avoid-page !important; page-break-before: avoid !important; }
+}
+</style>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("stval")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/stval_stval.compact.js"></script>
+</body></html>

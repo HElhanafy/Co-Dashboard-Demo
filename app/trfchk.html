@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Transfer Integrity - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/trfchk_trfchk.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_trfchk.js"></script>
+<script src="../shim/srv_itcard.js"></script>
+<script src="js/trfchk_trfchk.fg.compact.js"></script>
+</head>
+<body data-alias="TRFCHK">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<div class="wrap">
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">T</div>
+            <div>
+                <div style="display:flex; align-items:center; gap: 12px; flex-wrap: wrap;">
+                    <h1>Transfer Integrity</h1>
+                    <div class="period-badge" id="periodBadge">Since 2023</div>
+                </div>
+                <div class="subtitle">Broken transfers between stores: issues, receipts and transfer headers that do not agree</div>
+            </div>
+        </div>
+        <div class="header-actions">
+          <div class="actions-row">
+            <a href="home.html" class="btn-reset" style="text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 6px 12px; font-size: 13px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Home
+            </a>
+          </div>
+          <div class="asof-line fresh" id="asOfLine">Live data</div>
+        </div>
+    </div>
+
+    <div class="kpi-row" id="kpiContainer"></div>
+
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px;">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">Transfer checks</span></h3>
+                <div class="panel-sub" id="tableSub"></div>
+            </div>
+            <div class="table-tools">
+                <button type="button" class="btn-back" id="backBtn" style="display:none">&#8592; Back</button>
+                <span id="exportBox"></span>
+            </div>
+        </div>
+        <div class="level-tabs tc-tabs" id="levelTabs"></div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll">
+            <table>
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("trfchk")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/trfchk_trfchk.compact.js"></script>
+</body></html>

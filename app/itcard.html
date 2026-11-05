@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Item Card - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/itcard_itcard.compact.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_itcard.js"></script>
+<script src="js/itcard_itcard.global.compact.js"></script>
+</head>
+<body data-alias="ITCARD">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- ITCARD.HTML - Item Card page (Static Content region, Seq 20) - 12/09/2026 · STOCK pattern 20/10/2026 -->
+<div class="wrap">
+    <!-- Header -->
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">C</div>
+            <div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <h1>Item Card</h1>
+                    <div class="period-badge" id="periodBadge">Select an item</div>
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="actions-row">
+                <!-- Export (Excel . PDF): the shared control window.jmExport drawn by ITCARD.JS (page 0 regions, SHARED_UI = Y); without it the two old buttons are drawn - 20/10/2026 -->
+                <span id="exportBox"></span>
+            </div>
+            <!-- no asof-line: the card reads the live ERP tables (no archive, no refresh job) -->
+        </div>
+    </div>
+
+    <!-- Filters (20/10/2026, STOCK pattern - user decision): the card spans the table width; main block = row 1 the item search, row 2 period . unit pills
+         (the hidden select keeps the value), then lot and warehouse chips after Run; a fixed side box holds the card switch, Run and Reset -->
+    <div class="sk-filters ic-filters">
+        <div class="sk-top">
+            <div class="sk-main">
+                <div class="sk-row2 ic-item">
+                    <div class="filter-group sk-grow">
+                        <label>Item</label>
+                        <div class="search-select">
+                            <input type="text" id="fItem" placeholder="Type a code or part of the name..." autocomplete="off">
+                            <button type="button" class="clear-btn" id="fItemClr" style="display:none">&times;</button>
+                            <div class="ss-menu" id="itemMenu" style="display:none"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sk-bar">
+                    <div class="filter-group">
+                        <label>Period</label>
+                        <div class="ic-period">
+                            <input type="date" id="fFrom" title="Start of the period (default: first day of last month)">
+                            <span class="ic-sep">&#8211;</span>
+                            <input type="date" id="fTo" title="End of the period (default: today)">
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <label>Unit</label>
+                        <select id="fUnit" style="display:none" disabled></select>
+                        <div class="tp" id="unitChips"><span class="tp-none">Select an item</span></div>
+                    </div>
+                    <!-- Run beside the unit pills, it moves with their count (user 20/10/2026) -->
+                    <button type="button" class="ic-run" id="runBtn" title="Build the card" disabled>&#9654; Run</button>
+                    <!-- Reset fixed at the right end of the row, lined up with the item box (user 20/10/2026) -->
+                    <button type="button" class="sk-reset" id="resetBtn" title="Clear all filters">&#8635; Reset</button>
+                </div>
+                <div class="ic-line" id="lotLine" style="display:none">
+                    <span class="sk-lbl" title="Lots with a balance at the end date or a movement inside the period">Lots</span>
+                    <div class="sk-chips ic-lots" id="lotChips"></div>
+                </div>
+                <div class="ic-line" id="storeLine" style="display:none">
+                    <span class="sk-lbl" title="All warehouses in one sequence, or one warehouse (only warehouses the lot moved in during the period)">Warehouse</span>
+                    <div class="sk-chips ic-stores" id="storeChips"></div>
+                </div>
+            </div>
+            <!-- side box: the card switch, two equal stacked buttons, centred in the card (user 20/10/2026): By lot . Average cost -->
+            <div class="sk-side">
+                <label>Card</label>
+                <div class="ic-seg ic-stack" id="cardSeg">
+                    <button type="button" class="on" data-v="lot" title="One lot: its cost, balance, sale and purchase prices">By lot</button>
+                    <button type="button" data-v="avg" title="All lots of the item in one sequence at moving average cost (cost viewers only)">Average cost</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card header: line 1 item + warehouse, line 2 lot / unit / prices / balance -->
+    <div class="panel ic-head" id="cardHead" style="display:none">
+        <div class="ic-l1" id="cardL1"></div>
+        <div class="ic-l2" id="cardL2"></div>
+    </div>
+
+    <!-- Movements -->
+    <div class="panel" id="printTablePanel" style="margin-bottom:16px">
+        <div class="table-header-row">
+            <div>
+                <h3><span class="dot"></span> <span id="tableTitleText">Movements</span></h3>
+            </div>
+            <!-- movement-type chips live in the table header (user 12/09): click = show only those types -->
+            <div class="ic-kinds" id="kindChips" style="display:none" title="Movement types in this table: click to show only those (the running balance stays complete)"></div>
+            <div class="table-tools">
+                <span class="mv-loading" id="tableNote">Select an item, then Run</span>
+            </div>
+        </div>
+        <div class="print-filters" id="printFilters"></div>
+        <div class="table-scroll">
+            <table id="cardTable">
+                <thead id="tableHead"></thead>
+                <tbody id="tableBody"></tbody>
+                <tfoot id="tableFoot"></tfoot>
+            </table>
+        </div>
+        <div class="panel-note" id="tableFootNote"></div>
+    </div>
+
+    <!-- Document view (replaces the movements table on click, Back returns - TB drill pattern) -->
+    <div class="panel" id="docPanel" style="display:none;margin-bottom:16px">
+        <div class="table-header-row">
+            <div class="ic-crumb">
+                <button type="button" class="btn-back" id="docBack">&#8592; Back</button>
+                <span id="docCrumb"></span>
+            </div>
+            <div class="table-tools">
+                <span class="mv-loading" id="docNote"></span>
+            </div>
+        </div>
+        <div class="ic-dochead" id="docHead"></div>
+        <div class="print-filters" id="docPrintFilters"></div>
+        <div class="table-scroll">
+            <table id="docTable">
+                <thead id="docTHead"></thead>
+                <tbody id="docBody"></tbody>
+                <tfoot id="docFoot"></tfoot>
+            </table>
+        </div>
+        <div class="panel-note">Click a line to open the card of that item and lot.</div>
+    </div>
+</div>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script>DEMO_RENDER("itcard")</script>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/itcard_itcard.compact.js"></script>
+</body></html>

@@ -160,7 +160,7 @@ for (i = 0; i < n; i++) { o = V.list[i]; if (!CNT[o.cls]) { CNT[o.cls] = [0, 0];
 for (i = 0; i < n; i++) {
 o = V.list[i];
 if (o.cls !== lastCls) {
-body += '<tr class="cls" data-g="' + esc(o.cls) + '" title="Click to collapse or expand the class"><td colspan="' + W + '">' + (COLL[o.cls] ? '&#9656; ' : '&#9662; ') + esc(o.cls) + ' - ' + esc(o.cname || 'No class') +
+body += '<tr class="cls" data-g="' + esc(o.cls) + '" title="Click to collapse or expand the class"><td colspan="' + W + '">' + (COLL[o.cls] ? '&#9656; ' : '&#9662; ') + '<bdi>' + esc(o.cls) + '</bdi> - <bdi>' + esc(o.cname || 'No class') + '</bdi>' +
 '<span class="cls-n">' + fmt(CNT[o.cls][0]) + (CNT[o.cls][0] === 1 ? ' item' : ' items') + (CNT[o.cls][1] ? ' - ' + fmt(CNT[o.cls][1]) + ' short' : '') + '</span></td></tr>';
 lastCls = o.cls;
 }

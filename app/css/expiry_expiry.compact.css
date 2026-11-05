@@ -629,7 +629,8 @@ background: var(--navy-a12); color: var(--muted);
 .sk-chip.rk { border-color: rgba(34,184,207,0.45); }
 .sk-chip.rk.on { background: var(--pink); border-color: var(--pink); color: #fff; }
 .ex-badge {
-display: inline-block; padding: 3px 10px; border-radius: 10px;
+display: inline-block; padding: 3px 10px; border-radius: var(--box-r);
+min-width: 64px; text-align: center;
 font-size: 11px; font-weight: 600; letter-spacing: 0.2px; white-space: nowrap;
 border: 1px solid transparent; direction: ltr; line-height: 1.3;
 }

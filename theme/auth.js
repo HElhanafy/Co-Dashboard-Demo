@@ -1,6 +1,6 @@
 /* auth.js - demo sign-in gate (deterrent only, static site); hashes written by build/PACKAGE.py from build/DEMO_LOGIN.txt (05/11/2026) */
 (function () {
-    var H = ['a982965829f350877d8a99e7961a199a74fab0cc6e168b1246255ef0869d4099'];
+    var H = ['1dd65608394297cc3e383de862ae2fb1666cec7fbe481e70072eec16f149cc52'];
     function sha256(s) {
         function r(n, x) { return (x >>> n) | (x << (32 - n)); }
         var K = [], k = 0, c = 2, i, j, w, a, b, d, e, f, g, h, t1, t2, hh = [];

@@ -355,9 +355,7 @@ td.c-name{min-width:260px;}
 thead th.band{text-align:center;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#fff !important;cursor:default;}
 th.b-sal{background:var(--navy) !important;}th.b-stk{background:#5a4fc4 !important;}th.b-po{background:#7a4fc4 !important;}th.b-net{background:#a5206f !important;}th.b-arr{background:var(--pink) !important;}th.b-oth{background:#55607a !important;}
 thead th.late{color:var(--bad) !important;}
-tr.cls td{background:var(--navy) !important;color:#fff !important;font-weight:600;font-size:12px;letter-spacing:.04em;cursor:pointer;user-select:none;}
-tr.cls:hover td{background:#3b43a3 !important;}
-tr.cls .cls-n{float:right;font-weight:400;font-size:11.5px;letter-spacing:0;opacity:.85;}
+tr.cls td{cursor:pointer;user-select:none;}
 td.lnkc{cursor:pointer;color:var(--navy) !important;font-weight:600;}
 td.lnkc:hover,td.lnkc.on{text-decoration:underline;}
 td.arr{background:rgba(34,184,207,0.06);font-weight:600;}

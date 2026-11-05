@@ -168,3 +168,13 @@ body td, body th, body .ss-code, body code { font-variant-numeric: tabular-nums;
 body code { font-family: var(--font-mono); }
 html body.jm-gp tr.grp-row td .cnt { float: right; margin: 0; padding: 1px 10px; background: var(--box-bg); border: 1px solid var(--box-line); border-radius: var(--box-r); color: var(--navy); font: 600 11.5px var(--font-body); letter-spacing: 0; text-transform: none; }
 html[dir=rtl] body.jm-gp tr.grp-row td .cnt { float: left; }
+@media screen {
+html body #poTable tr.cls td { color: var(--navy) !important; font: 700 12px var(--font-head); letter-spacing: .06em; text-transform: uppercase; padding: 7px 10px; padding-inline-start: 14px;
+border-top: 1px solid var(--navy-a12) !important; border-bottom: 1px solid var(--navy-a12) !important;
+background: linear-gradient(180deg, var(--navy), var(--purple)) left / 4px 100% no-repeat, linear-gradient(90deg, var(--box-bg), var(--panel) 60%) !important; }
+html body #poTable tr.cls:hover td { background: linear-gradient(180deg, var(--navy), var(--purple)) left / 4px 100% no-repeat, linear-gradient(90deg, var(--navy-a12), var(--box-bg) 60%) !important; }
+html[dir=rtl] body #poTable tr.cls td { letter-spacing: 0; background: linear-gradient(180deg, var(--navy), var(--purple)) right / 4px 100% no-repeat, linear-gradient(270deg, var(--box-bg), var(--panel) 60%) !important; }
+html[dir=rtl] body #poTable tr.cls:hover td { background: linear-gradient(180deg, var(--navy), var(--purple)) right / 4px 100% no-repeat, linear-gradient(270deg, var(--navy-a12), var(--box-bg) 60%) !important; }
+html body #poTable tr.cls .cls-n { float: right; padding: 1px 10px; background: var(--box-bg); border: 1px solid var(--box-line); border-radius: var(--box-r); color: var(--navy); opacity: 1; font: 600 11.5px var(--font-body); letter-spacing: 0; text-transform: none; }
+html[dir=rtl] body #poTable tr.cls .cls-n { float: left; }
+}

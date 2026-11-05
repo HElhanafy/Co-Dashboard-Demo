@@ -147,14 +147,11 @@ Array.prototype.forEach.call(ruleChips.querySelectorAll('.chip'), function (b) {
 b.addEventListener('click', function () { var r = b.getAttribute('data-r'); if (r === rule) return; rule = r; load(); });
 });
 tot = 0; DATA.stores.forEach(function (s) { tot += +s[2]; });
-h = '<button type="button" class="chip two' + (store === null ? ' on' : '') + '" data-s=""><span class="chip-t">All</span><span class="chip-sub">' + tot + ' lines</span></button>';
-DATA.stores.forEach(function (s) {
-h += '<button type="button" class="chip two' + (store === s[0] ? ' on' : '') + '" data-s="' + s[0] + '"><span class="chip-t"><bdi>' + esc(s[1]) + '</bdi></span><span class="chip-sub">' + s[2] + ' lines</span></button>';
-});
+h = '<select id="storeSel" title="Store"><option value="">All (' + tot + ')</option>' + DATA.stores.slice().sort(function (a, b) { return b[2] - a[2]; }).map(function (s) {
+return '<option value="' + s[0] + '"' + (store === s[0] ? ' selected' : '') + '>' + esc(s[1]) + ' (' + s[2] + ')</option>';
+}).join('') + '</select>';
 storeChips.innerHTML = h; storeLine.style.display = '';
-Array.prototype.forEach.call(storeChips.querySelectorAll('.chip'), function (b) {
-b.addEventListener('click', function () { var s = b.getAttribute('data-s'), v = s ? +s : null; if (v === store) return; store = v; load(); });
-});
+g('storeSel').addEventListener('change', function () { var v = this.value ? +this.value : null; if (v === store) return; store = v; load(); });
 }
 function visLots() {
 return q ? DATA.lots.filter(function (l) { return String(l[0]).toLowerCase().indexOf(q) !== -1 || String(l[1]).toLowerCase().indexOf(q) !== -1; }) : DATA.lots;

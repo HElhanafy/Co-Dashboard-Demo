@@ -653,3 +653,4 @@ background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/200
 background-repeat: no-repeat; background-position: 13px center; }
 .cc-item .search-select input:hover { border-color: var(--navy); }
 .cc-item .search-select input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px var(--navy-a12); }
+.ic-stores select { min-width: 300px; max-width: 460px; }

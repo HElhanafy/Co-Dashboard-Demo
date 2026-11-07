@@ -1,4 +1,3 @@
-/* srv_prices.js - PRICES page: pl-* payload (active, classed, priced items) and PRICES_AJAX log from DEMO.priceLog (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2);

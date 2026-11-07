@@ -1,4 +1,3 @@
-/* srv_move.js - MOVE page: mv-meta/i18n/classes blocks, MOVE_AJAX (dims/rows/custs/docs/cust/stk) and MOVE_COST_AJAX (cls/itm) (24/10/2026; 28/10 the live round) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIND = D.meta.start;

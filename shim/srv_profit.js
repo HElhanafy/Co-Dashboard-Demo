@@ -1,4 +1,3 @@
-/* srv_profit.js - PROFIT page: #profit-data block and GET_PROFIT_DETAIL (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
 

@@ -1,4 +1,3 @@
-/* srv_custst.js - CUSTST page: CUSTST_AJAX run/stmt/mov/find over the customer ledger (open items replayed as srv_smcard.js) (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIN_D = '2025-01-01';

@@ -1,4 +1,3 @@
-/* srv_supst.js - SUPST page: SUPST_AJAX run/stmt/pay over the supplier ledger (grn = invoices, kind O = opening; spay = payments; FIFO settlement) (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIN_D = H.base + '-01-01';

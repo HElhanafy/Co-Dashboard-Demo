@@ -1,4 +1,3 @@
-/* srv_smcard.js - SMCARD page: #sm-meta block and SMCARD_AJAX (receivables replayed from inv/rcpt/alloc/ret) (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2);

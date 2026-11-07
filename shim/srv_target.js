@@ -1,4 +1,3 @@
-/* srv_target.js - TARGET page: #target-data block, annual targets per rep x class split by the actual class mix (24/10/2026) */
 (function () {
     var D = window.DEMO, H = window.DEMO_H;
 

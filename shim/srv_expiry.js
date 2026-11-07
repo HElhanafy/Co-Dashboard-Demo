@@ -1,4 +1,3 @@
-/* srv_expiry.js - EXPIRY page: ex-* payload and EXPIRY_AJAX bal/who; medical only, trading gets an empty working page (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H, MED = window.DEMO_INDUSTRY !== 'trading';
 

@@ -1,4 +1,3 @@
-/* srv_itcard.js - ITCARD page: #ic-meta block, ITCARD_AJAX (dims/card/doc) and the stock ledger engine shared with COSTCHK (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     /* document types: [tc, tt, effect, name, rank within the day] - effect 1 in, 2 sale, 3 out, 4 return in, 5 transfer out, 6 transfer in */

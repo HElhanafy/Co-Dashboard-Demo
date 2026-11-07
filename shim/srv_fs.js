@@ -1,4 +1,3 @@
-/* srv_fs.js - FS hub (no processes) + shared ledger helpers H.LG for TB, FSIS, FSBS (included via "head") (24/10/2026) */
 (function () {
     var D = window.DEMO, H = window.DEMO_H, G = H.LG = H.LG || {};
     function two(n) { return (n < 10 ? '0' : '') + n; }

@@ -1,4 +1,3 @@
-/* srv_tb.js - TB page: tb-* islands and TB_AJAX rows/stmt (callback style); ledger helpers in srv_fs.js (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var RX = /^20[0-9]{2}(0[1-9]|1[0-2])$/;

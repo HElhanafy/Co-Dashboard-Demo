@@ -1,4 +1,3 @@
-/* srv_priceadj.js - PRICEADJ page: pa-data payload and PRICEADJ_AJAX (items, find, save, apply, reverse, cancel, batches, lines) in memory over DEMO.items (05/11/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var USER = D.meta.user || 'ADMIN', NOW = H.asOf.slice(0, 16);

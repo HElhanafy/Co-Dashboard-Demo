@@ -1,4 +1,3 @@
-/* srv_costchk.js - COSTCHK page: #cc-meta block and COSTCHK_AJAX (list/lines) from the item card ledger in srv_itcard.js (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     function n10(x) { return Math.round(x * 1e10) / 1e10; }

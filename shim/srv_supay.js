@@ -1,4 +1,3 @@
-/* srv_supay.js - Supplier Payables: SUPAY_AJAX run (orders not received + supplier invoices, ledger = AP 210101 per supplier); helpers in srv_poarr.js (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
 

@@ -1,4 +1,3 @@
-/* srv_poarr.js - PO Arrivals: POARR_AJAX + shared purchase helpers (H.pur), POARR_PO_AJAX and SUPAY_INV_AJAX (also used by SUPAY, SUPST) (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var T_PO = 501, T_RCV = 301, USD = D.meta.usd || 3.75;

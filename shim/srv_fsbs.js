@@ -1,4 +1,3 @@
-/* srv_fsbs.js - FSBS page: fs-* islands and BS_AJAX bs/stmt (cumulative, virtual year-end close); ledger helpers in srv_fs.js (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     function L(id, lbl, t, f, neg) { return { id: id, lbl: lbl, t: t, f: f, neg: neg }; }

@@ -1,4 +1,3 @@
-/* srv_trfreg.js - TRFREG page (Transfer Register): #trf-data (open view) and TRFREG_AJAX (arch / lines) from the demo transfers; the cases come from H.trfDemo in srv_trfchk.js (04/11/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var TO = 1090101, TI = 1090201;

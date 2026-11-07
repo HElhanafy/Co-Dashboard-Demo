@@ -1,4 +1,3 @@
-/* srv_trfchk.js - TRFCHK page (Transfer Integrity): #trf-data from the demo transfers, with a few broken cases made up on purpose; H.trfDemo is shared with TRFREG (04/11/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var TO = 1090101, TI = 1090201, BR = { '1': 'CEN', '2': 'NTH', '3': 'EST', '4': 'WST', '5': 'CEN' };

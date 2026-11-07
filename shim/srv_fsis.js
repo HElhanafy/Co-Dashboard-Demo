@@ -1,4 +1,3 @@
-/* srv_fsis.js - FSIS page: fs-* islands and IS_AJAX data/used/stmt; ledger helpers in srv_fs.js (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
 

@@ -1,4 +1,3 @@
-/* srv_stval.js - STVAL page: sk-* blocks (+ accounts, sale price), STVAL_AJAX bal/gl; uses H.sk from srv_stock.js (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
 

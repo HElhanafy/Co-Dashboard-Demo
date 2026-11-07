@@ -1,4 +1,3 @@
-/* auth.js - demo sign-in gate (deterrent only, static site); hashes written by build/PACKAGE.py from build/DEMO_LOGIN.txt (05/11/2026) */
 (function () {
     var H = ['1dd65608394297cc3e383de862ae2fb1666cec7fbe481e70072eec16f149cc52'];
     function sha256(s) {

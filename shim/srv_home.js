@@ -1,4 +1,3 @@
-/* srv_home.js - HOME page: HOME_KPI_AJAX board (admin) and the re-archive command (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var AR = '110401', AP = '210101';

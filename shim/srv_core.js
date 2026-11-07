@@ -1,4 +1,3 @@
-/* srv_core.js - fake server core: indexes over window.DEMO, render blocks, page-0 processes (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV = window.DEMO_SRV || {}, R = window.DEMO_RENDERERS = {};
     var H = window.DEMO_H = {};

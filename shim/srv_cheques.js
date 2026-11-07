@@ -1,4 +1,3 @@
-/* srv_cheques.js - CHEQUES page: CHEQUES_AJAX run/find/chq over DEMO.chq and their GL lines (needs srv_bankst.js for H.bankBuild) (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIN_D = '2025-01-01', CHQ_BANK = 901, T_RCPT = 20;

@@ -1,4 +1,3 @@
-/* shell.js - writes the sidebar and header the live server prints on page 0 (24/10/2026) */
 (function () {
     var A = (document.body.getAttribute('data-alias') || '').toUpperCase(), N = window.DEMO_NAV || [],
         B = window.DEMO_BUILT || [], h = [], lang = 'EN', ind = window.DEMO_INDUSTRY === 'trading' ? 'Trading' : 'Medical';

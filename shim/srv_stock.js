@@ -1,4 +1,3 @@
-/* srv_stock.js - STOCK page: sk-* blocks, STOCK_AJAX / STOCK_AJAX_LOTS; shared stock-at-date helpers (H.sk) for STVAL (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H, SK = H.sk = {};
     var INV_ACCT = '110501';

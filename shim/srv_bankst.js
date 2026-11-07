@@ -1,4 +1,3 @@
-/* srv_bankst.js - BANKST page: BANKST_AJAX run/stmt/mov over the GL lines of the bank and cheque-portfolio accounts (statement = ledger); H.bank shared with srv_cheques.js (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIN_D = '2025-01-01', CHQ_BANK = 901;

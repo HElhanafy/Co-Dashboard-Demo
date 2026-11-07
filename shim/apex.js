@@ -1,4 +1,3 @@
-/* apex.js - offline stand-in for the APEX client API used by the dashboard pages (24/10/2026) */
 (function () {
     var SRV = window.DEMO_SRV = window.DEMO_SRV || {};
 

@@ -1,4 +1,3 @@
-/* srv_payroll.js - PAYROLL page (Payroll Sheet): #pay-meta, PAYROLL_AJAX (sheet rows + status) and PAYROLL_LOANS_AJAX (list / emp) from a seeded fake staff (04/11/2026) */
 (function () {
     var S = window.DEMO_SRV, H = window.DEMO_H, R = window.DEMO_RENDERERS;
     var CO = 'Co.', SIS = 'ITS', TD = H.today.replace(/^(\d\d)\/(\d\d)\/(\d{4})$/, '$3-$2-$1');   /* demo date as ISO */

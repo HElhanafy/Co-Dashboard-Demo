@@ -1,4 +1,3 @@
-/* srv_sales.js - SALES page: #sales-data block and GET_SALES_DETAIL (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
 

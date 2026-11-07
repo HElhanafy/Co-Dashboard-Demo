@@ -1,4 +1,3 @@
-/* srv_shared.js - shared application processes: SALES_DOC_AJAX, GL_ENTRY_AJAX (24/10/2026) */
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
     var T_INV = 1180101, T_RET = 1180201;

@@ -178,3 +178,40 @@ html[dir=rtl] body #poTable tr.cls:hover td { background: linear-gradient(180deg
 html body #poTable tr.cls .cls-n { float: right; padding: 1px 10px; background: var(--box-bg); border: 1px solid var(--box-line); border-radius: var(--box-r); color: var(--navy); opacity: 1; font: 600 11.5px var(--font-body); letter-spacing: 0; text-transform: none; }
 html[dir=rtl] body #poTable tr.cls .cls-n { float: left; }
 }
+.jm-sb-gico { display: none; }
+.jm-sb-gico svg { width: 18px; height: 18px; }
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-group {
+position: relative;
+height: 40px;
+margin: 0;
+padding: 0 12px 0 19px;
+width: 100%;
+justify-content: flex-start;
+background: transparent;
+color: var(--jm-sb-muted);
+opacity: 1;
+overflow: visible;
+pointer-events: auto;
+}
+html[dir=rtl] body.jm-has-sb:not(.jm-sb-open) .jm-sb-group { padding: 0 19px 0 12px; }
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-group .jm-sb-gtxt,
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-group .jm-sb-caret { display: none; }
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-gico {
+display: flex;
+width: 20px;
+height: 20px;
+align-items: center;
+justify-content: center;
+}
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-group:hover { background: var(--jm-sb-bg2); color: var(--jm-sb-navy); }
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) > .jm-sb-group { color: var(--jm-sb-navy); }
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-items .jm-sb-item:not(.is-active) { display: none; }
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) {
+margin: 2px 6px;
+border-radius: var(--box-r);
+background: var(--box-bg);
+}
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) .jm-sb-group,
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) .jm-sb-item { padding-left: 13px; padding-right: 6px; background: transparent; }
+html[dir=rtl] body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) .jm-sb-group,
+html[dir=rtl] body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) .jm-sb-item { padding-left: 6px; padding-right: 13px; }

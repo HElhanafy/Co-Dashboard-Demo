@@ -238,6 +238,34 @@ init();
 }());
 (function () {
 'use strict';
+function init() {
+var sb = document.getElementById('jmSidebar');
+if (!sb) { return; }
+sb.addEventListener('click', function (e) {
+var n = e.target, mod, t;
+if (/\bjm-sb-open\b/.test(document.body.className) || window.innerWidth <= 1024) { return; }
+while (n && n !== sb) {
+if (n.className && String(n.className).split(' ')[0] === 'jm-sb-group') { break; }
+n = n.parentNode;
+}
+if (!n || n === sb) { return; }
+e.stopPropagation();
+mod = n.parentNode;
+Array.prototype.forEach.call(sb.querySelectorAll('.jm-sb-mod'), function (m) {
+m.className = m === mod ? 'jm-sb-mod is-open' : 'jm-sb-mod';
+});
+t = document.getElementById('jmSbToggle');
+if (t) { t.click(); }
+}, true);
+}
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', init, false);
+} else {
+init();
+}
+}());
+(function () {
+'use strict';
 var hdr = document.getElementById('jmHdr');
 if (!hdr) { return; }
 function pwdDialog() {

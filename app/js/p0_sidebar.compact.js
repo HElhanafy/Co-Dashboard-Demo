@@ -318,7 +318,7 @@ window.setTimeout(close, 900);
 return;
 }
 save.disabled = false;
-say('Not changed: ' + ((d && d.err) ? d.err : 'unknown error'));
+say((window.jmT || String)((d && d.err) ? d.err : 'Password not changed.'));
 })
 .fail(function () {
 busy = false;

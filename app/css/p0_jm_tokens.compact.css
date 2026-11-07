@@ -180,7 +180,7 @@ html[dir=rtl] body #poTable tr.cls .cls-n { float: left; }
 }
 .jm-sb-gico { display: none; }
 .jm-sb-gico svg { width: 18px; height: 18px; }
-body.jm-has-sb:not(.jm-sb-open) .jm-sb-group {
+html body.jm-has-sb:not(.jm-sb-open) .jm-sb-group {
 position: relative;
 height: 40px;
 margin: 0;
@@ -203,7 +203,7 @@ height: 20px;
 align-items: center;
 justify-content: center;
 }
-body.jm-has-sb:not(.jm-sb-open) .jm-sb-group:hover { background: var(--jm-sb-bg2); color: var(--jm-sb-navy); }
+html body.jm-has-sb:not(.jm-sb-open) .jm-sb-group:hover { background: var(--jm-sb-bg2); color: var(--jm-sb-navy); }
 body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) > .jm-sb-group { color: var(--jm-sb-navy); }
 body.jm-has-sb:not(.jm-sb-open) .jm-sb-items .jm-sb-item:not(.is-active) { display: none; }
 body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) {
@@ -215,3 +215,17 @@ body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) .jm-sb-gro
 body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) .jm-sb-item { padding-left: 13px; padding-right: 6px; background: transparent; }
 html[dir=rtl] body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) .jm-sb-group,
 html[dir=rtl] body.jm-has-sb:not(.jm-sb-open) .jm-sb-mod:has(.jm-sb-item.is-active) .jm-sb-item { padding-left: 6px; padding-right: 13px; }
+.jm-sb-sub {
+display: flex;
+align-items: center;
+gap: 8px;
+margin: 8px 12px 2px 18px;
+font: 600 11px var(--font-body);
+letter-spacing: .6px;
+text-transform: uppercase;
+color: var(--jm-sb-muted);
+}
+.jm-sb-sub::after { content: ''; flex: 1 1 auto; height: 1px; background: var(--border); }
+.jm-sb-sub.is-ops { color: var(--pink); }
+html[dir=rtl] .jm-sb-sub { margin: 8px 18px 2px 12px; font-size: 12px; letter-spacing: 0; }
+body.jm-has-sb:not(.jm-sb-open) .jm-sb-sub { display: none; }

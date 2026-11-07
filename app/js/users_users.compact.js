@@ -31,6 +31,7 @@ u.role = u.isAdmin ? 'Admin' : 'Normal';
 u.seeCost = u.seeCost === 'Y' || u.seeCost === true;
 u.allReports = u.allReports === 'Y' || u.allReports === true;
 u.canRefresh = u.canRefresh === 'Y' || u.canRefresh === true;
+u.locked = u.locked === 'Y' || u.locked === true;
 u.grpList = splitReps(u.groups);
 u.passNum = u.grpList[0] || '';
 u.groupName = u.grpList.map(function (g) { return GRP[g] || g; }).join(' ');
@@ -124,7 +125,7 @@ var grp = u.grpList.length && !u.isAdmin
 html += '<tr class="u-row' + (u.isAdmin ? ' is-admin' : '') + '" data-c="' + esc(u.code) + '">' +
 '<td class="c-code">' + esc(u.code) + '</td>' +
 '<td class="c-name">' + esc(u.name || u.code) + (isMain ? '<span class="main-tag" title="Main administrator">' + I_LOCK + '</span>' : '') + '</td>' +
-'<td><span class="badge ' + roleCls + '">' + u.role + '</span></td>' +
+'<td><span class="badge ' + roleCls + '">' + u.role + '</span>' + (u.locked ? ' <span class="badge locked" title="' + (isMain ? 'Locked after 5 wrong attempts. Unlocked only from the database.' : 'Locked after 5 wrong attempts. Set a new password to unlock.') + '">Locked</span>' : '') + '</td>' +
 '<td class="c-grp">' + grp + '</td>' +
 '<td class="c-reps">' + repBadges(u) + '</td>' +
 '<td class="c-cost">' + cost + '</td>' +
@@ -346,12 +347,14 @@ refresh = role === 'Normal' && chkRefresh.checked, reps = [];
 each(repChks(), function (c) { if (c.checked && (!all || c.getAttribute('data-inall') !== 'Y')) reps.push(c.value); });
 if (role === 'Normal' && !all && !reps.length && !confirm('This user will have no report at all. Save anyway?')) return;
 saving = true; $('saveUserBtn').disabled = true;
+var sentPwd = !!inpPass.value;
 apex.server.process('SAVE_USER', { x01: code, x02: inpPass.value, x03: grpSel.join(','), x04: role, x05: reps.join(','), x06: cost ? 'Y' : 'N', x07: all ? 'Y' : 'N', x08: refresh ? 'Y' : 'N' }, {
 success: function (d) {
 saving = false; $('saveUserBtn').disabled = false;
 if (d.status !== 'success') { alert('Error saving: ' + d.message); return; }
 var u = userByCode(code);
 if (!u) { u = { code: code, name: SYSN[code] || code }; USERS.push(u); }
+if (sentPwd && code !== '0') { u.locked = false; }
 u.role = role; u.groups = grpSel.join(','); u.seeCost = cost ? 'Y' : 'N'; u.allReports = all ? 'Y' : 'N'; u.canRefresh = refresh ? 'Y' : 'N'; u.reports = d.reports || '';
 norm(u);
 closeModal('userModal'); render();
@@ -377,7 +380,8 @@ apex.server.process('SET_PASSWORD', { x01: pwdUser.code, x02: p }, {
 success: function (d) {
 $('setPwdBtn').disabled = false;
 if (d.status !== 'success') { alert('Error: ' + d.message); return; }
-closeModal('pwdModal'); toast('Password set for ' + pwdUser.code + ' - ' + (pwdUser.name || ''));
+if (pwdUser.code !== '0') { pwdUser.locked = false; render(); }
+closeModal('pwdModal'); toast('Password set for ' + pwdUser.code + ' - ' + (pwdUser.name || '') + '. It must be changed at the next sign-in.');
 },
 error: function () { $('setPwdBtn').disabled = false; alert('Request failed.'); }
 });

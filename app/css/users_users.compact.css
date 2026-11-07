@@ -47,7 +47,7 @@ cursor: pointer; transition: 0.2s; flex-shrink: 0; font-family: inherit; text-de
 .btn-add { background: var(--navy); border: 1px solid var(--navy); color: #fff; box-shadow: 0 4px 12px var(--navy-a25); }
 .btn-add:hover { filter: brightness(1.12); transform: translateY(-1px); }
 .btn-sync[disabled] { opacity: .55; cursor: default; background: transparent; color: var(--navy); box-shadow: none; }
-.um-sync-note { font-size: 11.5px; color: var(--muted); text-align: right; margin-top: 6px; }
+.um-sync-note { display: table; margin: 8px 0 0 auto; margin-inline-start: auto; padding: 5px 12px; font-size: 11.5px; color: var(--muted); background: var(--box-bg); border: 1px solid var(--box-line); border-radius: var(--box-r); }
 .um-sync-note b { color: var(--text); font-weight: 600; }
 .um-sync-note.ok b { color: #1e8e4e; }
 .um-sync-note.bad b { color: #c0392b; }
@@ -141,6 +141,7 @@ th.c-act, td.c-act { text-align: right; white-space: nowrap; width: 140px; }
 .badge { display: inline-block; padding: 4px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; line-height: 1.2; }
 .badge.admin { background: rgba(34,184,207,0.10); color: var(--pink); }
 .badge.normal { background: var(--navy-a12); color: var(--navy); }
+.badge.locked { background: transparent; color: var(--pink); border: 1px solid var(--pink); padding: 3px 10px; margin-inline-start: 6px; }
 td.c-reps { min-width: 260px; }
 .rb { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; margin: 2px 4px 2px 0; border-radius: 10px; font-size: 12px; font-weight: 600; line-height: 1.3; cursor: default; white-space: nowrap; }
 .rb small { font-size: 10.5px; font-weight: 700; padding: 0 6px; border-radius: 6px; background: rgba(255,255,255,0.75); }

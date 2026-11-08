@@ -37,13 +37,13 @@ color: var(--text) !important;
 .t-Header-logo-link span {
 color: var(--navy) !important;
 font-family: var(--font-head) !important;
-font-size: 19px !important;
+font-size: var(--fs-title) !important;
 font-weight: 500 !important;
 letter-spacing: 1px !important;
 }
 .co-brand {
 font-family: var(--font-head) !important;
-font-size: 19px !important;
+font-size: var(--fs-title) !important;
 font-weight: 500 !important;
 letter-spacing: 1.5px !important;
 }
@@ -85,7 +85,7 @@ border-radius: 12px;
 background: linear-gradient(135deg, var(--navy), var(--pink));
 display: flex; align-items: center; justify-content: center;
 font-family: var(--font-head);
-font-weight: 600; font-size: 20px;
+font-weight: 600; font-size: var(--fs-title);
 color: #fff; flex: none;
 box-shadow: 0 4px 12px var(--navy-a25);
 }
@@ -267,7 +267,7 @@ cursor: pointer;
 tr.grp-row:hover td { background: var(--navy-a12) !important; }
 tr.grp-row .tw {
 display: inline-block; width: 14px;
-color: var(--navy); font-size: 10px;
+color: var(--navy); font-size: var(--fs-th);
 transition: transform .15s;
 }
 tr.grp-row.open .tw { transform: rotate(90deg); }
@@ -296,7 +296,7 @@ width: 8px; height: 8px; border-radius: 50%; background: var(--navy);
 margin-top: 12px;
 padding-top: 10px;
 border-top: 1px dashed var(--border);
-font-size: 11.5px;
+font-size: var(--fs-hint);
 color: var(--muted);
 }
 .table-header-row {
@@ -397,7 +397,7 @@ cursor: pointer;
 white-space: nowrap;
 }
 thead th:hover { color: var(--navy); }
-thead th.sorted::after { content: " \25BC"; font-size: 8px; }
+thead th.sorted::after { content: " \25BC"; font-size: var(--fs-tiny); }
 thead th.sorted.asc::after { content: " \25B2"; }
 tbody td { color: var(--text) !important; padding: 8px 10px; border: 1px solid var(--grid-line); }
 tbody tr:nth-child(even) { background: var(--bg); }
@@ -520,10 +520,10 @@ gap: 14px;
 padding: 16px 18px;
 }
 .brand { align-items: flex-start; gap: 12px; }
-.brand .mark { width: 38px; height: 38px; font-size: 17px; border-radius: 10px; }
-.dash-header h1 { font-size: 18px; line-height: 1.25; }
+.brand .mark { width: 38px; height: 38px; font-size: var(--fs-title); border-radius: 10px; }
+.dash-header h1 { font-size: var(--fs-title); line-height: 1.25; }
 .subtitle { font-size: 12px; margin-top: 3px; }
-.period-badge { font-size: 11.5px; padding: 3px 10px; }
+.period-badge { font-size: var(--fs-hint); padding: 3px 10px; }
 .header-actions { align-items: stretch; width: 100%; gap: 8px; }
 .actions-row {
 width: 100%;
@@ -547,7 +547,7 @@ white-space: normal;
 text-align: center;
 line-height: 1.35;
 padding: 7px 12px;
-font-size: 11.5px;
+font-size: var(--fs-hint);
 }
 }
 .header-actions, .actions-row, .dash-header { overflow: visible; }
@@ -688,14 +688,14 @@ thead th.num { text-align: right; }
 th.c-code { white-space: nowrap; }
 td.c-code { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
 td.c-name { min-width: 260px; }
-td.c-unit { color: var(--muted); font-size: 11.5px; white-space: nowrap; }
+td.c-unit { color: var(--muted); font-size: var(--fs-num); white-space: nowrap; }
 td.c-tot { font-weight: 700; background: var(--navy-a06); }
 td.z { color: #c3c9d4 !important; font-weight: 400; }
 td.nf { color: var(--warn); }
 tr.grp-row td { background: #5a61a8 !important; color: #fff !important; font-weight: 700; cursor: pointer;
 border-top: 1px solid #4a51a0 !important; border-bottom: 1px solid #4a51a0 !important; padding-top: 9px; padding-bottom: 9px; letter-spacing: 0.02em; }
 tr.grp-row:hover td { background: #4d54a0 !important; }
-tr.grp-row td .cnt { color: #fff; opacity: 0.75; font-weight: 500; font-size: 11.5px; margin-left: 8px; }
+tr.grp-row td .cnt { color: #fff; opacity: 0.75; font-weight: 500; font-size: var(--fs-num); margin-left: 8px; }
 tr.grp-row .tw { color: #fff; }
 tbody td { border-color: var(--cell-line) !important; }
 tr.child-row.hidden { display: none; }
@@ -710,7 +710,7 @@ tr.child-row.hidden { display: none; }
 .table-scroll { max-height: none !important; }
 thead th.ar { direction: rtl; }
 }
-td.num .qb { font-size: 11.5px; font-weight: 600; color: var(--purple); white-space: nowrap; }
+td.num .qb { font-size: var(--fs-num); font-weight: 600; color: var(--purple); white-space: nowrap; }
 button:focus:not(:focus-visible) { outline: none; }
 #fClassMenu input, #fSmMenu input { position: sticky; top: 6px; z-index: 2; box-shadow: 0 -6px 0 var(--panel), 0 6px 0 var(--panel); }
 #fClassMenu, #fSmMenu { padding-top: 0; }

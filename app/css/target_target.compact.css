@@ -37,13 +37,13 @@ color:var(--text) !important;
 .t-Header-logo-link span{
 color:var(--navy) !important;
 font-family:var(--font-head) !important;
-font-size:19px !important;
+font-size:var(--fs-title) !important;
 font-weight:500 !important;
 letter-spacing:1px !important;
 }
 .co-brand{
 font-family:var(--font-head) !important;
-font-size:19px !important;
+font-size:var(--fs-title) !important;
 font-weight:500 !important;
 letter-spacing:1.5px !important;
 }
@@ -85,7 +85,7 @@ border-radius:12px;
 background:linear-gradient(135deg,var(--navy),var(--pink));
 display:flex;align-items:center;justify-content:center;
 font-family:var(--font-head);
-font-weight:600;font-size:20px;
+font-weight:600;font-size:var(--fs-title);
 color:#fff;flex:none;
 box-shadow:0 4px 12px var(--navy-a25);
 }
@@ -282,7 +282,7 @@ line-height:1.1;
 letter-spacing:-.01em;
 font-variant-numeric:tabular-nums;
 }
-.kpi .value .cur{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--font-body);letter-spacing:.04em;margin-inline-start:2px;}
+.kpi .value .cur{font-size:var(--fs-hint);color:var(--muted);font-weight:600;font-family:var(--font-body);letter-spacing:.04em;margin-inline-start:2px;}
 .kpi .value.v-neg{color:var(--bad);}
 .kpi .sub{font-size:12px;margin-top:6px;color:var(--muted);}
 .kpi .sub.note-cap{font-size:10.5px;line-height:1.45;color:#8a93a5;}
@@ -442,7 +442,7 @@ html[dir=rtl] thead th{text-align:right;white-space:normal;}
 html[dir=rtl] th.num,html[dir=rtl] td.num{text-align:left;}
 html[dir=rtl] .tw{margin-right:0 !important;margin-left:8px;transform:scaleX(-1);}
 thead th:hover{color:var(--pink);}
-thead th.sorted::after{content:" \25BC";font-size:8px;}
+thead th.sorted::after{content:" \25BC";font-size:var(--fs-tiny);}
 thead th.sorted.asc::after{content:" \25B2";}
 tbody td{color:var(--text) !important;padding:9px 12px;border:1px solid var(--grid-line);}
 tbody tr:nth-child(even){background:#fafbfe;}
@@ -567,7 +567,7 @@ font-family:var(--font-head);font-size:12px !important;font-weight:600 !importan
 .r-hi .rv{stroke:var(--good);}.r-mid .rv{stroke:var(--warn);}.r-low .rv{stroke:var(--bad);}
 .rp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 15px var(--font-head);color:var(--text);font-variant-numeric:tabular-nums;}
 .sc-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
-.sc-stats span{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px;}
+.sc-stats span{display:block;font-size:var(--fs-hint);color:var(--muted);margin-bottom:3px;}
 .sc-stats b{font-size:14px;font-weight:600;color:var(--text);font-variant-numeric:tabular-nums;}
 .sc-stats b.pos{color:var(--good);}.sc-stats b.neg{color:var(--bad);}
 .chart-panel{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px 18px 10px;margin-bottom:14px;box-shadow:0 1px 2px rgba(26,31,54,.04);}
@@ -580,7 +580,7 @@ font-family:var(--font-head);font-size:12px !important;font-weight:600 !importan
 #chSvg{width:100%;height:210px;display:block;}
 #chSvg text{font:500 11px var(--font-body);fill:var(--muted);letter-spacing:0;}
 #chSvg text.v{font-weight:600;font-size:10.5px;fill:var(--text);}
-#chSvg text.m{font-size:11.5px;fill:#4a5072;}
+#chSvg text.m{font-size:var(--fs-hint);fill:#4a5072;}
 @media (max-width:1100px){.kpi-row.kr3,.kpi-row.kr4{grid-template-columns:repeat(2,minmax(0,1fr));}}
 @media (max-width:600px){.kpi-row.kr3,.kpi-row.kr4{grid-template-columns:1fr;}}
 @media print{
@@ -617,10 +617,10 @@ gap:14px;
 padding:16px 18px;
 }
 .brand{align-items:flex-start;gap:12px;}
-.brand .mark{width:38px;height:38px;font-size:17px;border-radius:10px;}
-.dash-header h1{font-size:18px;line-height:1.25;}
+.brand .mark{width:38px;height:38px;font-size:var(--fs-title);border-radius:10px;}
+.dash-header h1{font-size:var(--fs-title);line-height:1.25;}
 .subtitle{font-size:12px;margin-top:3px;}
-.period-badge{font-size:11.5px;padding:3px 10px;}
+.period-badge{font-size:var(--fs-hint);padding:3px 10px;}
 .header-actions{align-items:stretch;width:100%;gap:8px;}
 .actions-row{
 width:100%;
@@ -644,6 +644,6 @@ white-space:normal;
 text-align:center;
 line-height:1.35;
 padding:7px 12px;
-font-size:11.5px;
+font-size:var(--fs-hint);
 }
 }

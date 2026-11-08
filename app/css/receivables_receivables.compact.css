@@ -36,13 +36,13 @@ color:var(--text) !important;
 .t-Header-logo-link span{
 color:var(--navy) !important;
 font-family:var(--font-head) !important;
-font-size:19px !important;
+font-size:var(--fs-title) !important;
 font-weight:500 !important;
 letter-spacing:1px !important;
 }
 .co-brand{
 font-family:var(--font-head) !important;
-font-size:19px !important;
+font-size:var(--fs-title) !important;
 font-weight:500 !important;
 letter-spacing:1.5px !important;
 }
@@ -84,7 +84,7 @@ border-radius:12px;
 background:linear-gradient(135deg,var(--navy),var(--pink));
 display:flex;align-items:center;justify-content:center;
 font-family:var(--font-head);
-font-weight:600;font-size:20px;
+font-weight:600;font-size:var(--fs-title);
 color:#fff;flex:none;
 box-shadow:0 4px 12px var(--navy-a25);
 }
@@ -340,7 +340,7 @@ letter-spacing:.09em;
 font-weight:700;
 }
 .kpi .value{
-font-size:24px;
+font-size:var(--fs-kpi);
 font-weight:600;
 font-family:var(--font-head);
 color:var(--text);
@@ -377,7 +377,7 @@ display:flex;align-items:center;gap:8px;
 .panel h3 .dot{
 width:8px;height:8px;border-radius:50%;background:var(--navy);
 }
-.panel .panel-sub{font-size:11.5px;color:var(--muted);margin-bottom:14px;}
+.panel .panel-sub{font-size:var(--fs-hint);color:var(--muted);margin-bottom:14px;}
 .table-header-row{
 display:flex;justify-content:space-between;
 align-items:flex-start;gap:12px;flex-wrap:wrap;
@@ -466,7 +466,7 @@ white-space:nowrap;
 thead th:hover{color:var(--pink);}
 thead th.nos{cursor:default;}
 thead th.nos:hover{color:var(--navy);}
-thead th.sorted::after{content:" \25BC";font-size:8px;}
+thead th.sorted::after{content:" \25BC";font-size:var(--fs-tiny);}
 thead th.sorted.asc::after{content:" \25B2";}
 tbody td{color:var(--text) !important;padding:8px 8px;border:1px solid var(--grid-line);}
 tbody tr:nth-child(even){background:#fafbfe;}
@@ -521,19 +521,19 @@ font-size:9px;vertical-align:middle;}
 .hb-band > div:first-child{border-inline-start:0;flex:1 1 260px;}
 .hb-band small{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.75;white-space:nowrap;}
 .hb-band strong{font:600 14px var(--font-head);white-space:nowrap;font-variant-numeric:tabular-nums;}
-.hb-band .nm{font-size:17px;font-weight:700;white-space:normal;}
+.hb-band .nm{font-size:var(--fs-panel);font-weight:700;white-space:normal;}
 .hb-grid{display:grid;grid-template-columns:.8fr 2fr .7fr;}
 .hb-grid.g2{grid-template-columns:.8fr 2.7fr;}
 .hb-c{padding:14px 18px;border-inline-start:1px solid var(--border);min-width:0;}
 .hb-c:first-child{border-inline-start:0;}
 .hb-c h5{margin-bottom:10px;}
 .hb-bal{padding:10px 14px;border-radius:10px;background:var(--box-bg);}
-.hb-bal b{display:block;font:700 24px var(--font-head);font-variant-numeric:tabular-nums;color:var(--navy);white-space:nowrap;}
+.hb-bal b{display:block;font:700 var(--fs-kpi) var(--font-head);font-variant-numeric:tabular-nums;color:var(--navy);white-space:nowrap;}
 .hb-bal small{font-size:12px;color:var(--muted);}
 .lim{display:block;height:12px;border-radius:6px;background:#eef0f6;overflow:hidden;}
 .lim i{display:block;height:100%;background:var(--navy);}.lim.hi i{background:var(--warn);}.lim.ov i{background:var(--bad);}
 .lm-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;font-size:12px;color:var(--muted);}
-.lm-top b{font:700 19px var(--font-head);color:var(--navy);}
+.lm-top b{font:700 var(--fs-figure) var(--font-head);color:var(--navy);}
 .lm-row{display:flex;justify-content:space-between;gap:6px 22px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px;}
 .lm-row b{color:var(--text);font-variant-numeric:tabular-nums;}
 .hb b.r,.lm-top b.r{color:var(--bad);}
@@ -663,10 +663,10 @@ gap:14px;
 padding:16px 18px;
 }
 .brand{align-items:flex-start;gap:12px;}
-.brand .mark{width:38px;height:38px;font-size:17px;border-radius:10px;}
-.dash-header h1{font-size:18px;line-height:1.25;}
+.brand .mark{width:38px;height:38px;font-size:var(--fs-title);border-radius:10px;}
+.dash-header h1{font-size:var(--fs-title);line-height:1.25;}
 .subtitle{font-size:12px;margin-top:3px;}
-.period-badge{font-size:11.5px;padding:3px 10px;}
+.period-badge{font-size:var(--fs-hint);padding:3px 10px;}
 .header-actions{align-items:stretch;width:100%;gap:8px;}
 .actions-row{
 width:100%;
@@ -690,6 +690,6 @@ white-space:normal;
 text-align:center;
 line-height:1.35;
 padding:7px 12px;
-font-size:11.5px;
+font-size:var(--fs-hint);
 }
 }

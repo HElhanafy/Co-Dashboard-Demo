@@ -37,13 +37,13 @@ color:var(--text) !important;
 .t-Header-logo-link span{
 color:var(--navy) !important;
 font-family:var(--font-head) !important;
-font-size:19px !important;
+font-size:var(--fs-title) !important;
 font-weight:500 !important;
 letter-spacing:1px !important;
 }
 .co-brand{
 font-family:var(--font-head) !important;
-font-size:19px !important;
+font-size:var(--fs-title) !important;
 font-weight:500 !important;
 letter-spacing:1.5px !important;
 }
@@ -85,7 +85,7 @@ border-radius:12px;
 background:linear-gradient(135deg,var(--navy),var(--pink));
 display:flex;align-items:center;justify-content:center;
 font-family:var(--font-head);
-font-weight:600;font-size:20px;
+font-weight:600;font-size:var(--fs-title);
 color:#fff;flex:none;
 box-shadow:0 4px 12px var(--navy-a25);
 }
@@ -393,7 +393,7 @@ line-height:1.1;
 letter-spacing:-.01em;
 font-variant-numeric:tabular-nums;
 }
-.kpi .value .cur{font-size:11.5px;color:var(--muted);font-weight:600;font-family:var(--font-body);letter-spacing:.04em;margin-inline-start:2px;}
+.kpi .value .cur{font-size:var(--fs-hint);color:var(--muted);font-weight:600;font-family:var(--font-body);letter-spacing:.04em;margin-inline-start:2px;}
 .kpi .sub{font-size:12px;margin-top:8px;color:var(--muted);}
 .kpi .spark{position:absolute;inset-inline-end:14px;top:14px;width:92px;height:32px;}
 .kpi.k-sales .label,.kpi.k-profit .label{padding-inline-end:100px;}
@@ -540,7 +540,7 @@ cursor:pointer;
 white-space:nowrap;
 }
 thead th:hover{color:var(--pink);}
-thead th.sorted::after{content:" \25BC";font-size:8px;}
+thead th.sorted::after{content:" \25BC";font-size:var(--fs-tiny);}
 thead th.sorted.asc::after{content:" \25B2";}
 thead tr.chg-row th{background:#fff;color:var(--muted);font-size:11px;text-transform:none;letter-spacing:0;padding:4px 12px;cursor:default;}
 thead tr.chg-row th:hover{color:var(--muted);}
@@ -685,10 +685,10 @@ gap:14px;
 padding:16px 18px;
 }
 .brand{align-items:flex-start;gap:12px;}
-.brand .mark{width:38px;height:38px;font-size:17px;border-radius:10px;}
-.dash-header h1{font-size:18px;line-height:1.25;}
+.brand .mark{width:38px;height:38px;font-size:var(--fs-title);border-radius:10px;}
+.dash-header h1{font-size:var(--fs-title);line-height:1.25;}
 .subtitle{font-size:12px;margin-top:3px;}
-.period-badge{font-size:11.5px;padding:3px 10px;}
+.period-badge{font-size:var(--fs-hint);padding:3px 10px;}
 .header-actions{align-items:stretch;width:100%;gap:8px;}
 .actions-row{
 width:100%;
@@ -712,7 +712,7 @@ white-space:normal;
 text-align:center;
 line-height:1.35;
 padding:7px 12px;
-font-size:11.5px;
+font-size:var(--fs-hint);
 }
 }
 .muted-dash{color:var(--muted);}

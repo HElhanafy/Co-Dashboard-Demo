@@ -163,10 +163,10 @@ gap: 14px;
 padding: 16px 18px;
 }
 .brand { align-items: flex-start; gap: 12px; }
-.brand .mark { width: 38px; height: 38px; font-size: 17px; border-radius: 10px; }
-.dash-header h1 { font-size: 18px; line-height: 1.25; }
+.brand .mark { width: 38px; height: 38px; font-size: var(--fs-title); border-radius: 10px; }
+.dash-header h1 { font-size: var(--fs-title); line-height: 1.25; }
 .subtitle { font-size: 12px; margin-top: 3px; }
-.period-badge { font-size: 11.5px; padding: 3px 10px; }
+.period-badge { font-size: var(--fs-hint); padding: 3px 10px; }
 .header-actions { align-items: stretch; width: 100%; gap: 8px; }
 .actions-row {
 width: 100%;
@@ -190,7 +190,7 @@ white-space: normal;
 text-align: center;
 line-height: 1.35;
 padding: 7px 12px;
-font-size: 11.5px;
+font-size: var(--fs-hint);
 }
 }
 .ms-box .ss-menu > .ss-option { padding: 8px 14px; font-size: 13.5px; color: var(--text); cursor: pointer; white-space: nowrap; border-bottom: 1px solid rgba(26,31,54,0.06); text-align: start; }

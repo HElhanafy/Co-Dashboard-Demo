@@ -37,13 +37,13 @@ color: var(--text) !important;
 .t-Header-logo-link span {
 color: var(--navy) !important;
 font-family: var(--font-head) !important;
-font-size: 19px !important;
+font-size: var(--fs-title) !important;
 font-weight: 500 !important;
 letter-spacing: 1px !important;
 }
 .co-brand {
 font-family: var(--font-head) !important;
-font-size: 19px !important;
+font-size: var(--fs-title) !important;
 font-weight: 500 !important;
 letter-spacing: 1.5px !important;
 }
@@ -85,7 +85,7 @@ border-radius: 12px;
 background: linear-gradient(135deg, var(--navy), var(--pink));
 display: flex; align-items: center; justify-content: center;
 font-family: var(--font-head);
-font-weight: 600; font-size: 20px;
+font-weight: 600; font-size: var(--fs-title);
 color: #fff; flex: none;
 box-shadow: 0 4px 12px var(--navy-a25);
 }
@@ -209,7 +209,7 @@ width: 8px; height: 8px; border-radius: 50%; background: var(--navy);
 margin-top: 12px;
 padding-top: 10px;
 border-top: 1px dashed var(--border);
-font-size: 11.5px;
+font-size: var(--fs-hint);
 color: var(--muted);
 }
 .table-header-row {
@@ -378,10 +378,10 @@ gap: 14px;
 padding: 16px 18px;
 }
 .brand { align-items: flex-start; gap: 12px; }
-.brand .mark { width: 38px; height: 38px; font-size: 17px; border-radius: 10px; }
-.dash-header h1 { font-size: 18px; line-height: 1.25; }
+.brand .mark { width: 38px; height: 38px; font-size: var(--fs-title); border-radius: 10px; }
+.dash-header h1 { font-size: var(--fs-title); line-height: 1.25; }
 .subtitle { font-size: 12px; margin-top: 3px; }
-.period-badge { font-size: 11.5px; padding: 3px 10px; }
+.period-badge { font-size: var(--fs-hint); padding: 3px 10px; }
 .header-actions { align-items: stretch; width: 100%; gap: 8px; }
 .actions-row {
 width: 100%;
@@ -405,7 +405,7 @@ white-space: normal;
 text-align: center;
 line-height: 1.35;
 padding: 7px 12px;
-font-size: 11.5px;
+font-size: var(--fs-hint);
 }
 }
 .header-actions, .actions-row, .dash-header { overflow: visible; }
@@ -484,7 +484,7 @@ thead th.num { text-align: right; }
 thead th.txt { text-align: left; }
 td.c-code { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
 td.z { color: #c3c9d4 !important; font-weight: 400; }
-td.num .qb { font-size: 11.5px; font-weight: 600; color: var(--purple); white-space: nowrap; }
+td.num .qb { font-size: var(--fs-num); font-weight: 600; color: var(--purple); white-space: nowrap; }
 tbody td { border-color: var(--cell-line) !important; }
 .table-scroll { max-height: none; overflow: visible; }
 #printTablePanel table { border-collapse: separate; border-spacing: 0; }
@@ -513,7 +513,7 @@ td.bal { font-weight: 700; color: var(--navy) !important; background: var(--navy
 tr.in td.bal { color: var(--good) !important; background: rgba(46,160,90,0.12); }
 tr.out td.bal { color: var(--bad) !important; background: rgba(200,40,60,0.10); }
 tr.ic-open td { background: var(--panel2) !important; font-weight: 600; color: var(--muted) !important; }
-tr.ic-sub td { padding-top: 3px; padding-bottom: 5px; font-size: 11.5px; color: var(--muted) !important; background: rgba(123,79,176,0.05) !important; border-top: none; }
+tr.ic-sub td { padding-top: 3px; padding-bottom: 5px; font-size: var(--fs-num); color: var(--muted) !important; background: rgba(123,79,176,0.05) !important; border-top: none; }
 .ic-warn { color: #9a5c00; font-weight: 700; }
 td.odd { color: var(--bad) !important; font-weight: 700; background: rgba(235,150,0,0.18) !important; box-shadow: inset 0 0 0 1px #d98a00; cursor: help; }
 tfoot tr.tot td { padding: 9px 10px; border: 1px solid var(--grid-line); font-weight: 700; background: var(--box-bg); color: var(--navy); }
@@ -571,7 +571,7 @@ tbody tr.lnk { cursor: pointer; }
 tbody tr.lnk:hover td { background: var(--navy-a06) !important; }
 td.num.neg, .ic-v.neg, .ic-v .neg { color: var(--bad) !important; }
 td.num.pos, .ic-v.pos, .ic-v .pos { color: var(--good) !important; }
-.cc-card { display: inline-block; padding: 3px 9px; border-radius: 6px; border: none; cursor: pointer; font-family: inherit; font-size: 11.5px; font-weight: 700; color: var(--navy); background: var(--navy-a06); white-space: nowrap; }
+.cc-card { display: inline-block; padding: 3px 9px; border-radius: 6px; border: none; cursor: pointer; font-family: inherit; font-size: var(--fs-hint); font-weight: 700; color: var(--navy); background: var(--navy-a06); white-space: nowrap; }
 .cc-card:hover { background: var(--navy); color: #fff; }
 #docTable td.num.odd { cursor: default; }
 tr.ic-dl.me td { background: var(--navy-a12) !important; font-weight: 700; }

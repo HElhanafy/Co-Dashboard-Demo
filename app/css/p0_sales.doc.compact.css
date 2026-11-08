@@ -23,10 +23,10 @@ body.sd-open #sdPanel{display:block;}
 #sdPanel .sd-b:first-child{border-left:0;}
 #sdPanel .sd-b small{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.75;color:#fff;}
 #sdPanel .sd-b > div{font:600 14px 'Segoe UI',Tahoma,sans-serif;color:#fff;}
-#sdPanel .sd-b > div.sd-no{font:700 24px var(--font-mono);letter-spacing:.02em;}
+#sdPanel .sd-b > div.sd-no{font:700 var(--fs-kpi) var(--font-mono);letter-spacing:.02em;}
 #sdPanel .sd-asof{margin-left:auto;text-align:right;}
 #sdPanel .sd-asof > div{font-size:12.5px;font-weight:500;opacity:.9;}
-#sdPanel .sd-chip{display:inline-block;padding:2px 10px;border-radius:10px;font:700 11.5px 'Segoe UI',Tahoma,sans-serif;letter-spacing:.04em;background:#fff;color:var(--purple);}
+#sdPanel .sd-chip{display:inline-block;padding:2px 10px;border-radius:10px;font:700 var(--fs-hint) 'Segoe UI',Tahoma,sans-serif;letter-spacing:.04em;background:#fff;color:var(--purple);}
 #sdPanel .sd-chip.cash{color:var(--good);}
 #sdPanel .sd-chip.retc{color:#8a2f3b;}
 #sdPanel .sd-body{display:flex;align-items:stretch;flex-wrap:wrap;}
@@ -36,10 +36,10 @@ body.sd-open #sdPanel{display:block;}
 #sdPanel .sd-band.ret + .sd-body .sd-ico{background:rgba(138,47,59,0.09);}
 #sdPanel .sd-band.ret + .sd-body .sd-ico svg{stroke:#8a2f3b;}
 #sdPanel .sd-cust small,#sdPanel .sd-ref small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
-#sdPanel .sd-name{font-size:16.5px;font-weight:700;margin-top:2px;line-height:1.25;}
+#sdPanel .sd-name{font-size:var(--fs-panel);font-weight:700;margin-top:2px;line-height:1.25;}
 #sdPanel .sd-code{display:inline-block;margin-top:3px;font:600 12px var(--font-mono);color:var(--muted);letter-spacing:.02em;}
 #sdPanel .sd-ref{flex:none;padding:14px 26px;border-left:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;min-width:200px;}
-#sdPanel .sd-ref .v{font:700 16px var(--font-mono);margin-top:4px;color:var(--text);letter-spacing:.02em;}
+#sdPanel .sd-ref .v{font:700 var(--fs-panel) var(--font-mono);margin-top:4px;color:var(--text);letter-spacing:.02em;}
 #sdPanel .sd-ref .v.txt{font:700 15px 'Segoe UI',Tahoma,sans-serif;letter-spacing:0;}
 #sdPanel .sd-ref .v.lnk{color:var(--navy);text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;cursor:pointer;}
 #sdPanel .sd-ref .v.lnk:hover{color:var(--pink);}
@@ -65,11 +65,11 @@ body.sd-open #sdPanel{display:block;}
 #sdPanel .sd-bar i{display:block;height:100%;background:var(--good);}
 #sdPanel .sd-bar i.low{background:var(--warn);}
 #sdPanel .sd-bar i.bad{background:var(--bad);}
-#sdPanel .sd-bdg{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:9px;font:700 10px 'Segoe UI',Tahoma,sans-serif;letter-spacing:.03em;}
+#sdPanel .sd-bdg{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:9px;font:700 var(--fs-th) 'Segoe UI',Tahoma,sans-serif;letter-spacing:.03em;}
 #sdPanel .sd-bdg.low{background:#fdf0dc;color:var(--warn);}
 #sdPanel .sd-bdg.bad{background:#fbe4e2;color:var(--bad);}
 #sdPanel .sd-bdg.chk{background:#ece6f7;color:var(--purple);}
-#sdPanel .sd-b > div.sd-big{font:700 18px 'Segoe UI',Tahoma,sans-serif;}
+#sdPanel .sd-b > div.sd-big{font:700 var(--fs-figure) 'Segoe UI',Tahoma,sans-serif;}
 #sdPanel .sd-b .sd-code.w{color:#fff;opacity:.8;margin-top:1px;}
 #sdPanel .sl-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:16px 0 8px;}
 #sdPanel .sl-tools .sd-h4{margin:0;}
@@ -101,7 +101,7 @@ body.sd-open #sdPanel{display:block;}
 #sdPanel .sd-box .r{display:flex;justify-content:space-between;gap:20px;padding:7px 14px;border-top:1px solid var(--grid-line);}
 #sdPanel .sd-box h5 + .r{border-top:0;}
 #sdPanel .sd-box .r span{color:var(--muted);font-weight:600;font-size:12.5px;}
-#sdPanel .sd-box .r span i{font-style:normal;font-weight:400;font-size:11.5px;}
+#sdPanel .sd-box .r span i{font-style:normal;font-weight:400;font-size:var(--fs-hint);}
 #sdPanel .sd-box .r b{font:700 13.5px var(--font-mono);color:var(--text);}
 #sdPanel .sd-box .r.sub span{padding-left:14px;font-weight:400;}
 #sdPanel .sd-box .r.sub b{font-weight:400;font-size:12.5px;color:var(--muted);}
@@ -118,7 +118,7 @@ body.sd-open #sdPanel{display:block;}
 .jx.open .jx-menu{display:block;}
 .jx-menu button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border:0;border-radius:8px;background:none;color:var(--text);font:500 13px 'Segoe UI',Tahoma,sans-serif;text-align:left;cursor:pointer;}
 .jx-menu button:hover{background:var(--navy-a06);color:var(--navy);}
-.jx-menu button i{display:inline-flex;align-items:center;justify-content:center;width:24px;height:20px;border-radius:5px;font:700 9.5px 'Segoe UI',Tahoma,sans-serif;letter-spacing:.04em;font-style:normal;}
+.jx-menu button i{display:inline-flex;align-items:center;justify-content:center;width:24px;height:20px;border-radius:5px;font:700 var(--fs-tiny) 'Segoe UI',Tahoma,sans-serif;letter-spacing:.04em;font-style:normal;}
 .jx-menu button i.xl{background:#e3f3ea;color:var(--good);}
 .jx-menu button i.pdf{background:#fbe4e2;color:var(--bad);}
 @media print{.jx{display:none !important;}}

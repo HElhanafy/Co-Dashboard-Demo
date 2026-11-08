@@ -43,13 +43,13 @@ color: var(--text) !important;
 .t-Header-logo-link span {
 color: var(--navy) !important;
 font-family: var(--font-head) !important;
-font-size: 19px !important;
+font-size: var(--fs-title) !important;
 font-weight: 500 !important;
 letter-spacing: 1px !important;
 }
 .co-brand {
 font-family: var(--font-head) !important;
-font-size: 19px !important;
+font-size: var(--fs-title) !important;
 font-weight: 500 !important;
 letter-spacing: 1.5px !important;
 }
@@ -91,7 +91,7 @@ border-radius: 12px;
 background: linear-gradient(135deg, var(--navy), var(--pink));
 display: flex; align-items: center; justify-content: center;
 font-family: var(--font-head);
-font-weight: 600; font-size: 20px;
+font-weight: 600; font-size: var(--fs-title);
 color: #fff; flex: none;
 box-shadow: 0 4px 12px var(--navy-a25);
 }
@@ -378,7 +378,7 @@ font-weight: 700;
 white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .kpi-value {
-font-size: 24px;
+font-size: var(--fs-kpi);
 font-weight: 600;
 font-family: var(--font-head);
 color: var(--navy);
@@ -411,12 +411,12 @@ display: flex; align-items: center; gap: 8px;
 .panel h3 .dot {
 width: 8px; height: 8px; border-radius: 50%; background: var(--navy);
 }
-.panel .panel-sub { font-size: 11.5px; color: var(--muted); margin-bottom: 14px; }
+.panel .panel-sub { font-size: var(--fs-hint); color: var(--muted); margin-bottom: 14px; }
 .panel-note {
 margin-top: 12px;
 padding-top: 10px;
 border-top: 1px dashed var(--border);
-font-size: 11.5px;
+font-size: var(--fs-hint);
 color: var(--muted);
 }
 .panel-note:empty { display: none; }
@@ -487,7 +487,7 @@ font-family: inherit;
 .jx.open .jx-menu { display: block; }
 .jx-menu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 12px; border: 0; border-radius: 8px; background: none; color: var(--text); font: 500 13px 'Segoe UI', Tahoma, sans-serif; text-align: left; cursor: pointer; }
 .jx-menu button:hover { background: var(--navy-a06); color: var(--navy); }
-.jx-menu button i { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 20px; border-radius: 5px; font: 700 9.5px 'Segoe UI', Tahoma, sans-serif; letter-spacing: .04em; font-style: normal; }
+.jx-menu button i { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 20px; border-radius: 5px; font: 700 var(--fs-tiny) 'Segoe UI', Tahoma, sans-serif; letter-spacing: .04em; font-style: normal; }
 .jx-menu button i.xl { background: #e3f3ea; color: var(--good); }
 .jx-menu button i.pdf { background: #fbe4e2; color: var(--bad); }
 .crumb-row {

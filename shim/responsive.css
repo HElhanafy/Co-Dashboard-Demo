@@ -29,3 +29,47 @@ html body .dash-header .btn-print svg { width: 15px; height: 15px; flex: none; }
 @media (max-width: 400px) {
     html body .jm-hdr-id { display: none; }
 }
+
+/* touch screens: 16px fields stop iOS Safari zooming the page on focus (user 08/11/2026) */
+@media (hover: none) and (pointer: coarse) {
+    html:not(.demo-x) body input:not([type=checkbox]):not([type=radio]):not([data-demo-x]),
+    html:not(.demo-x) body select:not([multiple]):not([data-demo-x]), html:not(.demo-x) body select[multiple]:not([data-demo-x]),
+    html:not(.demo-x) body textarea:not([data-demo-x]):not([data-demo-y]) { font-size: 16px !important; }
+}
+
+/* pill groups that would wrap: one row that scrolls sideways, edges fade (set by responsive.js) */
+html body [data-demo-fit=strip] {
+    flex-wrap: nowrap !important; overflow-x: auto; overflow-y: hidden; scrollbar-width: none;
+    -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity; max-width: 100%; min-width: 0;
+}
+html body [data-demo-fit=strip]::-webkit-scrollbar { display: none; }
+html body [data-demo-fit=strip] > * { flex: 0 0 auto; scroll-snap-align: start; }
+html body [data-demo-fit=strip].demo-more-r { -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); }
+html body [data-demo-fit=strip].demo-more-l { -webkit-mask-image: linear-gradient(90deg, transparent, #000 28px); mask-image: linear-gradient(90deg, transparent, #000 28px); }
+html body [data-demo-fit=strip].demo-more-l.demo-more-r { -webkit-mask-image: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, transparent, #000 28px, #000 calc(100% - 28px), transparent); }
+
+@media (max-width: 640px) {
+    /* page header: action buttons share the full width */
+    html body .dash-header .header-actions, html body .dash-header .actions-row { width: 100%; }
+    html body .dash-header .actions-row > *, html body .dash-header .actions-row .jx { flex: 1 1 0; min-width: 0; display: flex; }
+    html body .dash-header .actions-row .jx-btn, html body .dash-header .actions-row .btn-print { width: 100%; }
+    /* filter panels: the side box (view, reset) lies across the panel instead of a narrow column */
+    html body .sk-top { align-items: stretch; }
+    html body .sk-top > .sk-side { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; }
+    html body .sk-top > .sk-side > label { width: 100%; margin: 0; }
+    html body .sk-top > .sk-side > .ic-stack { flex: 2 1 0; flex-direction: row; display: flex; gap: 6px; }
+    html body .sk-top > .sk-side > .ic-stack > button { flex: 1 1 0; }
+    html body .sk-top > .sk-side > .sk-reset { flex: 1 1 0; margin: 0; }
+    /* journal entry viewer */
+    html body .jme-ov { padding: 10px 8px; }
+    html body .jme-box { padding: 12px; border-radius: 12px; }
+    html body .jme-top { flex-direction: column; align-items: stretch; gap: 8px; }
+    html body .jme-top > div { display: flex; gap: 8px; }
+    html body .jme-top > div > button { flex: 1 1 0; }
+    html body .jme-band { flex-wrap: wrap; padding: 0; }
+    html body .jme-b { flex: 1 1 50%; padding: 10px 14px; border-left: 0; border-top: 1px solid rgba(255,255,255,.14); }
+    html body .jme-b:first-child { flex-basis: 100%; border-top: 0; }
+    html body .jme-no { font-size: 18px !important; white-space: nowrap; }
+    html body .jme-tot { margin-left: 0; text-align: left; flex-basis: 100%; }
+    html[dir=rtl] body .jme-tot { margin-right: 0; text-align: right; }
+}

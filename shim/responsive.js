@@ -96,7 +96,9 @@
                 if (!pill(k)) { ok = false; break; }
                 tops[Math.round(k.offsetTop / 8)] = 1; vis++;
             }
-            if (!ok || vis < 3 || Object.keys(tops).length < 2) continue;
+            var own = e.scrollWidth > e.clientWidth + 2;   // a one-line pill row that overflows or already scrolls
+            for (c = 0; c < n && !own; c++) own = e.children[c].scrollWidth > e.children[c].clientWidth + 2;   // or squeezes its pills
+            if (!ok || vis < 3 || (Object.keys(tops).length < 2 && !own)) continue;
             e.setAttribute('data-demo-fit', 'strip');
             for (var q = e, up = 0; q && up < 4 && q !== document.body; q = q.parentElement, up++) { q.style.minWidth = '0'; q.style.maxWidth = '100%'; }
             e.addEventListener('scroll', function () { edges(this); }, { passive: true });

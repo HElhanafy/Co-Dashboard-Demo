@@ -28,6 +28,10 @@ html body .dash-header .btn-print svg { width: 15px; height: 15px; flex: none; }
 }
 @media (max-width: 400px) {
     html body .jm-hdr-id { display: none; }
+    /* small phones: the from-to dates stack so the full date shows */
+    html body .ic-period { flex-wrap: wrap; gap: 6px; }
+    html body .ic-period > input { flex: 1 1 100% !important; }
+    html body .ic-period > .ic-sep { display: none; }
 }
 
 /* touch screens: 16px fields stop iOS Safari zooming the page on focus (user 08/11/2026) */
@@ -60,6 +64,14 @@ html body [data-demo-fit=strip].demo-more-l.demo-more-r { -webkit-mask-image: li
     html body .sk-top > .sk-side > .ic-stack { flex: 2 1 0; flex-direction: row; display: flex; gap: 6px; }
     html body .sk-top > .sk-side > .ic-stack > button { flex: 1 1 0; }
     html body .sk-top > .sk-side > .sk-reset { flex: 1 1 0; margin: 0; }
+    html body .po-bar > .po-side { align-self: stretch; flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+    html body .po-bar > .po-side > .filter-group { flex: 1 1 140px; min-width: 0; }
+    html body .po-bar > .po-side > .po-reset { flex: 1 1 100%; margin: 0; }
+    html body .po-div { display: none; }
+    /* from-to date pairs share their box (16px dates are wider than the live 140px) */
+    html body :has(> .ic-period) { flex-wrap: wrap; }
+    html body .ic-period { flex: 1 1 220px; min-width: 0; max-width: 100%; }
+    html body .ic-period > input { flex: 1 1 0; width: auto !important; min-width: 0; }
     /* journal entry viewer */
     html body .jme-ov { padding: 10px 8px; }
     html body .jme-box { padding: 12px; border-radius: 12px; }
@@ -72,4 +84,11 @@ html body [data-demo-fit=strip].demo-more-l.demo-more-r { -webkit-mask-image: li
     html body .jme-no { font-size: 18px !important; white-space: nowrap; }
     html body .jme-tot { margin-left: 0; text-align: left; flex-basis: 100%; }
     html[dir=rtl] body .jme-tot { margin-right: 0; text-align: right; }
+}
+
+/* print (also from a phone): the demo's sideways scroll boxes, strips and wide charts give everything back to the page */
+@media print {
+    html body .demo-xs { overflow: visible !important; max-width: none !important; }
+    html body .demo-chart > svg { min-width: 0 !important; }
+    html body [data-demo-fit=strip] { flex-wrap: wrap !important; overflow: visible !important; -webkit-mask-image: none !important; mask-image: none !important; }
 }

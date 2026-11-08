@@ -61,7 +61,7 @@
             o.ev.forEach(function (e) { q[e[1]] = (q[e[1]] || 0) - e[2]; if (e[4] !== 'T') V0 -= e[5]; });
             Object.keys(q).forEach(function (w) { Q0 += q[w]; });
             o.q0 = q; o.Q0 = Q0; o.V0 = H.r2(V0);
-            o.first = Q0 > 0 ? '2024-12-31' : (o.ev.length ? o.ev[0][0] : null);
+            o.first = Q0 > 0 ? (+MIND.slice(0, 4) - 1) + '-12-31' : (o.ev.length ? o.ev[0][0] : null);
             /* replay the moving average to value transfers (no effect on the company value) */
             var Q = Q0, V = o.V0;
             o.ev.forEach(function (e) {
@@ -159,7 +159,7 @@
         D.items.forEach(function (r) { cnt[r[2]] = (cnt[r[2]] || 0) + 1; });
         return [
             { id: 'mv-meta', data: { admin: 1, cost: 1, asOf: H.asOf, fcstAt: H.today + ' 02:40', today: TODAY,
-                defFrom: TODAY.slice(0, 4) + '-01-01' > MIND ? TODAY.slice(0, 4) + '-01-01' : MIND, dimsV: 'demo-' + window.DEMO_INDUSTRY + '-20261024c', minD: MIND } },
+                defFrom: TODAY.slice(0, 4) + '-01-01' > MIND ? TODAY.slice(0, 4) + '-01-01' : MIND, dimsV: 'demo-' + window.DEMO_INDUSTRY + '-' + TODAY.replace(/-/g, '') + 'd', minD: MIND } },
             { id: 'mv-i18n', data: { sc: SCOPES, br: br, bra: br, dp: dp } },
             { id: 'mv-classes', data: D.classes.map(function (n, i) { return { c: String(i + 1), n: n, k: cnt[i] || 0 }; }) }
         ];

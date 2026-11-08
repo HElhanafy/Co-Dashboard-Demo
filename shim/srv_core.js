@@ -11,6 +11,21 @@
         });
     };
 
+    /* the browser clock runs from the demo date, so pages that read today pick the demo period (08/11/2026) */
+    (function () {
+        var m = /(\d\d)\/(\d\d)\/(\d{4}) (\d\d):(\d\d)/.exec(D.meta.asof), RD = window.Date;
+        if (!m || RD.demo) return;
+        var off = new RD(+m[3], +m[2] - 1, +m[1], +m[4], +m[5]).getTime() - RD.now();
+        function FD() {
+            if (!(this instanceof FD)) return new RD(RD.now() + off).toString();
+            var a = [].slice.call(arguments);
+            return a.length ? new (Function.prototype.bind.apply(RD, [null].concat(a)))() : new RD(RD.now() + off);
+        }
+        FD.prototype = RD.prototype;
+        FD.now = function () { return RD.now() + off; };
+        FD.parse = RD.parse; FD.UTC = RD.UTC; FD.demo = 1;
+        window.Date = FD;
+    })();
     H.base = +D.meta.start.slice(0, 4);
     H.asOf = D.meta.asof;
     H.today = D.meta.asof.slice(0, 10);

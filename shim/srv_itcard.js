@@ -5,7 +5,7 @@
         RET: [H.T_RET || 1180201, 4, 4, 'Sales return', 1], TRO: [1090101, 9, 5, 'Transfer out', 3],
         TRI: [1090201, 9, 6, 'Transfer in', 4], GRN: [1010101, 1, 1, 'Purchase receipt', 5], WOF: [1350101, 7, 3, 'Expired stock write-off', 6] };
     var TN = {}; Object.keys(TY).forEach(function (k) { TN[TY[k][0]] = TY[k][3]; });
-    var WIN = '2026-01-01';   /* cost check window: the current year (last year closed) */
+    var WIN = D.meta.asof.slice(6, 10) + '-01-01';   /* cost check window: the current year (last year closed) */
     H.icWin = WIN;
     function iso(dmy) { return dmy.slice(6, 10) + '-' + dmy.slice(3, 5) + '-' + dmy.slice(0, 2); }
     var TODAY = iso(H.today), MIN = D.meta.start;

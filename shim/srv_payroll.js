@@ -30,13 +30,15 @@
                          saudi: 0, insur: rd() < 0.06 ? 50 : 0 });
             }
         });
-        LEAVE[5003] = ['2026-08-20', '2026-10-10']; LEAVE[7004] = ['2026-09-05', '2026-11-05']; LEAVE[8002] = ['2026-09-12', '2026-11-12'];
-        LATE[4005] = [2026, 7];
+        LEAVE[5003] = ['2026-10-20', '2026-12-10']; LEAVE[7004] = ['2026-11-05', '2027-01-05']; LEAVE[8002] = ['2026-11-12', '2027-01-12'];
+        LATE[4005] = [2026, 9];
         /* loans: [emp, serial, type, start month index, value, instalment, stopped] */
         var L = [[2001, 1, 'Personal loan', 14, 20000, 1000, 0], [2003, 1, 'Personal loan', 18, 6000, 500, 0], [5002, 1, 'Salary advance', 19, 3000, 1000, 0],
                  [5006, 1, 'Personal loan', 10, 30000, 1500, 0], [5006, 2, 'Salary advance', 20, 2000, 1000, 0], [7001, 1, 'Personal loan', 12, 12000, 600, 0],
                  [7006, 1, 'Personal loan', 16, 9000, 750, 1], [8003, 1, 'Salary advance', 20, 2500, 1250, 0], [4002, 1, 'Personal loan', 6, 8000, 400, 0],
                  [3002, 1, 'Personal loan', 17, 15000, 1000, 0]];
+        var L0 = H.midx('2025-01-01');   /* loan months were written from 01/2025 */
+        L.forEach(function (l) { l[3] += L0; });
         return (H._pay = { E: E, L: L });
     }
 

@@ -1,6 +1,6 @@
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
-    var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIN_D = '2025-01-01', CHQ_BANK = 901;
+    var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIN_D = D.meta.start, CHQ_BANK = 901;
     var T_OPEN = 1, T_RCPT = 20, T_CHQDEP = 21, T_CHQBNC = 22, T_BANKTRF = 81;
 
     // the bank-module accounts: banks (code = GL account) then one cheque portfolio per branch (code 901 + branch)

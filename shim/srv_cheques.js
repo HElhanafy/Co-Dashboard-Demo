@@ -1,6 +1,6 @@
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
-    var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIN_D = '2025-01-01', CHQ_BANK = 901, T_RCPT = 20;
+    var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIN_D = D.meta.start, CHQ_BANK = 901, T_RCPT = 20;
 
     // per cheque: id = [20, line no. of the receipt's portfolio debit], its portfolio, its GL lines on bank/portfolio accounts
     function build() {

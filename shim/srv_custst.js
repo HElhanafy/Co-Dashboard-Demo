@@ -1,6 +1,6 @@
 (function () {
     var D = window.DEMO, S = window.DEMO_SRV, H = window.DEMO_H;
-    var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIN_D = '2025-01-01';
+    var TODAY = H.today.slice(6, 10) + '-' + H.today.slice(3, 5) + '-' + H.today.slice(0, 2), MIN_D = D.meta.start;
     var AR = { INV: 101, RET: 102, RCP: 103, RCH: 104, OPN: 107 };
     var TN = { INV: 'Sales invoice', RET: 'Sales return', RCP: 'Customer receipt', RCH: 'Bounced cheque', OPN: 'Opening balance' };
     var SUPV = H.idx(D.supervisors), CHQ = H.idx(D.chq), BANK = H.idx(D.banks), CHQB = {};

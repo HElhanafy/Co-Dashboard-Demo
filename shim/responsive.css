@@ -1,0 +1,31 @@
+html, body { max-width: 100%; }
+html body img, html body svg, html body canvas { max-width: 100%; }
+html body .t-Body-content input, html body .t-Body-content select, html body .t-Body-content textarea { max-width: 100%; }
+/* page header: no subtitle, no Refresh button, no load-time note in the demo (user 08/11/2026) */
+html body .dash-header .subtitle, html body #dashRefreshBtn, html body .dash-header .asof-line,
+html body #asOfLine, html body #syncPwdNote { display: none !important; }
+html body .dash-header .header-actions, html body .dash-header .actions-row { gap: 8px; }
+html body .dash-header .btn-print, html body .dash-header .jx-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    height: 36px; padding: 0 14px; font-size: 13px; line-height: 1; white-space: nowrap; box-sizing: border-box;
+}
+html body .dash-header .btn-print svg { width: 15px; height: 15px; flex: none; }
+.demo-xs { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
+.demo-xs > table { margin: 0; }
+
+@media (max-width: 1024px) {
+    html body .t-Body-content { padding: 12px 12px 32px; }
+}
+@media (max-width: 640px) {
+    html body .t-Body-content { padding: 10px 10px 28px; }
+    /* top bar: room for the burger, then the controls fit in 375px */
+    html body .jm-hdr { gap: 6px; padding: 0 10px 0 64px; }
+    html[dir=rtl] body .jm-hdr { padding: 0 64px 0 10px; }
+    html body .jm-hdr-id { padding: 0 10px; }
+    html body .jm-hdr-name { max-width: 84px; }
+    html body .jm-hdr-btn.demo-ind { padding: 0 8px; }
+    html body .jm-hdr-lang button { padding-left: 8px; padding-right: 8px; }
+}
+@media (max-width: 400px) {
+    html body .jm-hdr-id { display: none; }
+}

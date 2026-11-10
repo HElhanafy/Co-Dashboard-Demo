@@ -116,4 +116,21 @@
         if (cmd === 'cancel') { o.st = 'CANCELLED'; return { ok: 1, msg: 'Loan cancelled - it leaves the list' }; }
         return err('unknown command');
     };
+    // the entry window: the loan entries live only here, so GL_ENTRY_AJAX answers them before the shared ledger data (two lines, as the live package writes them)
+    var GL0 = S.GL_ENTRY_AJAX;
+    S.GL_ENTRY_AJAX = function (p) {
+        var y = +p.x02, t = +p.x03, n = +p.x04, i, a, L, ds, lines;
+        if (t === 101) {
+            for (i = 0; i < M.acc.length; i++) {
+                a = M.acc[i];
+                if (a.st === 'POSTED' && a.ey === y && a.en === n) {
+                    L = find(a.loan);
+                    ds = (a.kind === 'F' ? 'Loan interest settlement# ' + L.code + ' up to ' + H.dmy(a.to) : 'Loan interest# ' + L.code + ' month ' + a.to.substr(5, 2) + '-' + a.to.substr(0, 4)) + ' - ' + L.sup;
+                    lines = [[1, 420402000000, 'Bank facilities finance cost', ds, a.amt, null, null, a.to, '', ''], [2, 210204001000, 'Accrued supplier invoices financing', ds, -a.amt, null, null, a.to, '', '']];
+                    return { ok: 1, y: y, t: t, n: n, dt: a.to, ds: ds, lines: lines };
+                }
+            }
+        }
+        return GL0 ? GL0(p) : { error: 'entry not found' };
+    };
 })();

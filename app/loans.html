@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bank Loans - Co. Dashboard</title>
+<script src="../theme/theme.js"></script>
+<link rel="stylesheet" href="../theme/THEME.css">
+<link rel="stylesheet" href="../shim/base.css">
+<link rel="stylesheet" href="css/p0_jm_tokens.compact.css">
+<link rel="stylesheet" href="css/p0_sidebar.compact.css">
+<link rel="stylesheet" href="css/p0_sales.doc.compact.css">
+<link rel="stylesheet" href="css/loans_loans.compact.css">
+<link rel="stylesheet" href="../shim/responsive.css">
+<script src="../data/load.js"></script>
+<script src="../shim/nav.js"></script>
+<script src="../shim/apex.js"></script>
+<script src="../shim/srv_core.js"></script>
+<script src="../shim/srv_shared.js"></script>
+<script src="../shim/srv_loans.js"></script>
+<script src="js/loans_loans.fg.compact.js"></script>
+</head>
+<body data-alias="LOANS">
+<script src="../shim/shell.js"></script>
+<script src="../shim/i18n.js"></script>
+<div class="t-Body" id="top"><div class="t-Body-main"><div class="t-Body-content">
+<!-- LOANS.HTML - Bank Loans page (Static Content region, Seq 20): level 0 the loans, level 1 one loan in plain words (rate . months . repayment); LOANS.JS fills it from LOANS_AJAX - 10/11/2026 -->
+<div class="wrap">
+    <div class="dash-header">
+        <div class="brand">
+            <div class="mark">L</div>
+            <div>
+                <h1 id="pgTitle">Bank Loans</h1>
+            </div>
+        </div>
+        <div class="header-actions">
+            <div class="actions-row">
+                <button type="button" class="btn-refresh" id="syncBtn" title="Read the new drawdowns and repayments of the bank module now">Sync bank moves</button>
+                <a href="home.html" class="btn-reset" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;height:auto">Home</a>
+            </div>
+            <div class="asof-line" id="asOfLine"></div>
+        </div>
+    </div>
+
+    <div id="lv0">
+        <div class="filters">
+            <div class="filter-group">
+                <label>Status</label>
+                <div class="level-tabs cols-tabs" id="stTabs">
+                    <button type="button" class="lvl-btn active" data-st="ALL">All<span class="n">0</span></button>
+                    <button type="button" class="lvl-btn" data-st="NEW">To approve<span class="n">0</span></button>
+                    <button type="button" class="lvl-btn" data-st="APPROVED">Running<span class="n">0</span></button>
+                    <button type="button" class="lvl-btn" data-st="DUE">Due in 30 days<span class="n">0</span></button>
+                    <button type="button" class="lvl-btn" data-st="OVER">Overdue<span class="n">0</span></button>
+                    <button type="button" class="lvl-btn" data-st="REPAID">Repaid<span class="n">0</span></button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label>Supplier</label>
+                <select id="supSel"><option value="">All suppliers</option></select>
+            </div>
+            <div class="filter-group">
+                <label>Year</label>
+                <select id="yrSel"><option value="">All years</option></select>
+            </div>
+            <div class="filter-group">
+                <label>Find loan <span class="lbl-hint">(code or transfer no)</span></label>
+                <input type="text" id="findBox" placeholder="CPMCIB AM251026-14" autocomplete="off" style="width:260px">
+            </div>
+            <div class="filter-group"><label>&nbsp;</label><button type="button" class="btn-reset" id="resetBtn">Reset</button></div>
+        </div>
+
+        <div class="kpi-row" id="kpi0"></div>
+
+        <div class="panel" id="printTablePanel">
+            <div class="table-header-row">
+                <div>
+                    <h3><span class="dot"></span> <span id="tableTitleText">Loans</span></h3>
+                    <div class="panel-sub" id="tableSub">Largest first - click a loan to open it</div>
+                </div>
+                <div class="table-tools">
+                    <span id="exportBox"></span>
+                </div>
+            </div>
+            <div class="print-filters" id="printFilters"></div>
+            <div class="table-scroll">
+                <table>
+                    <thead id="tHead"></thead>
+                    <tbody id="tBody"></tbody>
+                </table>
+            </div>
+            <div id="tableLoader" class="table-loader">Loading the loans...</div>
+        </div>
+    </div>
+
+    <div id="lv1" style="display:none">
+        <div class="kpi-row">
+            <div class="kpi k-scope">
+                <span class="label">Loan</span>
+                <span class="scope-path" id="crumb"></span>
+                <span class="scope-note" id="scopeNote"></span>
+            </div>
+        </div>
+        <div class="panel" id="loanPanel">
+            <div class="table-header-row">
+                <div>
+                    <h3><span class="dot"></span> <span id="l1Title">Loan</span></h3>
+                    <div class="panel-sub" id="l1Sub"></div>
+                </div>
+                <div class="table-tools">
+                    <button type="button" class="btn-back" id="backBtn">&#8592; Back</button>
+                    <span id="exportBox1"></span>
+                </div>
+            </div>
+            <div class="print-filters" id="printFilters1"></div>
+
+            <div class="story" id="story"></div>
+
+            <div class="sec-h">1. Interest rate <span class="sp"></span></div>
+            <p class="sec-p" id="rateP"></p>
+            <div class="rate-box" id="rateBox"></div>
+
+            <div class="sec-h">2. Interest month by month <span class="sp"></span></div>
+            <p class="sec-p" id="schP"></p>
+            <div class="table-scroll">
+                <table id="schTable">
+                    <thead><tr class="print-title-row"><th colspan="7"></th></tr><tr><th>Month</th><th>From</th><th>To</th><th class="num">Days</th><th class="num">Interest (SAR)</th><th>Entry in Co.</th><th></th></tr></thead>
+                    <tbody id="schBody"></tbody>
+                </table>
+            </div>
+
+            <div class="sec-h">3. Repayment <span class="sp"></span></div>
+            <p class="sec-p" id="repP"></p>
+            <div id="repBox"></div>
+
+            <div class="sec-h">History <span class="sp"></span></div>
+            <div id="logBox" class="log"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function () {
+function grpTxt() {
+var s = document.getElementById('jmHdrGroup'), e = document.querySelector('.jm-hdr-grp'), g = s && s.selectedIndex >= 0 ? s.options[s.selectedIndex].text : (e ? e.textContent : '');
+g = (g || '').replace(/^\s+|\s+$/g, '');
+return g ? ' - Data group: ' + g : '';
+}
+function cols(W) { var w = '<cols>', j; for (j = 0; j < W.length; j++) { w += '<col min="' + (j + 1) + '" max="' + (j + 1) + '" width="' + W[j] + '" customWidth="1"/>'; } return w + '</cols>'; }
+window.loansExcel = function (c) {
+var T = c.T, head, W, lines = [], i, o, m, r, tP = 0, tI = 0, tPo = 0, tD = 0, tA = 0, info;
+if (!window.svXlsx) { return; }
+if (c.kind === 'list') {
+head = [T('Loan'), T('Supplier'), T('Transfer no'), T('Taken on'), T('Amount'), T('Bank margin %'), T('SAIBOR %'), T('Rate a year'), T('Interest to due date'), T('Amount + interest'), T('Due on'), T('Age'), T('Status'), T('Interest booked'), T('Months booked')];
+W = [24, 22, 13, 12, 16, 12, 12, 12, 16, 16, 12, 24, 12, 16, 10];
+for (i = 0; i < c.rows.length; i++) {
+o = c.rows[i]; tP += o.p; tI += o.tot; tPo += o.pa;
+lines.push([[o.code || '', 3], [o.sup || '', 0], [o.tr === null || o.tr === undefined ? '' : String(o.tr), 3], [c.dmy(o.draw), 0], [o.p, 5], [o.fx, 5], [o.sb === null ? '' : o.sb, 5], [o.sb === null ? '' : c.rateOf(o), 5],
+[o.sb === null ? '' : o.tot, 5], [o.sb === null ? '' : o.p + o.tot, 5], [c.dmy(o.due), 0], [c.age(o).t, 0], [T(c.st[o.st]), 0], [o.pa, 5], [o.pm, 5]]);
+}
+lines.push([[T('TOTAL'), 4], ['', 0], ['', 0], ['', 0], [tP, 5], ['', 0], ['', 0], ['', 0], [tI, 5], [tP + tI, 5], ['', 0], ['', 0], ['', 0], [tPo, 5], ['', 0]]);
+info = c.title + grpTxt();
+window.svXlsx.save(info, head, lines, cols(W), 'Bank_Loans.xlsx', 'Loans');
+return;
+}
+head = [T('Month'), T('From'), T('To'), T('Days'), T('Rate %'), T('Interest (SAR)'), T('Kind'), T('Status'), T('Entry in Co.'), T('Entry date'), T('Booked by'), T('Note')];
+W = [16, 12, 12, 8, 10, 16, 10, 12, 16, 12, 18, 40];
+for (i = 0; i < c.months.length; i++) {
+r = c.months[i]; m = { to: r[3], from: r[2], days: r[4], rate: +r[5], amt: +r[6], kind: r[7], st: r[8], e: r[11] === null || r[11] === undefined ? '' : r[9] + '/' + r[10] + '/' + r[11], ed: r[12], by: r[13], note: r[17] };
+if (m.st !== 'CANCELLED') { tD += m.days; tA += m.amt; }
+lines.push([[m.to.substr(0, 7), 0], [c.dmy(m.from), 0], [c.dmy(m.to), 0], [m.days, 5], [m.rate, 5], [m.amt, 5], [T(m.kind === 'F' ? 'Final' : 'Monthly'), 0], [T(m.st), 0], [m.e, 3], [c.dmy(m.ed), 0], [m.by || '', 0], [m.note || '', 0]]);
+}
+lines.push([[T('TOTAL'), 4], ['', 0], ['', 0], [tD, 5], ['', 0], [tA, 5], ['', 0], ['', 0], ['', 0], ['', 0], ['', 0], ['', 0]]);
+info = c.title + ' - ' + T('Amount') + ' ' + c.fm(c.loan.p) + ' - ' + T('Rate') + ' ' + c.rate.toFixed(2) + '%' + grpTxt();
+window.svXlsx.save(info, head, lines, cols(W), 'Loan_' + String(c.loan.code || c.loan.id).replace(/[^A-Za-z0-9]+/g, '_') + '.xlsx', 'Loan');
+};
+window.addEventListener('beforeprint', function () {
+var T = window.jmT || function (s) { return s; }, wrap = document.querySelector('.wrap'), panel = document.getElementById('printTablePanel'),
+th = panel ? panel.querySelector('.print-title-row th') : null, pf = panel ? panel.querySelector('.print-filters') : null,
+parts = th ? th.textContent.split(' | ') : [], sep = '<span class="pf-sep">|</span>', seg, box;
+if (!wrap) { return; }
+box = document.getElementById('jmPrintHead');
+if (!box) { box = document.createElement('div'); box.id = 'jmPrintHead'; wrap.insertBefore(box, wrap.firstChild); }
+seg = pf ? pf.innerHTML.split(sep) : [];
+box.innerHTML = '<div class="ph-top"><b class="ph-co"></b><span class="ph-at"></span></div><div class="ph-title"></div><div class="ph-meta">' + seg.join(sep) + (parts[2] ? (seg.length ? sep : '') + '<b>' + T('Facility') + ':</b> ' + parts[2] : '') + '</div>';
+box.querySelector('.ph-co').textContent = T('Co. Dashboard');
+box.querySelector('.ph-at').textContent = T(parts[3] || '');
+box.querySelector('.ph-title').textContent = T(parts[1] || '');
+box = document.getElementById('jmPageCss');
+if (!box) { box = document.createElement('style'); box.id = 'jmPageCss'; }
+document.body.appendChild(box);
+box.textContent = document.body.className.indexOf('sd-print') !== -1 ? '' : '@media print{@page{@top-right{content:none}@bottom-right{content:'
++ (window.JM_LANG === 'AR' ? '"\\0635 \\0641 \\062D \\0629  " counter(page) " \\0645 \\0646  " counter(pages)' : '"Page " counter(page) " of " counter(pages)')
++ ';font:8px sans-serif;color:#555}}}';
+}, false);
+}());
+</script>
+
+</div></div></div>
+<footer class="t-Footer"><div class="t-Footer-top"><a href="#top" class="t-Footer-topButton" title="Back to top"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><polyline points="18 15 12 9 6 15"></polyline></svg></a></div></footer>
+<script src="js/p0_sidebar.compact.js"></script>
+<script src="js/p0_sales.doc.compact.js"></script>
+<script src="js/p0_gl.entry.compact.js"></script>
+<script src="js/loans_loans.compact.js"></script>
+<script src="../shim/responsive.js"></script>
+</body></html>

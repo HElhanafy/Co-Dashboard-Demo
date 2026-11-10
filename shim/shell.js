@@ -36,7 +36,7 @@
             g.g + '"><span class="jm-sb-gico">' + svg(MI[g.g] || MI.Administration) + '</span><span class="jm-sb-gtxt">' + g.g + '</span><span class="jm-sb-caret">' +
             svg('<polyline points="6 9 12 15 18 9"></polyline>', 2.5) + '</span></button><div class="jm-sb-items">');
         /* Operations then Reports and analysis, captions only when both show (SIDEBAR_SQL print_sub, 07/11/2026) */
-        var OPS = { TGTSET: 1, COMM: 1, PRICEADJ: 1, BANKREC: 1, HRSET: 1 }, ops = [], rep = [];
+        var OPS = { TGTSET: 1, COMM: 1, PRICEADJ: 1, BANKREC: 1, HRSET: 1, LOANS: 1 }, ops = [], rep = [];
         g.items.forEach(function (it) { (OPS[it.a] ? ops : rep).push(it); });
         var two = ops.length && rep.length;
         if (two) { h.push('<div class="jm-sb-sub is-ops">Operations</div>'); }

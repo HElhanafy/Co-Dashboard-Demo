@@ -228,7 +228,7 @@ function renderBatches() {
 $('tableTitleText').textContent = T('Changes log');
 $('tableSub').innerHTML = crumb([T('Price Adjustment'), T('Changes log')]) + ' &middot; ' + T('click a price change to see its units');
 $('tableHead').innerHTML = '<tr><th>' + T('No.') + '</th><th>' + T('Class') + '</th><th>' + T('Status') + '</th><th>' + T('Created') + '</th><th class="num">' + T('Items') + '</th><th class="num">' + T('Units') + '</th><th class="num">' + T('Refused') + '</th><th>' + T('Approved') + '</th><th>' + T('Reversed') + '</th></tr>';
-$('tableBody').innerHTML = batches.map((b, i) => cls && String(b[2]) !== String(cls) ? '' : '<tr class="drill-row" data-i="' + i + '"><td><span class="tw">&#9656;</span>#' + b[0] + '</td><td>' + esc(b[3] ? (ar() && CLS[b[2]] ? CLS[b[2]].a : b[3]) : b[2]) + '</td><td>' + stBadge(b[1]) + '</td>'
+$('tableBody').innerHTML = batches.map((b, i) => (cls && String(b[2]) !== String(cls)) || (window.paIn && !window.paIn(b)) ? '' : '<tr class="drill-row" data-i="' + i + '"><td><span class="tw">&#9656;</span>#' + b[0] + '</td><td>' + esc(b[3] ? (ar() && CLS[b[2]] ? CLS[b[2]].a : b[3]) : b[2]) + '</td><td>' + stBadge(b[1]) + '</td>'
 + '<td>' + esc(b[4]) + ' <span class="pk">' + esc(b[5] || '') + '</span></td><td class="num">' + (b[11] == null ? '' : b[11]) + '</td><td class="num">' + (b[12] == null ? '' : b[12]) + '</td><td class="num">' + (b[13] ? b[13] : '') + '</td>'
 + '<td>' + (b[7] ? esc(b[7]) + ' <span class="pk">' + esc(b[8]) + '</span>' : '<span class="dash">&mdash;</span>') + '</td><td>' + (b[9] ? esc(b[9]) + ' <span class="pk">' + esc(b[10]) + '</span>' : '<span class="dash">&mdash;</span>') + '</td></tr>').join('')
 || '<tr><td class="pa-empty" colspan="9">' + T('No price change yet') + '</td></tr>';

@@ -250,28 +250,18 @@ window.svXlsx.save(c.info, head, lines, w + '</cols>', c.file, 'Prices');
 window.paPrintNow = function (c) {
 const T = c.T, esc = c.esc, fx = c.fx, st = c.blines ? c.blines.status : '', b = c.bsel, orig = document.title;
 let mode = '', title = c.title, meta = c.cls ? T('Class') + ': ' + c.clsName : '', file = 'Price_Adjustment_' + c.stamp;
-if (c.view === 'EDIT' || c.view === 'REVIEW') {
-mode = 'pa-pdf-draft';
-title = T('Price change draft') + (c.draftNo ? ' #' + c.draftNo : '') + (c.clsName ? ' - ' + c.clsName : '');
-meta += (meta ? '  |  ' : '') + T('Draft - before approval');
-file = 'Price_Change_Draft_' + (c.draftNo || c.cls) + '_' + c.stamp;
-} else if (c.view === 'BLINES' && b && (st === 'APPLIED' || st === 'REVERSED')) {
-mode = 'pa-pdf-sales';
-title = T('Sales price list') + ' - ' + T('Price change') + ' #' + b[0] + (b[3] ? ' - ' + b[3] : '');
-meta = '';
-file = 'Price_List_Change_' + b[0] + '_' + c.stamp;
-let last = '', body = '';
-(c.blines.rows || []).forEach(r => {
-if (r[6] !== 'WRITTEN' && r[6] !== 'REVERSED') { return; }
-const same = r[0] === last;
-last = r[0];
-body += '<tr><td class="code">' + (same ? '' : esc(r[0])) + '</td><td class="nm">' + (same ? '' : esc(r[1])) + '</td><td>' + esc(r[2]) + '</td>'
-+ '<td class="num">' + (r[4] == null ? '&mdash;' : fx(r[4])) + '</td><td class="num np-new">' + fx(r[5]) + '</td></tr>';
+const sheet = rows => {
+let n = 0, body = '';
+rows.forEach(r => {
+n += 1;
+body += '<tr><td class="no">' + n + '</td><td class="code">' + esc(r[0]) + '</td><td class="nm">' + esc(r[1]) + '</td><td class="un">' + esc(r[2]) + '</td>'
++ '<td class="num">' + (r[3] == null ? '&mdash;' : fx(r[3])) + '</td><td class="num np-new">' + fx(r[4]) + '</td></tr>';
 });
-document.getElementById('tableHead').innerHTML = '<tr><th class="c-code">' + T('Code') + '</th><th>' + T('Item') + '</th><th class="c-unit">' + T('Unit') + '</th><th class="num">'
-+ T('Old price') + '</th><th class="num">' + T('New price') + '</th></tr>';
+document.getElementById('tableHead').innerHTML = '<tr><th class="c-no">' + T('Seq') + '</th><th class="c-code">' + T('Code') + '</th><th>' + T('Item') + '</th><th class="c-unit">'
++ T('Unit') + '</th><th class="num">' + T('Old price') + '</th><th class="num">' + T('New price') + '</th></tr>';
 document.getElementById('tableBody').innerHTML = body;
-}
+};
+const go = () => {
 window.paPrint = { title: title, meta: meta };
 document.title = file;
 if (mode) { document.body.classList.add(mode); }
@@ -284,8 +274,62 @@ window.removeEventListener('afterprint', restore);
 window.addEventListener('afterprint', restore);
 window.print();
 };
+if (c.view === 'EDIT' || c.view === 'REVIEW') {
+mode = 'pa-pdf-draft';
+title = T('Price change draft') + (c.draftNo ? ' #' + c.draftNo : '') + (c.clsName ? ' - ' + c.clsName : '');
+meta += (meta ? '  |  ' : '') + T('Draft - before approval');
+file = 'Price_Change_Draft_' + (c.draftNo || c.cls) + '_' + c.stamp;
+} else if (c.view === 'BLINES' && b && (st === 'APPLIED' || st === 'REVERSED')) {
+mode = 'pa-pdf-sales';
+title = T('Sale price change');
+meta = b[8] ? T('Change date') + ': ' + String(b[8]).substring(0, 10) : '';
+file = 'Price_Change_' + b[0] + '_' + c.stamp;
+const one = [];
+(c.blines.rows || []).forEach(r => { if ((r[6] === 'WRITTEN' || r[6] === 'REVERSED') && r[8] === 1) { one.push([r[0], r[1], r[2], r[4], r[5]]); } });
+sheet(one);
+} else if (c.view === 'BATCHES' && paA && document.getElementById('paFrom')) {
+const f = document.getElementById('paFrom').value, t = document.getElementById('paTo').value,
+dm = v => v.substring(8, 10) + '/' + v.substring(5, 7) + '/' + v.substring(0, 4);
+if (!f || !t) { alert(T('Choose the period first')); return; }
+paA.call({ x01: 'sheet', x02: f, x03: t }, d => {
+const rows = [];
+(d.rows || []).forEach(r => { if (r[3] == null || Math.abs(r[3] - r[4]) >= 0.00005) { rows.push(r); } });
+if (!rows.length) { alert(T('No approved price change in this period')); return; }
+mode = 'pa-pdf-sales';
+title = T('Sale price change');
+meta = f === t ? T('Change date') + ': ' + dm(f) : T('From') + ' ' + dm(f) + ' ' + T('to') + ' ' + dm(t);
+file = 'Price_Changes_' + f + '_' + t;
+sheet(rows);
+go();
+}, e => alert(e));
+return;
+}
+go();
+};
+let paA = null;
+window.paIn = function (b) {
+const fe = document.getElementById('paFrom'), te = document.getElementById('paTo'), s = String(b[8] || b[5] || '');
+if (!fe || s.length < 10) { return true; }
+const k = s.substring(6, 10) + '-' + s.substring(3, 5) + '-' + s.substring(0, 2);
+return (!fe.value || k >= fe.value) && (!te.value || k <= te.value);
+};
+function paRange(A) {
+const rs = document.querySelector('.pa-filters .filter-reset'), d = new Date(), z = n => (n < 10 ? '0' : '') + n;
+if (!rs || document.getElementById('paRange')) { return; }
+const g = document.createElement('div');
+g.className = 'filter-group'; g.id = 'paRange'; g.style.display = 'none';
+g.innerHTML = '<label>' + A.T('Changes period') + '</label><div class="pa-dates"><input type="date" class="pa-box" id="paFrom"><span>&ndash;</span><input type="date" class="pa-box" id="paTo"></div>';
+rs.parentNode.insertBefore(g, rs);
+A.$('paFrom').value = d.getFullYear() + '-' + z(d.getMonth() + 1) + '-01';
+A.$('paTo').value = d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate());
+const log = () => document.querySelector('#viewBox .vbtn[data-v="LOG"]'),
+sync = () => setTimeout(() => { const l = log(); g.style.display = l && l.classList.contains('on') ? '' : 'none'; }, 0);
+document.addEventListener('click', sync);
+['paFrom', 'paTo'].forEach(id => A.$(id).addEventListener('change', () => { const l = log(); if (l) { l.click(); } }));
+}
 window.paFind = function (A) {
 const inp = A.$('itemInput');
+paA = A; paRange(A);
 if (!inp) return;
 inp.placeholder = A.T('Item code or name');
 const m = document.createElement('div');

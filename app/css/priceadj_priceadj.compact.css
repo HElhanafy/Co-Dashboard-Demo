@@ -34,6 +34,8 @@ font:500 13.5px var(--font-body);color:var(--text);outline:none;box-sizing:borde
 }
 .pa-box:focus,.search-select input:focus,.pa-dlg select:focus,.pa-dlg input:focus,.pa-dlg textarea:focus{border-color:var(--navy);background:var(--panel);box-shadow:0 0 0 3px var(--navy-a12);}
 .pa-item{width:360px;}
+.pa-dates{display:flex;align-items:center;gap:6px;color:var(--muted);}
+.pa-dates .pa-box{width:150px;}
 .pa-cls{width:320px;}
 .search-select{position:relative;}
 .search-select input{width:100%;}
@@ -218,9 +220,23 @@ white-space:normal !important;line-height:1.2 !important;vertical-align:bottom;p
 #printTablePanel th.c-unit{width:6% !important;}
 #printTablePanel th.num{width:9% !important;}
 body.pa-pdf-draft #printTablePanel th.num{width:8.5% !important;}
-body.pa-pdf-sales #printTablePanel th.c-code{width:15% !important;}
-body.pa-pdf-sales #printTablePanel th.c-unit{width:10% !important;}
-body.pa-pdf-sales #printTablePanel th.num{width:13% !important;}
-body.pa-pdf-sales #printTablePanel td.num{font-size:10px !important;}
-body.pa-pdf-sales #printTablePanel td.np-new{color:var(--print-text) !important;font-weight:700;}
+html body.pa-pdf-sales .jm-gprint{display:none !important;}
+body.pa-pdf-sales #jmPrintHead{border-bottom-width:2px;padding-bottom:7px;margin-bottom:10px;}
+body.pa-pdf-sales #jmPrintHead .ph-title{font-size:var(--fs-title);color:var(--navy);text-align:center;margin:4px 0 2px;}
+body.pa-pdf-sales #jmPrintHead .ph-meta{font-size:var(--fs-body);text-align:center;}
+body.pa-pdf-sales #printTablePanel table{font-size:var(--fs-label) !important;border-color:var(--navy-a25) !important;}
+body.pa-pdf-sales #printTablePanel th,body.pa-pdf-sales #printTablePanel td{padding:5px 8px !important;line-height:1.25;}
+body.pa-pdf-sales #printTablePanel thead th{font-size:var(--fs-hint) !important;text-align:center !important;vertical-align:middle;background:var(--navy) !important;
+color:var(--panel) !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+body.pa-pdf-sales #printTablePanel th.c-no{width:5% !important;padding-inline:2px !important;white-space:nowrap !important;}
+body.pa-pdf-sales #printTablePanel th.c-code{width:14% !important;}
+body.pa-pdf-sales #printTablePanel th.c-unit{width:8% !important;}
+body.pa-pdf-sales #printTablePanel th.num{width:11% !important;}
+body.pa-pdf-sales #printTablePanel td{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+body.pa-pdf-sales #printTablePanel td.no,body.pa-pdf-sales #printTablePanel td.code,body.pa-pdf-sales #printTablePanel td.un,body.pa-pdf-sales #printTablePanel td.num{text-align:center !important;}
+body.pa-pdf-sales #printTablePanel td.no,body.pa-pdf-sales #printTablePanel td.code{color:var(--print-muted) !important;}
+body.pa-pdf-sales #printTablePanel td.nm{font-size:var(--fs-hint) !important;direction:ltr;text-align:left !important;}
+body.pa-pdf-sales #printTablePanel td.num{font-size:var(--fs-label) !important;color:var(--print-muted) !important;}
+body.pa-pdf-sales #printTablePanel tbody tr:nth-child(even) td{background:var(--panel2) !important;}
+body.pa-pdf-sales #printTablePanel tbody tr td.np-new{background:var(--box-bg) !important;color:var(--navy) !important;font-weight:700 !important;border-inline:1px solid var(--navy-a25);}
 }

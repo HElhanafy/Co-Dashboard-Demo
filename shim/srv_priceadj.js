@@ -58,7 +58,7 @@
                     var x = H.item[c], us = units(x), def = us[1], base = b.lines[c][0] / def[2];
                     us.forEach(function (u) {
                         var nw = r4(base * u[2]), same = Math.abs(nw - u[3]) < 0.00005;
-                        b.u.push([c, x[1], u[1], u[2], u[3], nw, same ? 'SAME' : 'WRITTEN', null, u[0]]);
+                        b.u.push([c, x[1], u[1], u[2], u[3], nw, same ? 'SAME' : 'WRITTEN', null, u[0], u === def ? 1 : 0]);
                         if (!same) { price[c + '|' + u[0]] = nw; nu++; }
                     });
                 });
@@ -72,6 +72,19 @@
             return { ok: 1, msg: b.msg };
         }
         if (a === 'batches') return { rows: batches.slice().reverse().map(batchRow) };
+        if (a === 'sheet') {
+            // the combined Sales sheet: approved changes of the period, one line per item on its default unit (first old price, last new price)
+            var m = {}, ks = [];
+            batches.forEach(function (x) {
+                var s = String(x.appAt || ''), k = s.substring(6, 10) + '-' + s.substring(3, 5) + '-' + s.substring(0, 2);
+                if (x.st !== 'APPLIED' || k < p.x02 || k > p.x03) return;
+                x.u.forEach(function (u) {
+                    if (u[6] !== 'WRITTEN' || !u[9]) return;
+                    if (!m[u[0]]) { m[u[0]] = [u[0], u[1], u[2], u[4], u[5]]; ks.push(u[0]); } else { m[u[0]][4] = u[5]; }
+                });
+            });
+            return { rows: ks.sort().map(function (k) { return m[k]; }) };
+        }
         if (a === 'lines') {
             if (!b) return { error: 'not found' };
             if (b.st === 'DRAFT' || b.st === 'CANCELLED') {
@@ -80,7 +93,7 @@
                     return [c, x[1], def[0], def[2], def[3], b.lines[c][0], x[6], b.lines[c][1]];
                 }) };
             }
-            return { status: b.st, rows: b.u.map(function (u) { return u.slice(0, 8); }) };
+            return { status: b.st, rows: b.u.map(function (u) { return u.slice(0, 8).concat(u[9] || 0); }) };
         }
         return { error: 'action' };
     };

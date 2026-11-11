@@ -131,6 +131,24 @@
                 }
             }
         }
+        // the bank module entries of a loan (type 106): the drawdown (bank debit / facility credit) and the repayment (facility + accrued interest debit / bank credit)
+        if (t === 106) {
+            for (i = 0; i < M.loans.length; i++) {
+                L = M.loans[i];
+                if (+L.draw.substr(0, 4) === y && 100130 + L.ser === n) {
+                    ds = 'Loan received# ' + L.code + ' - ' + L.sup + ' - bank move 1010201/' + L.ser;
+                    lines = [[1, 110102001001, 'Demo Bank current account', ds, L.p, null, null, L.draw, '', ''], [2, L.acc, 'Supplier invoices financing - ' + L.sup, ds, -L.p, null, null, L.draw, '', '']];
+                    return { ok: 1, y: y, t: t, n: n, dt: L.draw, ds: ds, lines: lines };
+                }
+                if (L.rser && +L.rdate.substr(0, 4) === y && 101100 + L.rser === n) {
+                    ds = 'Loan repaid# ' + L.code + ' - ' + L.sup + ' - bank move 1010202/' + L.rser;
+                    lines = [[1, L.acc, 'Supplier invoices financing - ' + L.sup, ds, L.p, null, null, L.rdate, '', ''],
+                             [2, 210204001000, 'Accrued supplier invoices financing', ds, r2(L.ramt - L.p), null, null, L.rdate, '', ''],
+                             [3, 110102001001, 'Demo Bank current account', ds, -L.ramt, null, null, L.rdate, '', '']];
+                    return { ok: 1, y: y, t: t, n: n, dt: L.rdate, ds: ds, lines: lines };
+                }
+            }
+        }
         return GL0 ? GL0(p) : { error: 'entry not found' };
     };
 })();

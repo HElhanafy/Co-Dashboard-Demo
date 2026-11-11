@@ -25,7 +25,21 @@
         ],
         moves: [{ ser: 8, date: addD(TODAY, -2), amt: 884120.33, tr: null, ds: 'Repayment loan# ' + 'CPMCIB AM' + d0.substr(8, 2) + d0.substr(5, 2) + d0.substr(2, 2) + '-14', used: false }]
     };
-    M.loans.forEach(function (L) { L.due = addD(L.draw, 270); L.apby = L.st === 'NEW' ? null : USER; L.apat = L.st === 'NEW' ? null : H.dmy(L.draw) + ' 10:00'; });
+    // demo only (11/11/2026): the accounts of the monthly interest entry and the loan term are chosen at approval, from a small made-up chart of accounts
+    M.coa = [[420402000000, 'Bank facilities finance cost'], [420401000000, 'Bank charges and commissions'], [420403000000, 'Term loans finance cost'], [420404000000, 'Letters of credit finance cost'],
+             [130501000000, 'Prepaid finance cost'], [210204001000, 'Accrued supplier invoices financing'], [210204002000, 'Accrued term loans finance cost'], [210204003000, 'Accrued letters of credit finance cost'],
+             [210201000000, 'Accrued expenses'], [110102001001, 'Demo Bank current account']];
+    function accName(k) { var i; for (i = 0; i < M.coa.length; i++) { if (M.coa[i][0] === +k) { return M.coa[i][1]; } } return ''; }
+    function preview(L, rate, term) {
+        var due = addD(L.draw, term), from = L.draw, to, n = 0, first = null, tot = r2(L.p * rate / 100 * term / 360);
+        while (utc(from) < utc(due)) {
+            to = lastDay(addD(from, 1)); if (utc(to) > utc(due)) { to = due; }
+            n++; if (!first) { first = { to: to, days: days(from, to), amt: to === due ? tot : r2(L.p * rate / 100 * days(from, to) / 360) }; }
+            from = to;
+        }
+        return { ok: 1, n: n, total: tot, due: due, first: first };
+    }
+    M.loans.forEach(function (L) { L.term = 270; L.dr = 420402000000; L.cr = 210204001000; L.due = addD(L.draw, L.term); L.apby = L.st === 'NEW' ? null : USER; L.apat = L.st === 'NEW' ? null : H.dmy(L.draw) + ' 10:00'; });
     function find(k) { var i; for (i = 0; i < M.loans.length; i++) { if (M.loans[i].id === k) { return M.loans[i]; } } return null; }
     function acc(k) { var i; for (i = 0; i < M.acc.length; i++) { if (M.acc[i].id === k) { return M.acc[i]; } } return null; }
     function rows(L) { var r = [], j; for (j = 0; j < M.acc.length; j++) { if (M.acc[j].loan === L.id) { r.push(M.acc[j]); } } r.sort(function (a, b) { return a.to < b.to ? -1 : a.to > b.to ? 1 : a.seq - b.seq; }); return r; }
@@ -34,7 +48,7 @@
         for (j = M.acc.length - 1; j >= 0; j--) { if (M.acc[j].loan === L.id && M.acc[j].st === 'PLANNED') { M.acc.splice(j, 1); } }
         for (j = 0; j < r.length; j++) { if (r[j].st === 'POSTED') { run += r[j].amt; seq = r[j].seq; lastTo = r[j].to; } }
         if (lastTo) { from = lastTo; }
-        tot = r2(L.p * rate / 100 * 270 / 360);
+        tot = r2(L.p * rate / 100 * L.term / 360);
         while (utc(from) < utc(L.due)) {
             to = lastDay(addD(from, 1)); if (utc(to) > utc(L.due)) { to = L.due; }
             seq++;
@@ -44,7 +58,7 @@
             from = to;
         }
     }
-    function post(a, who, when) { a.st = 'POSTED'; a.ey = +a.to.substr(0, 4); a.et = 101; a.en = (+a.to.substr(5, 2)) * 10000 + 40 + a.seq; a.edate = a.to; a.by = who; a.at = when || NOW; M.log.push([a.at, who, 'POST', 'month ' + H.dmy(a.to), null, f2(a.amt) + ' - entry 101/' + a.en + ' dated ' + H.dmy(a.to), a.loan]); }
+    function post(a, who, when) { a.st = 'POSTED'; a.ey = +a.to.substr(0, 4); a.et = 101; a.en = (+a.to.substr(5, 2)) * 10000 + a.loan * 100 + a.seq; a.edate = a.to; a.by = who; a.at = when || NOW; M.log.push([a.at, who, 'POST', 'month ' + H.dmy(a.to), null, f2(a.amt) + ' - entry 101/' + a.en + ' dated ' + H.dmy(a.to), a.loan]); }
     function postAll(L, when) { var r = rows(L), j; for (j = 0; j < r.length; j++) { if (r[j].st === 'PLANNED') { post(r[j], USER, when); } } }
     function posted(L) { var r = rows(L), v = 0, j; for (j = 0; j < r.length; j++) { if (r[j].st === 'POSTED') { v += r[j].amt; } } return r2(v); }
     // the opening state: the running loans booked at approval, the repaid one settled
@@ -69,7 +83,7 @@
         var r = rows(L), pa = 0, pm = 0, pl = 0, tot = 0, cx = 0, j;
         for (j = 0; j < r.length; j++) { if (r[j].st === 'POSTED') { pa += r[j].amt; pm++; tot += r[j].amt; } else if (r[j].st === 'PLANNED') { pl++; tot += r[j].amt; } else { cx++; } }
         return [L.id, L.code, L.tr, L.draw, f2(L.p), f4(L.fx), f4(L.sb), L.due, L.st, L.sup, L.acc, f2(pa), pm, pl,
-                L.rdate || null, L.ramt === undefined ? null : f2(L.ramt), L.bank === undefined ? null : f2(L.bank), 1010201, L.ser, +L.draw.substr(0, 4), 106, 100130 + L.ser, 360, 270,
+                L.rdate || null, L.ramt === undefined ? null : f2(L.ramt), L.bank === undefined ? null : f2(L.bank), 1010201, L.ser, +L.draw.substr(0, 4), 106, 100130 + L.ser, 360, L.term,
                 L.apby || null, L.apat || null, L.rtype || null, L.rser || null, L.rser ? +L.rdate.substr(0, 4) : null, L.rser ? 106 : null, L.rser ? 101100 + L.rser : null, L.rpby || null, L.rpat || null,
                 'Loan# ' + L.code + ' - ' + L.sup + ' orders 2600' + (90 + L.ser) + ' & 2600' + (91 + L.ser), L.sup + ' CO', f2(tot), cx];
     }
@@ -89,6 +103,13 @@
             for (i = 0; i < M.acc.length; i++) { if (M.acc[i].st === 'POSTED' && M.acc[i].to.substr(0, 4) === TODAY.substr(0, 4)) { y += M.acc[i].amt; } }
             out.ytd = f2(y); return out;
         }
+        // demo only: the chart of accounts, the setup of the loan on screen and the preview of its entries, for the approval window (loans_demo.js)
+        if (cmd === 'coa') { return { ok: 1, coa: M.coa }; }
+        if (cmd === 'setup' || cmd === 'plan') {
+            o = find(cmd === 'plan' ? id : M.cur); if (!o) { return err('loan not found'); }
+            if (cmd === 'plan') { return preview(o, (+p.x03 || 0) + (+p.x04 || 0), +p.x07 || o.term); }
+            return { ok: 1, id: o.id, st: o.st, code: o.code, sup: o.sup, p: o.p, draw: o.draw, term: o.term, due: o.due, dr: o.dr, drn: accName(o.dr), cr: o.cr, crn: accName(o.cr) };
+        }
         if (cmd === 'sync') { return { ok: 1, msg: 'Bank moves read - 0 new loan(s), 0 repayment(s) matched' }; }
         if (cmd === 'post' || cmd === 'unpost') {
             a = acc(id); if (!a) { return err('month not found'); } o = find(a.loan);
@@ -96,9 +117,16 @@
             a.st = 'PLANNED'; delete a.en; delete a.by; M.log.push([NOW, USER, 'UNPOST', 'month ' + H.dmy(a.to), 'entry 101', 'OK', a.loan]); return { ok: 1, msg: 'Booking undone - the entry was removed from the ledger' };
         }
         o = find(id); if (!o) { return err('loan not found'); }
-        if (cmd === 'loan') { return loanOut(o); }
+        if (cmd === 'loan') { M.cur = o.id; return loanOut(o); }
         if (cmd === 'approve') {
             if (o.st !== 'NEW') { return err('Only a new loan can be approved (this one is ' + o.st + ')'); }
+            a = window.DEMO_LOAN_SETUP; window.DEMO_LOAN_SETUP = null;
+            if (a) {
+                if (!accName(a.dr) || !accName(a.cr) || +a.dr === +a.cr) { return err('Choose two different accounts'); }
+                if (!(a.term >= 30 && a.term <= 3650)) { return err('The loan term is between 30 and 3650 days'); }
+                o.dr = +a.dr; o.cr = +a.cr; o.term = Math.round(a.term); o.due = addD(o.draw, o.term);
+            }
+            M.log.push([NOW, USER, 'ACCOUNTS', 'debit ' + o.dr + ' - credit ' + o.cr + ' - term ' + o.term + ' days', null, null, o.id]);
             o.fx = +p.x03; o.sb = +p.x04; o.st = 'APPROVED'; o.apby = USER; o.apat = NOW; schedule(o); M.log.push([NOW, USER, 'APPROVE', 'margin ' + o.fx + ' saibor ' + o.sb, 'NEW', 'APPROVED - ' + rows(o).length + ' months', o.id]); postAll(o);
             return { ok: 1, msg: 'Loan approved - ' + rows(o).length + ' months booked in the ledger, each dated at its month end' };
         }
@@ -126,7 +154,7 @@
                 if (a.st === 'POSTED' && a.ey === y && a.en === n) {
                     L = find(a.loan);
                     ds = (a.kind === 'F' ? 'Loan interest settlement# ' + L.code + ' up to ' + H.dmy(a.to) : 'Loan interest# ' + L.code + ' month ' + a.to.substr(5, 2) + '-' + a.to.substr(0, 4)) + ' - ' + L.sup;
-                    lines = [[1, 420402000000, 'Bank facilities finance cost', ds, a.amt, null, null, a.to, '', ''], [2, 210204001000, 'Accrued supplier invoices financing', ds, -a.amt, null, null, a.to, '', '']];
+                    lines = [[1, L.dr, accName(L.dr), ds, a.amt, null, null, a.to, '', ''], [2, L.cr, accName(L.cr), ds, -a.amt, null, null, a.to, '', '']];
                     return { ok: 1, y: y, t: t, n: n, dt: a.to, ds: ds, lines: lines };
                 }
             }
@@ -143,7 +171,7 @@
                 if (L.rser && +L.rdate.substr(0, 4) === y && 101100 + L.rser === n) {
                     ds = 'Loan repaid# ' + L.code + ' - ' + L.sup + ' - bank move 1010202/' + L.rser;
                     lines = [[1, L.acc, 'Supplier invoices financing - ' + L.sup, ds, L.p, null, null, L.rdate, '', ''],
-                             [2, 210204001000, 'Accrued supplier invoices financing', ds, r2(L.ramt - L.p), null, null, L.rdate, '', ''],
+                             [2, L.cr, accName(L.cr), ds, r2(L.ramt - L.p), null, null, L.rdate, '', ''],
                              [3, 110102001001, 'Demo Bank current account', ds, -L.ramt, null, null, L.rdate, '', '']];
                     return { ok: 1, y: y, t: t, n: n, dt: L.rdate, ds: ds, lines: lines };
                 }

@@ -41,15 +41,19 @@ function call(p, cb) {
 if (busy) { return; }
 busy = true; document.body.classList.add('busy');
 apex.server.process('LOANS_AJAX', p, {
-success: function (d) { busy = false; document.body.classList.remove('busy'); if (!d || !d.ok) { toast((d && d.error) || 'Request failed', true); if (cb) { cb(null); } return; } cb(d); },
+success: function (d) { busy = false; document.body.classList.remove('busy'); if (!d || !d.ok) { toast(T((d && d.error) || 'Request failed'), true); if (cb) { cb(null); } return; } cb(d); },
 error: function (x, s, e) { busy = false; document.body.classList.remove('busy'); toast('Request failed - ' + ((errObj(x) || {}).error || e || s), true); if (cb) { cb(null); } }
 });
 }
 function L(r) {
-return { id: r[0], code: r[1], tr: r[2], draw: r[3], p: +r[4], fx: +r[5], sb: has(r[6]) ? +r[6] : null, due: r[7], st: r[8], sup: r[9], acc: r[10], pa: +r[11], pm: r[12], pl: r[13],
+var o = { id: r[0], code: r[1], tr: r[2], draw: r[3], p: +r[4], fx: +r[5], sb: has(r[6]) ? +r[6] : null, due: r[7], st: r[8], sup: r[9], acc: r[10], pa: +r[11], pm: r[12], pl: r[13],
 rdate: r[14], ramt: has(r[15]) ? +r[15] : null, bank: has(r[16]) ? +r[16] : null, dtype: r[17], dser: r[18], dey: r[19], det: r[20], den: r[21], basis: +r[22] || 360, term: +r[23] || 270,
-apby: r[24], apat: r[25], rtype: r[26], rser: r[27], rey: r[28], ret: r[29], ren: r[30], rpby: r[31], rpat: r[32], desc: r[33], fname: r[34], tot: +r[35], cx: r[36] };
+apby: r[24], apat: r[25], rtype: r[26], rser: r[27], rey: r[28], ret: r[29], ren: r[30], rpby: r[31], rpat: r[32], desc: r[33], fname: r[34], tot: +r[35], cx: r[36], chg: r[37] || null, namt: has(r[38]) ? +r[38] : null, ndate: r[39] || null };
+if (o.st === 'NEW' && has(o.sb)) { o.tot = r2(o.p * (o.fx + o.sb) / 100 * o.term / o.basis); }
+return o;
 }
+function stTxt(o) { return T(o.st === 'NEW' && has(o.sb) ? 'Draft' : ST_TXT[o.st]); }
+function chgTxt(o) { return !o.chg ? '' : o.chg === 'X' ? T('The bank move was deleted in Co.') : T('The bank move changed in Co.') + ': ' + (has(o.namt) && o.namt !== o.p ? T('amount') + ' ' + fm(o.p) + ' ' + String.fromCharCode(8594) + ' ' + fm(o.namt) + ' ' : '') + (o.ndate && o.ndate !== o.draw ? T('date') + ' ' + dmy(o.draw) + ' ' + String.fromCharCode(8594) + ' ' + dmy(o.ndate) : ''); }
 function rateOf(o, sb) { return o.fx + (has(sb) ? sb : (has(o.sb) ? o.sb : 0)); }
 function planned(o, rate) {
 var tot = r2(o.p * rate / 100 * o.term / o.basis), from = o.draw, to, rows = [], run = 0, amt;
@@ -66,7 +70,7 @@ function ageInfo(o) {
 var m = days(o.draw, D.today) / 30.4375, left = days(D.today, o.due), k, t;
 if (o.st === 'REPAID') { return { k: 'ag0', t: T('repaid') + ' ' + dmy(o.rdate) }; }
 if (left < 0) { k = 'ag3'; t = T('overdue by') + ' ' + (-left) + ' ' + T('days'); }
-else { k = m < 3 ? 'ag0' : m < 6 ? 'ag1' : 'ag2'; t = (Math.round(m * 10) / 10) + ' ' + T('months old') + ' - ' + left + ' ' + T('days left'); }
+else { k = m < 3 ? 'ag0' : m < 6 ? 'ag1' : 'ag2'; t = left + ' ' + T('days left'); }
 return { k: k, t: t };
 }
 function entryLnk(y, t, n) { return has(n) ? '<span class="lnk" data-e="' + y + '/' + t + '/' + n + '">' + t + '/' + n + '</span>' : ''; }
@@ -118,11 +122,11 @@ $('kpi0').innerHTML =
 '<div class="kpi k-int"><div class="label">' + T('Interest booked in') + ' ' + D.today.substr(0, 4) + '</div><div class="value">' + fm(+D.ytd) + ' <span class="cur">SAR</span></div><div class="sub">' + T('entries 101 posted by the dashboard') + '</div></div>' +
 '<div class="kpi k-due' + (overN ? ' over' : '') + '"><div class="label">' + T('Due within 30 days') + '</div><div class="value">' + dueN + ' <span class="cur">' + T('loans') + '</span></div><div class="sub">' + fm0(dueA) + ' SAR - ' + (overN ? '<span class="neg"><b>' + overN + ' ' + T('overdue') + '</b></span>' : T('none overdue')) + '</div></div>';
 }
-function sortVal(o, k) { return k === 'p' ? o.p : k === 'int' ? o.tot : k === 'draw' ? o.draw : k === 'due' ? o.due : k === 'po' ? o.pa : k === 'st' ? o.st : k === 'tot' ? o.p + o.tot : o.code || ''; }
+function sortVal(o, k) { return k === 'p' ? o.p : k === 'int' ? o.tot : k === 'draw' ? o.draw : k === 'due' || k === 'age' ? o.due : k === 'po' ? o.pa : k === 'st' ? o.st : k === 'tot' ? o.p + o.tot : o.code || ''; }
 function drawList() {
 var all = loans(), list = [], cols = [
 { k: 'code', t: 'Loan' }, { k: 'draw', t: 'Taken on' }, { k: 'p', t: 'Amount', n: 1 }, { k: 'rt', t: 'Rate a year', n: 1 }, { k: 'int', t: 'Interest to due date', n: 1 }, { k: 'tot', t: 'Amount + interest', n: 1 },
-{ k: 'due', t: 'Due on' }, { k: 'age', t: 'Age' }, { k: 'st', t: 'Status' }, { k: 'po', t: 'Interest booked', n: 1 }], h, b = '', tP = 0, tI = 0, tPo = 0, i, o, a, c, x, y;
+{ k: 'due', t: 'Due on' }, { k: 'age', t: 'Remaining' }, { k: 'st', t: 'Status' }, { k: 'po', t: 'Interest booked', n: 1 }], h, b = '', tP = 0, tI = 0, tPo = 0, i, o, a, c, x, y;
 for (i = 0; i < all.length; i++) { if (keep(all[i])) { list.push(all[i]); } }
 list.sort(function (p, q) { x = sortVal(p, sortK); y = sortVal(q, sortK); return x === y ? 0 : (x < y ? -1 : 1) * sortD; });
 h = '<tr class="print-title-row"><th colspan="' + cols.length + '"></th></tr><tr>';
@@ -130,15 +134,15 @@ for (i = 0; i < cols.length; i++) { c = cols[i]; h += '<th class="' + (c.n ? 'nu
 $('tHead').innerHTML = h + '</tr>';
 for (i = 0; i < list.length; i++) {
 o = list[i]; a = ageInfo(o); tP += o.p; tI += o.tot; tPo += o.pa;
-b += '<tr class="drill-row" data-id="' + o.id + '"><td><span class="tw">&#9656;</span>' + esc(o.code || ('1010201/' + o.dser)) + '<span class="sub-l">' + esc(o.sup || o.fname || '') + (has(o.tr) ? ' - ' + T('transfer no') + ' ' + o.tr : '') + '</span></td>' +
+b += '<tr class="drill-row" data-id="' + o.id + '"><td><span class="tw">&#9656;</span>' + esc(o.code || ('1010201/' + o.dser)) + '<span class="sub-l">' + esc(o.sup || o.fname || '') + (has(o.tr) ? ' - ' + T('transfer no') + ' ' + o.tr : '') + '</span>' + (o.chg ? '<span class="sub-l"><span class="chip ag3">' + chgTxt(o) + '</span></span>' : '') + '</td>' +
 '<td>' + dmy(o.draw) + '</td><td class="num">' + fm(o.p) + '</td>' +
 '<td class="num">' + (has(o.sb) ? pc(rateOf(o)) + '<span class="sub-l">' + pc(o.fx) + ' + ' + pc(o.sb) + '</span>' : '<span class="muted-dash">' + pc(o.fx) + ' + SAIBOR ?</span>') + '</td>' +
 '<td class="num">' + (has(o.sb) ? fm(o.tot) : '<span class="muted-dash">&mdash;</span>') + '</td><td class="num">' + (has(o.sb) ? fm(o.p + o.tot) : '<span class="muted-dash">&mdash;</span>') + '</td>' +
-'<td>' + dmy(o.due) + '</td><td><span class="chip ' + a.k + '">' + a.t + '</span></td><td><span class="chip st-' + o.st + '">' + T(ST_TXT[o.st]) + '</span></td>' +
+'<td>' + dmy(o.due) + '</td><td><span class="chip ' + a.k + '">' + a.t + '</span></td><td><span class="chip st-' + o.st + '">' + stTxt(o) + '</span></td>' +
 '<td class="num">' + (o.pa ? fm(o.pa) + '<span class="sub-l">' + o.pm + ' ' + T(o.pm === 1 ? 'month' : 'months') + '</span>' : '<span class="muted-dash">&mdash;</span>') + '</td></tr>';
 }
 if (list.length) { b += '<tr class="total-row"><td>' + T('TOTAL') + '</td><td></td><td class="num">' + fm(tP) + '</td><td></td><td class="num">' + fm(tI) + '</td><td class="num">' + fm(tP + tI) + '</td><td></td><td></td><td></td><td class="num">' + fm(tPo) + '</td></tr>'; }
-else { b = '<tr><td colspan="' + cols.length + '" style="text-align:center;color:var(--muted);padding:24px">' + T(all.length ? 'No loan matches this filter' : 'No loan since 25/10/2026 - press Sync bank moves') + '</td></tr>'; }
+else { b = '<tr><td colspan="' + cols.length + '" style="text-align:center;color:var(--muted);padding:24px">' + T(all.length ? 'No loan matches this filter' : 'No loan since 25/10/2026') + '</td></tr>'; }
 $('tBody').innerHTML = b;
 $('tableSub').textContent = list.length + ' ' + T('loans') + ' - ' + T('largest first - click a loan to open it');
 $('printFilters').innerHTML = '<b>' + T('Status') + ':</b> ' + esc($('stTabs').querySelector('.active').textContent.replace(/\d+$/, '')) + ($('supSel').value ? '<span class="pf-sep">|</span><b>' + T('Supplier') + ':</b> ' + esc($('supSel').value) : '') + ($('yrSel').value ? '<span class="pf-sep">|</span><b>' + T('Year') + ':</b> ' + $('yrSel').value : '');
@@ -150,7 +154,8 @@ call({ x01: 'list' }, function (d) {
 $('tableLoader').style.display = 'none';
 if (!d) { return; }
 D = d;
-$('asOfLine').textContent = (d.asof ? T('Last bank sync') + ' ' + d.asof + ' - ' : '') + d.loans.length + ' ' + T('loans') + ' - ' + T('job 00:40 daily');
+$('asOfLine').textContent = d.link === 0 ? T('Co. is not reachable - this is the last copy and the actions are off') + (d.asof ? ' (' + d.asof + ')' : '') : d.loans.length + ' ' + T('loans') + ' - ' + T('bank moves read live from Co.');
+$('asOfLine').style.color = d.link === 0 ? 'var(--pink)' : '';
 fillSelects(); counts(); kpis(); drawList();
 if (cb) { cb(); }
 });
@@ -184,12 +189,15 @@ function printTitle() {
 return 'Co. Dashboard | ' + (CUR && $('lv1').style.display !== 'none' ? T('Bank loan') + ' ' + (CUR.code || '') + (CUR.sup ? ' - ' + CUR.sup : '') : T('Bank Loans')) + ' |  | ' + T('Printed') + ' ' + nowTxt();
 }
 function doPrint() {
-var th = document.querySelector('#printTablePanel .print-title-row th'), orig = document.title, lv1 = $('lv1').style.display !== 'none';
+var th = document.querySelector('#printTablePanel .print-title-row th'), orig = document.title, lv1 = $('lv1').style.display !== 'none', n = document.querySelectorAll(lv1 ? '#schBody tr' : '#tBody tr').length, st = document.querySelector('#lv1 .steps'), pfs;
+pfs = (700 - (lv1 ? 215 + (st && st.offsetHeight ? 95 : 0) : 80)) / ((n + 2) * ((lv1 ? 2.3 : 3.2) + 1.1));
+pfs = Math.round(Math.max(10, Math.min(12.5, pfs)) * 10) / 10;
+document.body.style.setProperty('--pfs', pfs + 'px');
 if (th) { th.textContent = printTitle(); }
 if (lv1) { $('printFilters1').innerHTML = '<b>' + T('Loan') + ':</b> ' + esc(CUR.code || '') + '<span class="pf-sep">|</span><b>' + T('Taken on') + ':</b> ' + dmy(CUR.draw) + '<span class="pf-sep">|</span><b>' + T('Amount') + ':</b> ' + fm(CUR.p) + '<span class="pf-sep">|</span><b>' + T('Rate') + ':</b> ' + pc(rateOf(CUR)); }
 document.title = lv1 ? 'Loan_' + String(CUR.code || CUR.id).replace(/[^A-Za-z0-9]+/g, '_') : 'Bank_Loans_' + D.today;
-document.body.classList.add('print-mode-table');
-window.addEventListener('afterprint', function r() { document.title = orig; document.body.classList.remove('print-mode-table'); window.removeEventListener('afterprint', r); });
+document.body.classList.add('print-mode-table'); document.body.classList.add('print-fit');
+window.addEventListener('afterprint', function r() { document.title = orig; document.body.classList.remove('print-mode-table'); document.body.classList.remove('print-fit'); window.removeEventListener('afterprint', r); });
 window.print();
 }
 function excel() {
@@ -198,7 +206,7 @@ if (!window.loansExcel) { return; }
 if (lv1) { window.loansExcel({ kind: 'loan', loan: CUR, months: G.months, title: printTitle(), rate: rateOf(CUR), T: T, fm: fm, dmy: dmy }); }
 else { window.loansExcel({ kind: 'list', rows: D.shown || [], title: printTitle(), T: T, fm: fm, dmy: dmy, rateOf: rateOf, age: ageInfo, st: ST_TXT }); }
 }
-var X = { $: $, T: T, esc: esc, fm: fm, fm0: fm0, pc: pc, dmy: dmy, my: my, days: days, utc: utc, has: has, r2: r2, planned: planned, ageInfo: ageInfo, rateOf: rateOf, entryLnk: entryLnk, act: act, printTitle: printTitle, toast: toast, ST_TXT: ST_TXT,
+var X = { $: $, T: T, esc: esc, fm: fm, fm0: fm0, pc: pc, dmy: dmy, my: my, days: days, utc: utc, has: has, r2: r2, planned: planned, ageInfo: ageInfo, rateOf: rateOf, entryLnk: entryLnk, act: act, printTitle: printTitle, toast: toast, ST_TXT: ST_TXT, stTxt: stTxt, chgTxt: chgTxt,
 s: function () { return { D: D, G: G, CUR: CUR }; } };
 $('stTabs').addEventListener('click', function (e) { var v = pick(e, 'data-st'), bs, i; if (!v) { return; } bs = $('stTabs').querySelectorAll('.lvl-btn'); for (i = 0; i < bs.length; i++) { bs[i].className = 'lvl-btn'; } e.target.closest('.lvl-btn').className = 'lvl-btn active'; stF = v; drawList(); });
 $('supSel').addEventListener('change', drawList);
@@ -208,7 +216,7 @@ $('resetBtn').addEventListener('click', function () { $('supSel').value = ''; $(
 $('tHead').addEventListener('click', function (e) { var k = pick(e, 'data-k'); if (!k) { return; } if (sortK === k) { sortD = -sortD; } else { sortK = k; sortD = -1; } drawList(); });
 $('tBody').addEventListener('click', function (e) { var id = pick(e, 'data-id'); if (id) { openLoan(+id); } });
 $('backBtn').addEventListener('click', back);
-$('syncBtn').addEventListener('click', function () { call({ x01: 'sync' }, function (d) { if (d) { toast(d.msg); loadList(true); } }); });
+$('refreshBtn').addEventListener('click', function () { loadList(); });
 $('schBody').addEventListener('click', function (e) {
 var un = pick(e, 'data-un'), po = pick(e, 'data-post'), en = pick(e, 'data-e');
 if (en) { openEntry(en); return; }

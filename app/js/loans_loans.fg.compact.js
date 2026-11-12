@@ -142,58 +142,65 @@ window.print();
 };
 window.loansL1 = function (X) {
 var D, G, CUR, $ = X.$, T = X.T, esc = X.esc, fm = X.fm, fm0 = X.fm0, pc = X.pc, dmy = X.dmy, my = X.my, days = X.days, utc = X.utc, has = X.has, r2 = X.r2,
-planned = X.planned, ageInfo = X.ageInfo, rateOf = X.rateOf, entryLnk = X.entryLnk, act = X.act, printTitle = X.printTitle, toast = X.toast, ST_TXT = X.ST_TXT,
+planned = X.planned, ageInfo = X.ageInfo, rateOf = X.rateOf, entryLnk = X.entryLnk, act = X.act, printTitle = X.printTitle, toast = X.toast, ST_TXT = X.ST_TXT, stTxt = X.stTxt, chgTxt = X.chgTxt, CALC = null, LAST = null,
 SEP = String.fromCharCode(8250), ARR = String.fromCharCode(8594);
 function sync() { var s = X.s(); D = s.D; G = s.G; CUR = s.CUR; }
 function month(r) { return { id: r[0], seq: r[1], from: r[2], to: r[3], days: r[4], rate: +r[5], amt: +r[6], kind: r[7], st: r[8], ey: r[9], et: r[10], en: r[11], edate: r[12], by: r[13], at: r[14], cby: r[15], cat: r[16], note: r[17] }; }
-function rateInputs(o) {
-return '<div class="filter-group"><label>' + T('Bank margin %') + '</label><input type="text" id="fxIn" value="' + o.fx.toFixed(2) + '" autocomplete="off"></div><div class="eq">+</div>' +
-'<div class="filter-group"><label>SAIBOR % <span class="lbl-hint">(' + T('3 months') + ')</span></label><input type="text" id="sbIn" value="' + (has(o.sb) ? o.sb.toFixed(2) : '') + '" placeholder="0.00" autocomplete="off"></div>' +
+function rateInputs(o, ro) {
+return '<div class="filter-group"><label>' + T('Bank margin %') + '</label><input type="text" id="fxIn" value="' + o.fx.toFixed(2) + '" autocomplete="off"' + (ro ? ' disabled' : '') + '></div><div class="eq">+</div>' +
+'<div class="filter-group"><label>SAIBOR % <span class="lbl-hint">(' + T('3 months') + ')</span></label><input type="text" id="sbIn" value="' + (has(o.sb) ? o.sb.toFixed(2) : '') + '" placeholder="0.00" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
 '<div class="eq" id="eqTxt">= ' + pc(rateOf(o)) + ' <small>' + T('a year') + '</small></div>';
 }
 function typed() { var f = parseFloat($('fxIn').value), s = parseFloat($('sbIn').value); return { fx: isNaN(f) ? null : f, sb: isNaN(s) ? null : s }; }
-function liveRate() { var t = typed(); $('eqTxt').innerHTML = '= ' + pc((t.fx || 0) + (t.sb || 0)) + ' <small>' + T('a year') + '</small>'; if (CUR.st === 'NEW') { drawMonths(); } }
-function drawLoan() {
-var o = CUR, a = ageInfo(o), left = days(D.today, o.due), sb = has(o.sb), rate = rateOf(o), nNote;
-$('crumb').innerHTML = '<span class="crumb">' + T('Bank Loans') + '</span><span class="crumb-sep">' + SEP + '</span><span class="crumb crumb-last">' + esc(o.code || ('1010201/' + o.dser)) + '</span>';
-$('scopeNote').innerHTML = '<span class="chip st-' + o.st + '">' + T(ST_TXT[o.st]) + '</span> &nbsp; <span class="chip ' + a.k + '">' + a.t + '</span>';
-$('l1Title').textContent = (o.code || ('1010201/' + o.dser)) + (o.sup ? ' - ' + o.sup : '');
-$('l1Sub').innerHTML = T('Bank move') + ' ' + o.dtype + '/' + o.dser + (has(o.tr) ? ' - ' + T('transfer no') + ' ' + o.tr : '') + (has(o.den) ? ' - ' + T('drawdown entry') + ' ' + entryLnk(o.dey, o.det, o.den) : '') + (o.acc ? ' - ' + T('facility account') + ' ' + o.acc + (o.fname ? ' ' + esc(o.fname) : '') : '') + (o.desc ? '<span class="sub-l">' + esc(o.desc) + '</span>' : '');
+function liveRate() { var t = typed(); $('eqTxt').innerHTML = '= ' + pc((t.fx || 0) + (t.sb || 0)) + ' <small>' + T('a year') + '</small>'; if (CUR.st === 'NEW') { CALC = null; drawCalc(); } }
+function drawStory() {
+var o = CUR, left = days(D.today, o.due), sb = o.st === 'NEW' ? !!CALC : has(o.sb), rate = o.st === 'NEW' ? (CALC ? CALC.fx + CALC.sb : 0) : rateOf(o), tot = o.st === 'NEW' ? (CALC ? planned(o, rate).total : 0) : o.tot;
 $('story').innerHTML =
 '<div class="it"><small>' + T('Taken on') + '</small><b class="d">' + dmy(o.draw) + '</b></div>' +
 '<div class="it"><small>' + T('Amount') + '</small><b>' + fm(o.p) + '</b></div>' +
 '<div class="it"><small>' + T('Rate a year') + '</small><b>' + (sb ? pc(rate) : '<span class="muted-dash">' + pc(o.fx) + ' + SAIBOR ?</span>') + '</b></div>' +
-'<div class="it"><small>' + T(o.st === 'REPAID' ? 'Interest the bank charged' : 'Interest until the due date') + '</small><b>' + (sb ? fm(o.tot) : '<span class="muted-dash">&mdash;</span>') + '</b></div>' +
-'<div class="it"><small>' + T(o.st === 'REPAID' ? 'Paid back' : 'To pay back on the due date') + '</small><b>' + (o.st === 'REPAID' ? fm(o.ramt) : sb ? fm(o.p + o.tot) : '<span class="muted-dash">&mdash;</span>') + '</b></div>' +
+'<div class="it"><small>' + T(o.st === 'REPAID' ? 'Interest the bank charged' : 'Interest until the due date') + '</small><b>' + (sb ? fm(tot) : '<span class="muted-dash">&mdash;</span>') + '</b></div>' +
+'<div class="it"><small>' + T(o.st === 'REPAID' ? 'Paid back' : 'To pay back on the due date') + '</small><b>' + (o.st === 'REPAID' ? fm(o.ramt) : sb ? fm(o.p + tot) : '<span class="muted-dash">&mdash;</span>') + '</b></div>' +
 '<div class="it"><small>' + T('Due on') + '</small><b class="d">' + dmy(o.due) + '</b></div>' +
 '<div class="it"><small>' + T(o.st === 'REPAID' ? 'Repaid on' : 'Days left') + '</small><b class="d">' + (o.st === 'REPAID' ? dmy(o.rdate) : left >= 0 ? left + ' ' + T('of') + ' ' + o.term : T('overdue')) + '</b></div>';
+}
+function drawCalc() { drawStory(); drawMonths(); if ($('draftBtn')) { $('draftBtn').disabled = !CALC; $('apprBtn').disabled = !CALC; } }
+function drawLoan() {
+var o = CUR, a = ageInfo(o), sb = has(o.sb), rate = rateOf(o), lock;
+$('crumb').innerHTML = '<span class="crumb">' + T('Bank Loans') + '</span><span class="crumb-sep">' + SEP + '</span><span class="crumb crumb-last">' + esc(o.code || ('1010201/' + o.dser)) + '</span>';
+$('scopeNote').innerHTML = '<span class="chip st-' + o.st + '">' + stTxt(o) + '</span> &nbsp; <span class="chip ' + a.k + '">' + a.t + '</span>' + (o.chg ? ' &nbsp; <span class="chip ag3">' + chgTxt(o) + '</span>' : '');
+$('l1Title').textContent = (o.code || ('1010201/' + o.dser)) + (o.sup ? ' - ' + o.sup : '');
+$('l1Sub').innerHTML = T('Bank move') + ' ' + o.dtype + '/' + o.dser + (has(o.den) ? ' - ' + T('entry') + ' ' + entryLnk(o.dey, o.det, o.den) : '') + (o.acc ? ' - ' + T('account') + ' ' + o.acc : '');
+$('l1Sub').title = o.desc || '';
+if (LAST !== o.id) { LAST = o.id; $('logTog').className = 'sec-h sec-tog'; }
+CALC = o.st === 'NEW' && sb ? { fx: o.fx, sb: o.sb } : null;
+drawStory();
 if (o.st === 'NEW') {
-$('rateP').innerHTML = T('Enter the two parts of the rate and approve the loan. The bank margin is') + ' <b>' + pc(o.fx) + '</b> ' + T('under the current agreement and may change; SAIBOR is the 3-month rate on the drawdown day.');
-$('rateBox').innerHTML = rateInputs(o) + '<button type="button" class="btn-act" id="apprBtn">' + T('Approve loan') + '</button><button type="button" class="btn-soft" id="cancelBtn">' + T('Not a loan') + '</button>' +
-'<span class="note">' + T('Approval writes every month below in Co. at once, each dated at its month end.') + '</span>';
+$('rateP').innerHTML = T('Enter both rates, then Calculate.');
+$('rateBox').innerHTML = rateInputs(o) + '<button type="button" class="btn-soft" id="calcBtn">' + T('Calculate') + '</button><button type="button" class="btn-soft" id="draftBtn">' + T('Save as draft') + '</button><button type="button" class="btn-act" id="apprBtn">' + T('Approve loan') + '</button>' +
+'<span class="note">' + (CALC ? T('Draft saved - nothing is booked until the approval.') : T('Nothing is booked until the approval.')) + '</span>';
+$('calcBtn').addEventListener('click', function () {
+var t = typed();
+if (!has(t.fx) || !has(t.sb) || t.fx < 0 || t.sb < 0) { toast(T('Enter the bank margin and the SAIBOR rate'), true); return; }
+CALC = t; drawCalc();
+});
+$('draftBtn').addEventListener('click', function () { if (CALC) { act({ x01: 'draft', x02: o.id, x03: CALC.fx, x04: CALC.sb }); } });
 $('apprBtn').addEventListener('click', function () {
-var t = typed();
-if (!has(t.fx) || !has(t.sb)) { toast(T('Enter the bank margin and the SAIBOR rate'), true); return; }
-if (!confirm(T('Approve this loan at') + ' ' + pc(t.fx + t.sb) + ' ' + T('a year') + ' (' + pc(t.fx) + ' + ' + pc(t.sb) + ')? ' + T('Every month is booked in Co. now, each dated at its month end.'))) { return; }
-act({ x01: 'approve', x02: o.id, x03: t.fx, x04: t.sb });
+if (!CALC) { return; }
+if (!confirm(T('Approve this loan at') + ' ' + pc(CALC.fx + CALC.sb) + ' ' + T('a year') + ' (' + pc(CALC.fx) + ' + ' + pc(CALC.sb) + ')? ' + T('Every month is booked in Co. now, each dated at its month end.'))) { return; }
+act({ x01: 'approve', x02: o.id, x03: CALC.fx, x04: CALC.sb });
 });
-$('cancelBtn').addEventListener('click', function () { if (confirm(T('Mark this bank move as not a loan? It leaves the list.'))) { act({ x01: 'cancel', x02: o.id }, true); } });
+$('draftBtn').disabled = !CALC; $('apprBtn').disabled = !CALC;
 } else if (o.st === 'APPROVED') {
-$('rateP').innerHTML = T('Rate in force') + ': <b>' + pc(o.fx) + ' ' + T('bank margin') + ' + ' + pc(o.sb) + ' SAIBOR = ' + pc(rate) + ' ' + T('a year') + '</b>. ' + T('A change re-books the months after today at the new rate; the months already ended keep their entries.');
-$('rateBox').innerHTML = rateInputs(o) + '<button type="button" class="btn-soft" id="rateBtn">' + T('Save rate') + '</button>' + '<button type="button" class="btn-act ghost" id="unapprBtn">' + T('Undo approval') + '</button>' + '<span class="note">' + (o.pm ? o.pm + ' ' + T(o.pm === 1 ? 'month' : 'months') + ' ' + T('booked in Co.') : T('no month booked yet')) + (o.apby ? ' - ' + T('approved by') + ' ' + esc(o.apby) + ' ' + o.apat : '') + '</span>';
-if ($('unapprBtn')) { $('unapprBtn').addEventListener('click', function () { if (confirm(T('Undo the approval? The month entries are deleted in Co. (open period, not reviewed) and the loan goes back to new.'))) { act({ x01: 'unapprove', x02: o.id }); } }); }
-$('rateBtn').addEventListener('click', function () {
-var t = typed();
-if (!has(t.fx) || !has(t.sb)) { toast(T('Enter the bank margin and the SAIBOR rate'), true); return; }
-if (t.fx === o.fx && t.sb === o.sb) { toast(T('The rate did not change')); return; }
-if (!confirm(T('Save the rate? The months after today are re-booked in Co. at the new rate.'))) { return; }
-act({ x01: 'rate', x02: o.id, x03: t.fx, x04: t.sb });
-});
+lock = has(G.close) && utc(G.close) >= utc(G.first || o.draw) ? T('The ledger is closed up to') + ' ' + dmy(G.close) + ' - ' + T('the approval cannot be undone until the reviewer reopens the year in Co.') : G.rev ? G.rev + ' ' + T('entries of this loan are reviewed in Co. - the approval cannot be undone until the review is removed') : '';
+$('rateP').innerHTML = T('Rate in force') + ': <b>' + pc(o.fx) + ' ' + T('bank margin') + ' + ' + pc(o.sb) + ' SAIBOR = ' + pc(rate) + ' ' + T('a year') + '</b>';
+$('rateBox').innerHTML = rateInputs(o, true) + '<button type="button" class="btn-act ghost" id="unapprBtn">' + T('Undo approval') + '</button>' + '<span class="note">' + (o.pm ? o.pm + ' ' + T(o.pm === 1 ? 'month' : 'months') + ' ' + T('booked in Co.') : T('no month booked yet')) + (o.apby ? ' - ' + T('approved by') + ' ' + esc(o.apby) + ' ' + o.apat : '') + '</span>' + (lock ? '<span class="chip ag3">' + lock + '</span>' : '');
+$('unapprBtn').addEventListener('click', function () { if (confirm(T('Undo the approval? Every month entry of this loan is deleted in Co. and the loan goes back to a draft.'))) { act({ x01: 'unapprove', x02: o.id }); } });
 } else {
-$('rateP').innerHTML = T('Rate used') + ': <b>' + pc(o.fx) + ' ' + T('bank margin') + ' + ' + pc(o.sb) + ' SAIBOR = ' + pc(rate) + ' ' + T('a year') + '</b>. ' + T('The loan is repaid, the rate is closed.');
+$('rateP').innerHTML = T('Rate used') + ': <b>' + pc(o.fx) + ' ' + T('bank margin') + ' + ' + pc(o.sb) + ' SAIBOR = ' + pc(rate) + ' ' + T('a year') + '</b>';
 $('rateBox').innerHTML = '<span class="note">' + T('No action.') + (o.apby ? ' ' + T('Approved by') + ' ' + esc(o.apby) + ' ' + o.apat + '.' : '') + '</span>';
 }
-if ($('fxIn')) { $('fxIn').addEventListener('input', liveRate); $('sbIn').addEventListener('input', liveRate); }
+if (o.st === 'NEW') { $('fxIn').addEventListener('input', liveRate); $('sbIn').addEventListener('input', liveRate); }
 drawMonths();
 drawRepay();
 drawLog();
@@ -201,13 +208,13 @@ drawLog();
 function drawMonths() {
 var o = CUR, rows = [], i, m, b = '', tot = 0, tD = 0, po = 0, nx = null, rate, t, pv, lastPosted = -1, cnt = 0;
 if (o.st === 'NEW') {
-t = typed(); rate = (t.fx || 0) + (t.sb || 0);
-pv = planned(o, rate); rows = pv.rows; tot = pv.total;
-$('schP').innerHTML = T('Figures below use the rate typed above') + ': <b>' + fm(o.p) + ' x ' + pc(rate) + ' x ' + T('days') + ' / ' + o.basis + '</b>. ' + T('Approval books every month in Co. at once, each dated at its month end; a repayment before the due date removes the later entries and re-books its month up to the repayment day.');
+rate = CALC ? CALC.fx + CALC.sb : 0;
+if (CALC) { pv = planned(o, rate); rows = pv.rows; tot = pv.total; }
+$('schP').innerHTML = !CALC ? T('Not calculated yet') : T('Each month') + ': <b>' + fm(o.p) + ' x ' + pc(rate) + ' x ' + T('days') + ' / ' + o.basis + '</b>';
 } else {
 for (i = 0; i < G.months.length; i++) { m = month(G.months[i]); rows.push(m); if (m.st === 'POSTED') { po += m.amt; lastPosted = i; } if (m.st !== 'CANCELLED') { tot += m.amt; } }
 for (i = 0; i < rows.length; i++) { if (rows[i].st === 'PLANNED') { nx = rows[i]; break; } }
-$('schP').innerHTML = T('Each month') + ': <b>' + fm(o.p) + ' x ' + pc(rateOf(o)) + ' x ' + T('days') + ' / ' + o.basis + '</b>. ' + T('Every month is booked in Co., each dated at its month end.') + (o.st === 'APPROVED' && nx ? ' <b>' + T('A month still waiting was refused by Co. - press Book now or wait for the job.') + '</b>' : '');
+$('schP').innerHTML = T('Each month') + ': <b>' + fm(o.p) + ' x ' + pc(rateOf(o)) + ' x ' + T('days') + ' / ' + o.basis + '</b>' + (o.st === 'APPROVED' && nx ? ' <b>' + T('A month still waiting was refused by Co. - press Book now or wait for the job.') + '</b>' : '');
 }
 for (i = 0; i < rows.length; i++) {
 m = rows[i]; if (m.st !== 'CANCELLED') { tD += m.days; }
@@ -218,8 +225,8 @@ b += '<tr class="' + (m.st === 'CANCELLED' ? 'off' : m.kind === 'F' ? 'fin' : ''
 '<td>' + (o.st === 'APPROVED' && m.st === 'POSTED' && i === lastPosted && G.adm ? '<button type="button" class="tiny-btn" data-un="' + m.id + '">' + T('Undo booking') + '</button>' : o.st === 'APPROVED' && nx && m === nx ? '<button type="button" class="tiny-btn" data-post="' + m.id + '">' + T('Book now') + '</button>' : '') + '</td></tr>';
 cnt++;
 }
-if (!cnt) { b = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:18px">' + T('No months yet') + '</td></tr>'; }
-b += '<tr class="total-row"><td>' + T('TOTAL') + '</td><td></td><td></td><td class="num">' + tD + '</td><td class="num">' + fm(tot) + '</td><td colspan="2">' + (o.st === 'REPAID' ? T('what the bank charged') : o.st === 'NEW' ? T('planned at the rate typed above') : T('booked') + ' ' + fm(po) + ' - ' + T('still to book') + ' ' + fm(r2(tot - po))) + '</td></tr>';
+if (!cnt) { b = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:18px">' + T(o.st === 'NEW' ? 'Not calculated yet' : 'No months yet') + '</td></tr>'; }
+b += '<tr class="total-row"><td>' + T('TOTAL') + '</td><td></td><td></td><td class="num">' + tD + '</td><td class="num">' + fm(tot) + '</td><td colspan="2">' + (o.st === 'REPAID' ? T('what the bank charged') : o.st === 'NEW' ? T(CALC ? 'planned at the calculated rate' : 'not calculated yet') : T('booked') + ' ' + fm(po) + ' - ' + T('still to book') + ' ' + fm(r2(tot - po))) + '</td></tr>';
 $('schBody').innerHTML = b;
 $('schTable').querySelector('.print-title-row th').textContent = printTitle();
 }
@@ -228,12 +235,12 @@ var o = CUR, i, m, s = '', po = 0, bank, late = 0;
 for (i = 0; i < G.months.length; i++) { m = month(G.months[i]); if (m.st === 'POSTED' && m.kind === 'M') { if (has(o.rdate) && utc(m.to) > utc(o.rdate)) { late++; } else { po += m.amt; } } }
 if (o.st === 'REPAID') {
 bank = has(o.bank) ? o.bank : r2(o.ramt - o.p);
-$('repP').innerHTML = T('The bank move') + ' <b>' + o.rtype + '/' + o.rser + ' ' + T('of') + ' ' + dmy(o.rdate) + '</b> ' + T('paid the loan back. What the bank charged is compared with what was booked, and the final entry settles the difference.');
+$('repP').innerHTML = T('The bank move') + ' <b>' + o.rtype + '/' + o.rser + ' ' + T('of') + ' ' + dmy(o.rdate) + '</b> ' + T('paid the loan back.');
 $('repBox').innerHTML = steps(o, o.ramt, bank, po, dmy(o.rdate)) + '<div class="act-line"><span class="note">' + T('Approved by') + ' ' + esc(o.rpby || '') + ' ' + (o.rpat || '') + '. ' + T('The months after the repayment were cancelled; they were never booked.') + (has(o.ren) ? ' ' + T('Repayment entry') + ' ' + entryLnk(o.rey, o.ret, o.ren) + '.' : '') + '</span>' + (G.adm ? '<button type="button" class="btn-act ghost" id="unrepBtn">' + T('Undo repayment') + '</button>' : '') + '</div>';
 if ($('unrepBtn')) { $('unrepBtn').addEventListener('click', function () { if (confirm(T('Undo the repayment? The final entry is deleted in Co. (open period, not reviewed), the loan goes back to running and the months after the repayment are planned again.'))) { act({ x01: 'undorepay', x02: o.id }); } }); }
 } else if (o.st === 'APPROVED' && has(o.rser)) {
 bank = r2(o.ramt - o.p);
-$('repP').innerHTML = T('The bank move') + ' <b>' + o.rtype + '/' + o.rser + ' ' + T('of') + ' ' + dmy(o.rdate) + '</b> ' + T('is linked to this loan. Check the figures, then approve the repayment.');
+$('repP').innerHTML = T('The bank move') + ' <b>' + o.rtype + '/' + o.rser + ' ' + T('of') + ' ' + dmy(o.rdate) + '</b> ' + T('is linked - check, then approve.');
 $('repBox').innerHTML = steps(o, o.ramt, bank, po, dmy(o.rdate)) +
 '<div class="act-line"><button type="button" class="btn-act" id="repBtn"' + (bank < 0 ? ' disabled' : '') + '>' + T('Approve repayment') + '</button><button type="button" class="btn-soft" id="unlinkBtn">' + T('Not this move') + '</button>' +
 '<span class="note">' + (bank < 0 ? '<b>' + T('The repaid amount is below the loan - check the move') + '</b>' : T('Approval books the final entry dated') + ' <b>' + dmy(o.rdate) + '</b> ' + T('and cancels the months after it.') + (late ? ' <b>' + late + ' ' + T(late === 1 ? 'month booked after the repayment day is removed from Co. (open period only).' : 'months booked after the repayment day are removed from Co. (open period only).') + '</b>' : '')) + (has(o.ren) ? ' ' + T('Repayment entry') + ' ' + entryLnk(o.rey, o.ret, o.ren) + '.' : '') + '</span></div>';
@@ -244,7 +251,7 @@ act({ x01: 'repay', x02: o.id });
 $('unlinkBtn').addEventListener('click', function () { if (confirm(T('Release this repayment move from the loan?'))) { act({ x01: 'unlink', x02: o.id }); } });
 } else if (o.st === 'APPROVED') {
 for (i = 0; i < G.moves.length; i++) { m = G.moves[i]; s += '<option value="' + m[0] + '/' + m[1] + '">' + m[0] + '/' + m[1] + ' - ' + dmy(m[2]) + ' - ' + fm(+m[3]) + (has(m[4]) ? ' - ' + T('transfer no') + ' ' + m[4] : '') + '</option>'; }
-$('repP').innerHTML = T('When the bank move') + ' <b>' + (D.fac ? D.fac[6] : '1010202') + '</b> ' + T('of this loan arrives it is matched by the transfer no or the loan code and shows here. If it is not matched, pick it from the list.');
+$('repP').innerHTML = T('Waiting for the bank move') + ' <b>' + (D.fac ? D.fac[6] : '1010202') + '</b>';
 $('repBox').innerHTML = '<div class="act-line"><div class="filter-group"><label>' + T('Repayment move') + '</label><select id="repSel"><option value="">' + T(G.moves.length ? 'Not repaid yet - pick the move' : 'Not repaid yet - no unmatched move') + '</option>' + s + '</select></div>' +
 '<button type="button" class="btn-soft" id="linkBtn"' + (G.moves.length ? '' : ' disabled') + '>' + T('Use this move') + '</button><button type="button" class="btn-act" disabled>' + T('Approve repayment') + '</button></div>';
 $('linkBtn').addEventListener('click', function () {
@@ -272,7 +279,10 @@ if (a === 'NEW') { return T('Read from the bank module') + ': ' + esc(key || '')
 if (a === 'MATCH') { return T('Repayment move matched') + ': ' + esc(key || '') + ' - ' + esc(newv || ''); }
 if (a === 'SYNC') { return T('Bank moves read'); }
 if (a === 'APPROVE') { n = String(newv || '').match(/(\d+) months/); return T('Approved at') + ' ' + (rt ? pc(+rt[1] + +rt[2]) + ' (' + rt[1] + ' + ' + rt[2] + ')' : esc(key || '')) + (n ? ' - ' + n[1] + ' ' + T('months booked') : ''); }
-if (a === 'UNAPPROVE') { return T('Approval undone - back to new') + (rt ? ' (' + T('was') + ' ' + pc(+rt[1] + +rt[2]) + ')' : ''); }
+if (a === 'UNAPPROVE') { return T('Approval undone - back to a draft') + (rt ? ' (' + T('was') + ' ' + pc(+rt[1] + +rt[2]) + ')' : ''); }
+if (a === 'DRAFT') { return T('Draft rate saved') + ': ' + esc(newv || ''); }
+if (a === 'MOVE') { return (String(newv || '').indexOf('flagged') > 0 ? T('The bank move changed in Co.') + ' (' + T('flagged only') + ')' : T('The bank move changed in Co. and the loan followed it')) + ': ' + esc(oldv || '') + ' ' + ARR + ' ' + esc(String(newv || '').split(' - ')[0]); }
+if (a === 'GONE') { return T('The bank move was deleted in Co.'); }
 if (a === 'RATE') { return T('Rate changed') + ': ' + esc(oldv || '') + ' ' + ARR + ' ' + esc(String(newv || '').split(' - ')[0]); }
 if (a === 'POST') { return T('Booked') + ' ' + (String(key || '').indexOf('final') === 0 ? T('final entry to') + ' ' + esc(key).replace('final ', '') : month()) + (amt ? ': ' + amt[1] : '') + (e ? ' - ' + T('entry') + ' 101/' + e[1] : ''); }
 if (a === 'UNPOST') { return T('Booking undone') + ' ' + month() + (oldv ? ' - ' + esc(oldv) : ''); }
@@ -284,7 +294,7 @@ if (a === 'UNDO_REPAY') { return T('Repayment undone - running again') + ' (' + 
 if (a === 'CANCEL') { return T('Marked as not a loan'); }
 return esc(key || '') + ' ' + esc(newv || '');
 }
-var LOG_K = { NEW: 'New loan', MATCH: 'Matched', SYNC: 'Sync', APPROVE: 'Approval', UNAPPROVE: 'Undo', RATE: 'Rate', POST: 'Booking', UNPOST: 'Undo', POSTERR: 'Refused', LINK: 'Link', UNLINK: 'Unlink', REPAID: 'Repayment', UNDO_REPAY: 'Undo', CANCEL: 'Cancel' };
+var LOG_K = { NEW: 'New loan', MATCH: 'Matched', SYNC: 'Sync', APPROVE: 'Approval', UNAPPROVE: 'Undo', RATE: 'Rate', POST: 'Booking', UNPOST: 'Undo', POSTERR: 'Refused', LINK: 'Link', UNLINK: 'Unlink', REPAID: 'Repayment', UNDO_REPAY: 'Undo', CANCEL: 'Cancel', DRAFT: 'Draft', MOVE: 'Move', GONE: 'Deleted' };
 function drawLog() {
 var i, g, s = '';
 for (i = 0; i < G.log.length; i++) {
@@ -292,6 +302,8 @@ g = G.log[i];
 s += '<tr><td class="lg-at">' + esc(g[0]) + '</td><td>' + esc(g[1] || '') + '</td><td><span class="chip lg-' + esc(g[2]) + '">' + T(LOG_K[g[2]] || g[2]) + '</span></td><td class="lg-tx" title="' + esc((g[3] || '') + ' | ' + (g[4] || '') + ' | ' + (g[5] || '')) + '">' + logTxt(g[2], g[3], g[4], g[5]) + '</td></tr>';
 }
 $('logBox').innerHTML = s ? '<div class="table-scroll"><table class="lg"><thead><tr><th>' + T('When') + '</th><th>' + T('Who') + '</th><th>' + T('Step') + '</th><th>' + T('What happened') + '</th></tr></thead><tbody>' + s + '</tbody></table></div>' : '<div class="note">' + T('No history yet') + '</div>';
+$('logN').textContent = G.log && G.log.length ? '(' + G.log.length + ')' : '';
 }
+$('logTog').addEventListener('click', function () { this.className = this.className === 'sec-h sec-tog' ? 'sec-h sec-tog open' : 'sec-h sec-tog'; });
 return { draw: function () { sync(); drawLoan(); }, months: function () { sync(); drawMonths(); } };
 };

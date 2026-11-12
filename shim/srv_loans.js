@@ -17,7 +17,7 @@
         loans: [
             { id: 1, code: 'CPMCIB AM' + d0.substr(8, 2) + d0.substr(5, 2) + d0.substr(2, 2) + '-14', tr: +(d0.substr(8, 2) + d0.substr(5, 2) + d0.substr(2, 2) + '14'), draw: d0, p: 875864.89, fx: 5, sb: 4.85, st: 'APPROVED', sup: 'BLUE RIVER MEDICAL', acc: 211001002000, ser: 1 },
             { id: 2, code: 'CPMCIB AM' + d1.substr(8, 2) + d1.substr(5, 2) + d1.substr(2, 2) + '-11', tr: +(d1.substr(8, 2) + d1.substr(5, 2) + d1.substr(2, 2) + '11'), draw: d1, p: 849285.35, fx: 5, sb: null, st: 'NEW', sup: 'BLUE RIVER MEDICAL', acc: 211001002000, ser: 2 },
-            { id: 3, code: 'CPMCIB R511172-72', tr: 51117272, draw: d2, p: 770929.71, fx: 5, sb: null, st: 'NEW', sup: 'NORTH SUPPLIES', acc: 211001001000, ser: 3 },
+            { id: 3, code: 'CPMCIB R511172-72', tr: 51117272, draw: d2, p: 770929.71, fx: 5, sb: 4.9, st: 'NEW', sup: 'NORTH SUPPLIES', acc: 211001001000, ser: 3 },
             { id: 4, code: 'CPMCIB AM' + d3.substr(8, 2) + d3.substr(5, 2) + d3.substr(2, 2) + '-13', tr: +(d3.substr(8, 2) + d3.substr(5, 2) + d3.substr(2, 2) + '13'), draw: d3, p: 775139.63, fx: 5, sb: 4.85, st: 'APPROVED', sup: 'BLUE RIVER MEDICAL', acc: 211001002000, ser: 4 },
             { id: 5, code: 'CPMCIB AN' + d9.substr(8, 2) + d9.substr(5, 2) + d9.substr(2, 2) + '-1', tr: +(d9.substr(8, 2) + d9.substr(5, 2) + d9.substr(2, 2) + '1'), draw: d9, p: 1941109.31, fx: 5, sb: 4.6, st: 'REPAID', sup: 'GLOVE WORKS', acc: 211001004000, ser: 5,
               rtype: 1010202, rser: 7, rdate: addD(TODAY, -7), ramt: 1987261.49, rpby: USER, rpat: NOW },
@@ -85,7 +85,7 @@
         return [L.id, L.code, L.tr, L.draw, f2(L.p), f4(L.fx), f4(L.sb), L.due, L.st, L.sup, L.acc, f2(pa), pm, pl,
                 L.rdate || null, L.ramt === undefined ? null : f2(L.ramt), L.bank === undefined ? null : f2(L.bank), 1010201, L.ser, +L.draw.substr(0, 4), 106, 100130 + L.ser, 360, L.term,
                 L.apby || null, L.apat || null, L.rtype || null, L.rser || null, L.rser ? +L.rdate.substr(0, 4) : null, L.rser ? 106 : null, L.rser ? 101100 + L.rser : null, L.rpby || null, L.rpat || null,
-                'Loan# ' + L.code + ' - ' + L.sup + ' orders 2600' + (90 + L.ser) + ' & 2600' + (91 + L.ser), L.sup + ' CO', f2(tot), cx];
+                'Loan# ' + L.code + ' - ' + L.sup + ' orders 2600' + (90 + L.ser) + ' & 2600' + (91 + L.ser), L.sup + ' CO', f2(tot), cx, null, null, null];
     }
     function err(m) { return { ok: 0, error: m }; }
     function loanOut(L) {
@@ -93,12 +93,12 @@
         for (j = 0; j < r.length; j++) { a = r[j]; m.push([a.id, a.seq, a.from, a.to, a.days, f4(a.rate), f2(a.amt), a.kind, a.st, a.ey || null, a.et || null, a.en === undefined ? null : a.en, a.edate || null, a.by || null, a.at || null, a.cby || null, a.cat || null, a.note || null]); }
         for (j = 0; j < M.moves.length; j++) { if (!M.moves[j].used) { mv.push([1010202, M.moves[j].ser, M.moves[j].date, f2(M.moves[j].amt), M.moves[j].tr, M.moves[j].ds]); } }
         for (j = M.log.length - 1; j >= 0 && lg.length < 30; j--) { if (M.log[j][6] === L.id) { lg.push(M.log[j].slice(0, 6)); } }
-        return { ok: 1, adm: 1, today: TODAY, loan: row(L), months: m, moves: mv, log: lg };
+        return { ok: 1, adm: 1, link: 1, close: null, first: r.length ? r[0].to : null, today: TODAY, loan: row(L), months: m, moves: mv, log: lg };
     }
     S.LOANS_AJAX = function (p) {
         var cmd = String(p.x01 || '').toLowerCase(), id = +p.x02, o, i, y = 0, out, a, res;
         if (cmd === 'list') {
-            out = { ok: 1, adm: 1, asof: H.today + ' 00:40', today: TODAY, fac: ['Demo Bank - supplier invoices financing', '5600000.00', '5.0000', 360, 270, 1010201, 1010202, 420402000000, 210204001000], loans: [], ytd: '0.00' };
+            out = { ok: 1, adm: 1, link: 1, close: null, asof: H.today + ' 00:40', today: TODAY, fac: ['Demo Bank - supplier invoices financing', '5600000.00', '5.0000', 360, 270, 1010201, 1010202, 420402000000, 210204001000], loans: [], ytd: '0.00' };
             for (i = 0; i < M.loans.length; i++) { if (M.loans[i].st !== 'CANCELLED') { out.loans.push(row(M.loans[i])); } }
             for (i = 0; i < M.acc.length; i++) { if (M.acc[i].st === 'POSTED' && M.acc[i].to.substr(0, 4) === TODAY.substr(0, 4)) { y += M.acc[i].amt; } }
             out.ytd = f2(y); return out;
@@ -110,7 +110,6 @@
             if (cmd === 'plan') { return preview(o, (+p.x03 || 0) + (+p.x04 || 0), +p.x07 || o.term); }
             return { ok: 1, id: o.id, st: o.st, code: o.code, sup: o.sup, p: o.p, draw: o.draw, term: o.term, due: o.due, dr: o.dr, drn: accName(o.dr), cr: o.cr, crn: accName(o.cr) };
         }
-        if (cmd === 'sync') { return { ok: 1, msg: 'Bank moves read - 0 new loan(s), 0 repayment(s) matched' }; }
         if (cmd === 'post' || cmd === 'unpost') {
             a = acc(id); if (!a) { return err('month not found'); } o = find(a.loan);
             if (cmd === 'post') { if (a.st !== 'PLANNED') { return err('This month is ' + a.st); } post(a, USER); return { ok: 1, msg: 'Month booked - entry 101/' + a.en + ' dated ' + H.dmy(a.to) }; }
@@ -118,6 +117,11 @@
         }
         o = find(id); if (!o) { return err('loan not found'); }
         if (cmd === 'loan') { M.cur = o.id; return loanOut(o); }
+        if (cmd === 'draft') {
+            if (o.st !== 'NEW') { return err('Only a loan not approved yet takes a draft rate (this one is ' + o.st + ')'); }
+            M.log.push([NOW, USER, 'DRAFT', 'margin+saibor', o.fx + ' + ' + (o.sb === null ? '?' : o.sb), p.x03 + ' + ' + p.x04, o.id]); o.fx = +p.x03; o.sb = +p.x04;
+            return { ok: 1, msg: 'Draft saved - nothing is booked until the approval' };
+        }
         if (cmd === 'approve') {
             if (o.st !== 'NEW') { return err('Only a new loan can be approved (this one is ' + o.st + ')'); }
             a = window.DEMO_LOAN_SETUP; window.DEMO_LOAN_SETUP = null;
@@ -130,18 +134,11 @@
             o.fx = +p.x03; o.sb = +p.x04; o.st = 'APPROVED'; o.apby = USER; o.apat = NOW; schedule(o); M.log.push([NOW, USER, 'APPROVE', 'margin ' + o.fx + ' saibor ' + o.sb, 'NEW', 'APPROVED - ' + rows(o).length + ' months', o.id]); postAll(o);
             return { ok: 1, msg: 'Loan approved - ' + rows(o).length + ' months booked in the ledger, each dated at its month end' };
         }
-        if (cmd === 'rate') {
-            if (o.st !== 'APPROVED') { return err('The rate can change on an approved, open loan only'); }
-            M.log.push([NOW, USER, 'RATE', 'margin+saibor', o.fx + ' + ' + o.sb, p.x03 + ' + ' + p.x04, o.id]); o.fx = +p.x03; o.sb = +p.x04;
-            var rr = rows(o), q; for (q = rr.length - 1; q >= 0; q--) { if (rr[q].st === 'POSTED' && utc(rr[q].to) > utc(TODAY)) { rr[q].st = 'PLANNED'; delete rr[q].en; } }
-            schedule(o); postAll(o); return { ok: 1, msg: 'Rate saved - months re-booked in the ledger at the new rate' };
-        }
         if (cmd === 'link') { for (i = 0; i < M.moves.length; i++) { if (M.moves[i].ser === +p.x04) { M.moves[i].used = true; o.rtype = 1010202; o.rser = M.moves[i].ser; o.rdate = M.moves[i].date; o.ramt = M.moves[i].amt; } } M.log.push([NOW, USER, 'LINK', '1010202/' + p.x04, null, f2(o.ramt) + ' ' + H.dmy(o.rdate), o.id]); return { ok: 1, msg: 'Repayment move linked - check the figures, then approve the repayment' }; }
         if (cmd === 'unlink') { for (i = 0; i < M.moves.length; i++) { if (M.moves[i].ser === o.rser) { M.moves[i].used = false; } } o.rser = null; o.rtype = null; o.rdate = null; delete o.ramt; M.log.push([NOW, USER, 'UNLINK', '', null, null, o.id]); return { ok: 1, msg: 'Repayment move released' }; }
         if (cmd === 'repay') { if (!o.rser) { return err('No repayment move linked'); } if (o.ramt < o.p) { return err('The repayment is below the principal'); } res = repay(o); return { ok: 1, msg: 'Repayment approved - bank interest ' + f2(res.bank) + ', final entry ' + f2(res.fin) + ', ' + res.n + ' later month(s) removed' }; }
-        if (cmd === 'unapprove') { for (i = M.acc.length - 1; i >= 0; i--) { if (M.acc[i].loan === o.id) { M.acc.splice(i, 1); } } o.st = 'NEW'; o.sb = null; o.apby = null; M.log.push([NOW, USER, 'UNAPPROVE', 'margin ' + o.fx + ' saibor', 'APPROVED', 'NEW - months removed (entries deleted in the ledger)', o.id]); return { ok: 1, msg: 'Approval undone - the loan is new again, its month entries removed from the ledger' }; }
+        if (cmd === 'unapprove') { for (i = M.acc.length - 1; i >= 0; i--) { if (M.acc[i].loan === o.id) { M.acc.splice(i, 1); } } o.st = 'NEW'; o.apby = null; M.log.push([NOW, USER, 'UNAPPROVE', 'margin ' + o.fx + ' saibor ' + o.sb, 'APPROVED', 'NEW - months removed (entries deleted in the ledger)', o.id]); return { ok: 1, msg: 'Approval undone - the loan is a draft again' }; }
         if (cmd === 'undorepay') { for (i = M.acc.length - 1; i >= 0; i--) { if (M.acc[i].loan === o.id && (M.acc[i].kind === 'F' || M.acc[i].st === 'CANCELLED')) { M.acc.splice(i, 1); } } o.st = 'APPROVED'; delete o.bank; o.rpby = null; schedule(o); postAll(o); M.log.push([NOW, USER, 'UNDO_REPAY', H.dmy(o.rdate), 'REPAID', 'APPROVED', o.id]); return { ok: 1, msg: 'Repayment undone - final entry removed from the ledger, the loan is running again and its months booked again' }; }
-        if (cmd === 'cancel') { o.st = 'CANCELLED'; return { ok: 1, msg: 'Loan cancelled - it leaves the list' }; }
         return err('unknown command');
     };
     // the entry window: the loan entries live only here, so GL_ENTRY_AJAX answers them before the shared ledger data (two lines, as the live package writes them)

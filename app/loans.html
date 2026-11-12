@@ -33,7 +33,7 @@
         </div>
         <div class="header-actions">
             <div class="actions-row">
-                <button type="button" class="btn-refresh" id="syncBtn" title="Read the new drawdowns and repayments of the bank module now">Sync bank moves</button>
+                <button type="button" class="btn-refresh" id="refreshBtn" title="Read the bank moves from Co. again">Refresh</button>
                 <a href="home.html" class="btn-reset" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;height:auto">Home</a>
             </div>
             <div class="asof-line" id="asOfLine"></div>
@@ -131,7 +131,7 @@
             <p class="sec-p" id="repP"></p>
             <div id="repBox"></div>
 
-            <div class="sec-h">History <span class="sp"></span></div>
+            <div class="sec-h sec-tog" id="logTog"><span class="tw">&#9656;</span><span>History</span> <span id="logN" class="note"></span><span class="sp"></span></div>
             <div id="logBox" class="log"></div>
         </div>
     </div>
@@ -148,7 +148,7 @@ window.loansExcel = function (c) {
 var T = c.T, head, W, lines = [], i, o, m, r, tP = 0, tI = 0, tPo = 0, tD = 0, tA = 0, info;
 if (!window.svXlsx) { return; }
 if (c.kind === 'list') {
-head = [T('Loan'), T('Supplier'), T('Transfer no'), T('Taken on'), T('Amount'), T('Bank margin %'), T('SAIBOR %'), T('Rate a year'), T('Interest to due date'), T('Amount + interest'), T('Due on'), T('Age'), T('Status'), T('Interest booked'), T('Months booked')];
+head = [T('Loan'), T('Supplier'), T('Transfer no'), T('Taken on'), T('Amount'), T('Bank margin %'), T('SAIBOR %'), T('Rate a year'), T('Interest to due date'), T('Amount + interest'), T('Due on'), T('Remaining'), T('Status'), T('Interest booked'), T('Months booked')];
 W = [24, 22, 13, 12, 16, 12, 12, 12, 16, 16, 12, 24, 12, 16, 10];
 for (i = 0; i < c.rows.length; i++) {
 o = c.rows[i]; tP += o.p; tI += o.tot; tPo += o.pa;

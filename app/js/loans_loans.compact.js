@@ -48,7 +48,7 @@ error: function (x, s, e) { busy = false; document.body.classList.remove('busy')
 function L(r) {
 var o = { id: r[0], code: r[1], tr: r[2], draw: r[3], p: +r[4], fx: +r[5], sb: has(r[6]) ? +r[6] : null, due: r[7], st: r[8], sup: r[9], acc: r[10], pa: +r[11], pm: r[12], pl: r[13],
 rdate: r[14], ramt: has(r[15]) ? +r[15] : null, bank: has(r[16]) ? +r[16] : null, dtype: r[17], dser: r[18], dey: r[19], det: r[20], den: r[21], basis: +r[22] || 360, term: +r[23] || 270,
-apby: r[24], apat: r[25], rtype: r[26], rser: r[27], rey: r[28], ret: r[29], ren: r[30], rpby: r[31], rpat: r[32], desc: r[33], fname: r[34], tot: +r[35], cx: r[36], chg: r[37] || null, namt: has(r[38]) ? +r[38] : null, ndate: r[39] || null };
+apby: r[24], apat: r[25], rtype: r[26], rser: r[27], rey: r[28], ret: r[29], ren: r[30], rpby: r[31], rpat: r[32], desc: r[33], fname: r[34], tot: +r[35], cx: r[36], chg: r[37] || null, namt: has(r[38]) ? +r[38] : null, ndate: r[39] || null, agr: has(r[40]) ? +r[40] : null };
 if (o.st === 'NEW' && has(o.sb)) { o.tot = r2(o.p * (o.fx + o.sb) / 100 * o.term / o.basis); }
 return o;
 }

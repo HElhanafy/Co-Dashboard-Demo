@@ -142,16 +142,39 @@ window.print();
 };
 window.loansL1 = function (X) {
 var D, G, CUR, $ = X.$, T = X.T, esc = X.esc, fm = X.fm, fm0 = X.fm0, pc = X.pc, dmy = X.dmy, my = X.my, days = X.days, utc = X.utc, has = X.has, r2 = X.r2,
-planned = X.planned, ageInfo = X.ageInfo, rateOf = X.rateOf, entryLnk = X.entryLnk, act = X.act, printTitle = X.printTitle, toast = X.toast, ST_TXT = X.ST_TXT, stTxt = X.stTxt, chgTxt = X.chgTxt, CALC = null, LAST = null,
+planned = X.planned, ageInfo = X.ageInfo, rateOf = X.rateOf, entryLnk = X.entryLnk, act = X.act, printTitle = X.printTitle, toast = X.toast, ST_TXT = X.ST_TXT, stTxt = X.stTxt, chgTxt = X.chgTxt, CALC = null, LAST = null, SBX = null, SBS = '',
 SEP = String.fromCharCode(8250), ARR = String.fromCharCode(8594);
 function sync() { var s = X.s(); D = s.D; G = s.G; CUR = s.CUR; }
 function month(r) { return { id: r[0], seq: r[1], from: r[2], to: r[3], days: r[4], rate: +r[5], amt: +r[6], kind: r[7], st: r[8], ey: r[9], et: r[10], en: r[11], edate: r[12], by: r[13], at: r[14], cby: r[15], cat: r[16], note: r[17] }; }
+function rs(x) { return (+x).toFixed(4).replace(/0{1,2}$/, ''); }
+function agrNum() { var e = $('agIn'), v = e ? parseFloat(String(e.value).replace(/,/g, '')) : NaN; return isNaN(v) || v <= 0 ? null : v; }
+function agrCalc(o, a) { var d = r2(Math.abs(a - o.p)), per = d / o.p * 100; return { diff: d, per: per, yr: per * o.basis / o.term }; }
+function agrRow(o, ro) {
+return '<div class="agr"><div class="filter-group"><label>' + T('Agreement value') + '</label><input type="text" id="agIn" value="' + (has(o.agr) ? o.agr.toFixed(2) : '') + '" placeholder="0.00" autocomplete="off"' + (ro ? ' disabled' : '') + '></div><div class="eq">&minus;</div>' +
+'<div class="filter-group"><label>' + T('Received in the bank') + '</label><div class="agr-v">' + fm(o.p) + '</div></div><div class="eq" id="agTxt"></div></div>';
+}
+function drawAgr() {
+var o = CUR, a = agrNum(), c, tot, h = '';
+if (!$('agTxt')) { return; }
+if (a) {
+c = agrCalc(o, a); tot = o.st === 'NEW' ? (CALC ? planned(o, CALC.fx + CALC.sb).total : null) : o.tot;
+h = '= ' + fm(c.diff) + ' <small>' + T('difference') + '</small> &nbsp;' + ARR + '&nbsp; ' + pc(c.per) + ' <small>' + T('for') + ' ' + o.term + ' ' + T('days') + '</small> = ' + pc(c.yr) + ' <small>' + T('a year') + '</small>' +
+(tot !== null && Math.abs(tot - c.diff) >= 0.005 ? ' <span class="chip ag3">' + T('The interest is not the agreement difference') + ': ' + fm(tot) + '</span>' : '');
+}
+$('agTxt').innerHTML = h;
+}
+function autoSb() {
+var o = CUR, a = agrNum(), f = parseFloat($('fxIn').value);
+if (a) { SBX = Math.round((agrCalc(o, a).yr - (isNaN(f) ? 0 : f)) * 1e10) / 1e10; SBS = rs(SBX); $('sbIn').value = SBS; }
+liveRate();
+}
 function rateInputs(o, ro) {
-return '<div class="filter-group"><label>' + T('Bank margin %') + '</label><input type="text" id="fxIn" value="' + o.fx.toFixed(2) + '" autocomplete="off"' + (ro ? ' disabled' : '') + '></div><div class="eq">+</div>' +
-'<div class="filter-group"><label>SAIBOR % <span class="lbl-hint">(' + T('3 months') + ')</span></label><input type="text" id="sbIn" value="' + (has(o.sb) ? o.sb.toFixed(2) : '') + '" placeholder="0.00" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
+SBX = has(o.sb) ? o.sb : null; SBS = has(o.sb) ? rs(o.sb) : '';
+return '<div class="filter-group"><label>' + T('Bank margin %') + '</label><input type="text" id="fxIn" value="' + rs(o.fx) + '" autocomplete="off"' + (ro ? ' disabled' : '') + '></div><div class="eq">+</div>' +
+'<div class="filter-group"><label>SAIBOR % <span class="lbl-hint">(' + T('3 months') + ')</span></label><input type="text" id="sbIn" value="' + SBS + '" placeholder="0.00" autocomplete="off"' + (ro ? ' disabled' : '') + '></div>' +
 '<div class="eq" id="eqTxt">= ' + pc(rateOf(o)) + ' <small>' + T('a year') + '</small></div>';
 }
-function typed() { var f = parseFloat($('fxIn').value), s = parseFloat($('sbIn').value); return { fx: isNaN(f) ? null : f, sb: isNaN(s) ? null : s }; }
+function typed() { var f = parseFloat($('fxIn').value), s = SBX !== null && $('sbIn').value === SBS ? SBX : parseFloat($('sbIn').value); return { fx: isNaN(f) ? null : f, sb: isNaN(s) ? null : s, agr: agrNum() }; }
 function liveRate() { var t = typed(); $('eqTxt').innerHTML = '= ' + pc((t.fx || 0) + (t.sb || 0)) + ' <small>' + T('a year') + '</small>'; if (CUR.st === 'NEW') { CALC = null; drawCalc(); } }
 function drawStory() {
 var o = CUR, left = days(D.today, o.due), sb = o.st === 'NEW' ? !!CALC : has(o.sb), rate = o.st === 'NEW' ? (CALC ? CALC.fx + CALC.sb : 0) : rateOf(o), tot = o.st === 'NEW' ? (CALC ? planned(o, rate).total : 0) : o.tot;
@@ -164,7 +187,7 @@ $('story').innerHTML =
 '<div class="it"><small>' + T('Due on') + '</small><b class="d">' + dmy(o.due) + '</b></div>' +
 '<div class="it"><small>' + T(o.st === 'REPAID' ? 'Repaid on' : 'Days left') + '</small><b class="d">' + (o.st === 'REPAID' ? dmy(o.rdate) : left >= 0 ? left + ' ' + T('of') + ' ' + o.term : T('overdue')) + '</b></div>';
 }
-function drawCalc() { drawStory(); drawMonths(); if ($('draftBtn')) { $('draftBtn').disabled = !CALC; $('apprBtn').disabled = !CALC; } }
+function drawCalc() { drawStory(); drawMonths(); drawAgr(); if ($('draftBtn')) { $('draftBtn').disabled = !CALC; $('apprBtn').disabled = !CALC; } }
 function drawLoan() {
 var o = CUR, a = ageInfo(o), sb = has(o.sb), rate = rateOf(o), lock;
 $('crumb').innerHTML = '<span class="crumb">' + T('Bank Loans') + '</span><span class="crumb-sep">' + SEP + '</span><span class="crumb crumb-last">' + esc(o.code || ('1010201/' + o.dser)) + '</span>';
@@ -173,34 +196,35 @@ $('l1Title').textContent = (o.code || ('1010201/' + o.dser)) + (o.sup ? ' - ' + 
 $('l1Sub').innerHTML = T('Bank move') + ' ' + o.dtype + '/' + o.dser + (has(o.den) ? ' - ' + T('entry') + ' ' + entryLnk(o.dey, o.det, o.den) : '') + (o.acc ? ' - ' + T('account') + ' ' + o.acc : '');
 $('l1Sub').title = o.desc || '';
 if (LAST !== o.id) { LAST = o.id; $('logTog').className = 'sec-h sec-tog'; }
-CALC = o.st === 'NEW' && sb ? { fx: o.fx, sb: o.sb } : null;
+CALC = o.st === 'NEW' && sb ? { fx: o.fx, sb: o.sb, agr: o.agr } : null;
 drawStory();
 if (o.st === 'NEW') {
-$('rateP').innerHTML = T('Enter both rates, then Calculate.');
-$('rateBox').innerHTML = rateInputs(o) + '<button type="button" class="btn-soft" id="calcBtn">' + T('Calculate') + '</button><button type="button" class="btn-soft" id="draftBtn">' + T('Save as draft') + '</button><button type="button" class="btn-act" id="apprBtn">' + T('Approve loan') + '</button>' +
+$('rateP').innerHTML = T('Enter the agreement value or both rates, then Calculate.');
+$('rateBox').innerHTML = agrRow(o) + rateInputs(o) + '<button type="button" class="btn-soft" id="calcBtn">' + T('Calculate') + '</button><button type="button" class="btn-soft" id="draftBtn">' + T('Save as draft') + '</button><button type="button" class="btn-act" id="apprBtn">' + T('Approve loan') + '</button>' +
 '<span class="note">' + (CALC ? T('Draft saved - nothing is booked until the approval.') : T('Nothing is booked until the approval.')) + '</span>';
 $('calcBtn').addEventListener('click', function () {
 var t = typed();
 if (!has(t.fx) || !has(t.sb) || t.fx < 0 || t.sb < 0) { toast(T('Enter the bank margin and the SAIBOR rate'), true); return; }
 CALC = t; drawCalc();
 });
-$('draftBtn').addEventListener('click', function () { if (CALC) { act({ x01: 'draft', x02: o.id, x03: CALC.fx, x04: CALC.sb }); } });
+$('draftBtn').addEventListener('click', function () { if (CALC) { act({ x01: 'draft', x02: o.id, x03: CALC.fx, x04: CALC.sb, x05: CALC.agr || '' }); } });
 $('apprBtn').addEventListener('click', function () {
 if (!CALC) { return; }
 if (!confirm(T('Approve this loan at') + ' ' + pc(CALC.fx + CALC.sb) + ' ' + T('a year') + ' (' + pc(CALC.fx) + ' + ' + pc(CALC.sb) + ')? ' + T('Every month is booked in Co. now, each dated at its month end.'))) { return; }
-act({ x01: 'approve', x02: o.id, x03: CALC.fx, x04: CALC.sb });
+act({ x01: 'approve', x02: o.id, x03: CALC.fx, x04: CALC.sb, x05: CALC.agr || '' });
 });
 $('draftBtn').disabled = !CALC; $('apprBtn').disabled = !CALC;
 } else if (o.st === 'APPROVED') {
 lock = has(G.close) && utc(G.close) >= utc(G.first || o.draw) ? T('The ledger is closed up to') + ' ' + dmy(G.close) + ' - ' + T('the approval cannot be undone until the reviewer reopens the year in Co.') : G.rev ? G.rev + ' ' + T('entries of this loan are reviewed in Co. - the approval cannot be undone until the review is removed') : '';
 $('rateP').innerHTML = T('Rate in force') + ': <b>' + pc(o.fx) + ' ' + T('bank margin') + ' + ' + pc(o.sb) + ' SAIBOR = ' + pc(rate) + ' ' + T('a year') + '</b>';
-$('rateBox').innerHTML = rateInputs(o, true) + '<button type="button" class="btn-act ghost" id="unapprBtn">' + T('Undo approval') + '</button>' + '<span class="note">' + (o.pm ? o.pm + ' ' + T(o.pm === 1 ? 'month' : 'months') + ' ' + T('booked in Co.') : T('no month booked yet')) + (o.apby ? ' - ' + T('approved by') + ' ' + esc(o.apby) + ' ' + o.apat : '') + '</span>' + (lock ? '<span class="chip ag3">' + lock + '</span>' : '');
+$('rateBox').innerHTML = (has(o.agr) ? agrRow(o, true) : '') + rateInputs(o, true) + '<button type="button" class="btn-act ghost" id="unapprBtn">' + T('Undo approval') + '</button>' + '<span class="note">' + (o.pm ? o.pm + ' ' + T(o.pm === 1 ? 'month' : 'months') + ' ' + T('booked in Co.') : T('no month booked yet')) + (o.apby ? ' - ' + T('approved by') + ' ' + esc(o.apby) + ' ' + o.apat : '') + '</span>' + (lock ? '<span class="chip ag3">' + lock + '</span>' : '');
 $('unapprBtn').addEventListener('click', function () { if (confirm(T('Undo the approval? Every month entry of this loan is deleted in Co. and the loan goes back to a draft.'))) { act({ x01: 'unapprove', x02: o.id }); } });
 } else {
 $('rateP').innerHTML = T('Rate used') + ': <b>' + pc(o.fx) + ' ' + T('bank margin') + ' + ' + pc(o.sb) + ' SAIBOR = ' + pc(rate) + ' ' + T('a year') + '</b>';
 $('rateBox').innerHTML = '<span class="note">' + T('No action.') + (o.apby ? ' ' + T('Approved by') + ' ' + esc(o.apby) + ' ' + o.apat + '.' : '') + '</span>';
 }
-if (o.st === 'NEW') { $('fxIn').addEventListener('input', liveRate); $('sbIn').addEventListener('input', liveRate); }
+if (o.st === 'NEW') { $('agIn').addEventListener('input', autoSb); $('fxIn').addEventListener('input', autoSb); $('sbIn').addEventListener('input', liveRate); }
+drawAgr();
 drawMonths();
 drawRepay();
 drawLog();

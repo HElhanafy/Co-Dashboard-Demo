@@ -82,10 +82,10 @@
     function row(L) {
         var r = rows(L), pa = 0, pm = 0, pl = 0, tot = 0, cx = 0, j;
         for (j = 0; j < r.length; j++) { if (r[j].st === 'POSTED') { pa += r[j].amt; pm++; tot += r[j].amt; } else if (r[j].st === 'PLANNED') { pl++; tot += r[j].amt; } else { cx++; } }
-        return [L.id, L.code, L.tr, L.draw, f2(L.p), f4(L.fx), f4(L.sb), L.due, L.st, L.sup, L.acc, f2(pa), pm, pl,
+        return [L.id, L.code, L.tr, L.draw, f2(L.p), L.fx, L.sb, L.due, L.st, L.sup, L.acc, f2(pa), pm, pl,
                 L.rdate || null, L.ramt === undefined ? null : f2(L.ramt), L.bank === undefined ? null : f2(L.bank), 1010201, L.ser, +L.draw.substr(0, 4), 106, 100130 + L.ser, 360, L.term,
                 L.apby || null, L.apat || null, L.rtype || null, L.rser || null, L.rser ? +L.rdate.substr(0, 4) : null, L.rser ? 106 : null, L.rser ? 101100 + L.rser : null, L.rpby || null, L.rpat || null,
-                'Loan# ' + L.code + ' - ' + L.sup + ' orders 2600' + (90 + L.ser) + ' & 2600' + (91 + L.ser), L.sup + ' CO', f2(tot), cx, null, null, null];
+                'Loan# ' + L.code + ' - ' + L.sup + ' orders 2600' + (90 + L.ser) + ' & 2600' + (91 + L.ser), L.sup + ' CO', f2(tot), cx, null, null, null, L.agr ? f2(L.agr) : null];
     }
     function err(m) { return { ok: 0, error: m }; }
     function loanOut(L) {
@@ -119,7 +119,7 @@
         if (cmd === 'loan') { M.cur = o.id; return loanOut(o); }
         if (cmd === 'draft') {
             if (o.st !== 'NEW') { return err('Only a loan not approved yet takes a draft rate (this one is ' + o.st + ')'); }
-            M.log.push([NOW, USER, 'DRAFT', 'margin+saibor', o.fx + ' + ' + (o.sb === null ? '?' : o.sb), p.x03 + ' + ' + p.x04, o.id]); o.fx = +p.x03; o.sb = +p.x04;
+            M.log.push([NOW, USER, 'DRAFT', 'margin+saibor', o.fx + ' + ' + (o.sb === null ? '?' : o.sb), p.x03 + ' + ' + p.x04, o.id]); o.fx = +p.x03; o.sb = +p.x04; o.agr = p.x05 ? +p.x05 : null;
             return { ok: 1, msg: 'Draft saved - nothing is booked until the approval' };
         }
         if (cmd === 'approve') {
@@ -131,7 +131,7 @@
                 o.dr = +a.dr; o.cr = +a.cr; o.term = Math.round(a.term); o.due = addD(o.draw, o.term);
             }
             M.log.push([NOW, USER, 'ACCOUNTS', 'debit ' + o.dr + ' - credit ' + o.cr + ' - term ' + o.term + ' days', null, null, o.id]);
-            o.fx = +p.x03; o.sb = +p.x04; o.st = 'APPROVED'; o.apby = USER; o.apat = NOW; schedule(o); M.log.push([NOW, USER, 'APPROVE', 'margin ' + o.fx + ' saibor ' + o.sb, 'NEW', 'APPROVED - ' + rows(o).length + ' months', o.id]); postAll(o);
+            o.fx = +p.x03; o.sb = +p.x04; o.agr = p.x05 ? +p.x05 : null; o.st = 'APPROVED'; o.apby = USER; o.apat = NOW; schedule(o); M.log.push([NOW, USER, 'APPROVE', 'margin ' + o.fx + ' saibor ' + o.sb, 'NEW', 'APPROVED - ' + rows(o).length + ' months', o.id]); postAll(o);
             return { ok: 1, msg: 'Loan approved - ' + rows(o).length + ' months booked in the ledger, each dated at its month end' };
         }
         if (cmd === 'link') { for (i = 0; i < M.moves.length; i++) { if (M.moves[i].ser === +p.x04) { M.moves[i].used = true; o.rtype = 1010202; o.rser = M.moves[i].ser; o.rdate = M.moves[i].date; o.ramt = M.moves[i].amt; } } M.log.push([NOW, USER, 'LINK', '1010202/' + p.x04, null, f2(o.ramt) + ' ' + H.dmy(o.rdate), o.id]); return { ok: 1, msg: 'Repayment move linked - check the figures, then approve the repayment' }; }

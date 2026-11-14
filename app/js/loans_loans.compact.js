@@ -189,15 +189,16 @@ function printTitle() {
 return 'Co. Dashboard | ' + (CUR && $('lv1').style.display !== 'none' ? T('Bank loan') + ' ' + (CUR.code || '') + (CUR.sup ? ' - ' + CUR.sup : '') : T('Bank Loans')) + ' |  | ' + T('Printed') + ' ' + nowTxt();
 }
 function doPrint() {
-var th = document.querySelector('#printTablePanel .print-title-row th'), orig = document.title, lv1 = $('lv1').style.display !== 'none', n = document.querySelectorAll(lv1 ? '#schBody tr' : '#tBody tr').length, st = document.querySelector('#lv1 .steps'), pfs;
-pfs = (700 - (lv1 ? 215 + (st && st.offsetHeight ? 95 : 0) : 80)) / ((n + 2) * ((lv1 ? 2.3 : 3.2) + 1.1));
-pfs = Math.round(Math.max(10, Math.min(12.5, pfs)) * 10) / 10;
+var th = document.querySelector('#printTablePanel .print-title-row th'), orig = document.title, lv1 = $('lv1').style.display !== 'none', n = document.querySelectorAll(lv1 ? '#schBody tr' : '#tBody tr').length, st = document.querySelector('#lv1 .steps'), pfs, sg;
+pfs = (700 - (lv1 ? 215 + (st && st.offsetHeight ? 95 : 0) : 265)) / ((n + 2) * ((lv1 ? 2.3 : 3.2) + 1.1));
+pfs = Math.round(Math.max(lv1 ? 10 : 9, Math.min(12.5, pfs)) * 10) / 10;
 document.body.style.setProperty('--pfs', pfs + 'px');
 if (th) { th.textContent = printTitle(); }
+if (!lv1) { sg = document.createElement('div'); sg.className = 'pr-sign'; sg.innerHTML = '<div>' + T('Prepared by') + '</div><div>' + T('Reviewed by') + '</div><div>' + T('Approved by') + '</div>'; $('printTablePanel').appendChild(sg); }
 if (lv1) { $('printFilters1').innerHTML = '<b>' + T('Loan') + ':</b> ' + esc(CUR.code || '') + '<span class="pf-sep">|</span><b>' + T('Taken on') + ':</b> ' + dmy(CUR.draw) + '<span class="pf-sep">|</span><b>' + T('Amount') + ':</b> ' + fm(CUR.p) + '<span class="pf-sep">|</span><b>' + T('Rate') + ':</b> ' + pc(rateOf(CUR)); }
 document.title = lv1 ? 'Loan_' + String(CUR.code || CUR.id).replace(/[^A-Za-z0-9]+/g, '_') : 'Bank_Loans_' + D.today;
 document.body.classList.add('print-mode-table'); document.body.classList.add('print-fit');
-window.addEventListener('afterprint', function r() { document.title = orig; document.body.classList.remove('print-mode-table'); document.body.classList.remove('print-fit'); window.removeEventListener('afterprint', r); });
+window.addEventListener('afterprint', function r() { document.title = orig; document.body.classList.remove('print-mode-table'); document.body.classList.remove('print-fit'); if (sg && sg.parentNode) { sg.parentNode.removeChild(sg); } window.removeEventListener('afterprint', r); });
 window.print();
 }
 function excel() {

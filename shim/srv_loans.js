@@ -97,8 +97,9 @@
     }
     S.LOANS_AJAX = function (p) {
         var cmd = String(p.x01 || '').toLowerCase(), id = +p.x02, o, i, y = 0, out, a, res;
+        if (cmd === 'limit') { if (!(+p.x03 > 0)) { return err('Enter the facility limit as a positive amount'); } M.lim = +p.x03; M.limat = H.today; return { ok: 1, msg: 'Facility limit saved' }; }
         if (cmd === 'list') {
-            out = { ok: 1, adm: 1, link: 1, close: null, asof: H.today + ' 00:40', today: TODAY, fac: ['Demo Bank - supplier invoices financing', '5600000.00', '5.0000', 360, 270, 1010201, 1010202, 420402000000, 210204001000], loans: [], ytd: '0.00' };
+            out = { ok: 1, adm: 1, link: 1, close: null, asof: H.today + ' 00:40', today: TODAY, limat: M.limat || null, fac: ['Demo Bank - supplier invoices financing', f2(M.lim || 5600000), '5.0000', 360, 270, 1010201, 1010202, 420402000000, 210204001000], loans: [], ytd: '0.00' };
             for (i = 0; i < M.loans.length; i++) { if (M.loans[i].st !== 'CANCELLED') { out.loans.push(row(M.loans[i])); } }
             for (i = 0; i < M.acc.length; i++) { if (M.acc[i].st === 'POSTED' && M.acc[i].to.substr(0, 4) === TODAY.substr(0, 4)) { y += M.acc[i].amt; } }
             out.ytd = f2(y); return out;

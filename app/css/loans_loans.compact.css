@@ -50,6 +50,9 @@ body,#t_PageBody{background:radial-gradient(circle at 15% 0%,var(--glow1),transp
 .kpi .value{font-size:var(--fs-kpi);font-weight:600;font-family:var(--font-head);color:var(--text);line-height:1.1;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
 .kpi .value .cur{font-size:var(--fs-hint);color:var(--muted);font-weight:600;letter-spacing:.04em;margin-inline-start:2px;}
 .kpi .sub{font-size:var(--fs-label);margin-top:8px;color:var(--muted);}
+.kpi .sub .tiny-btn{margin-inline-start:6px;}
+.kpi .lim-ed{display:flex;align-items:center;gap:6px;}
+.kpi .lim-ed input{width:130px;height:28px;padding:0 8px;text-align:right;border:1px solid var(--box-line);border-radius:var(--box-r);background:var(--box-bg);color:var(--text);font:600 var(--fs-field) var(--font-body);font-variant-numeric:tabular-nums;}
 .kpi .bar{height:6px;border-radius:3px;background:var(--grid-line);margin-top:10px;overflow:hidden;}
 .kpi .bar > i{display:block;height:100%;background:var(--purple);border-radius:3px;}
 @media screen{html[dir=rtl] .kpi .label{font-size:12px;font-weight:600;letter-spacing:0;text-transform:none;}}

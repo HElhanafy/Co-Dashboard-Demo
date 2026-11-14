@@ -118,9 +118,19 @@ left = days(D.today, o.due); if (left < 0) { overN++; } else if (left <= 30) { d
 used = lim ? out / lim * 100 : 0;
 $('kpi0').innerHTML =
 '<div class="kpi"><div class="label">' + T('Loans outstanding') + '</div><div class="value">' + fm(out) + ' <span class="cur">SAR</span></div><div class="sub">' + nOpen + ' ' + T('open loans') + ' - ' + nNew + ' ' + T('waiting for approval') + '</div></div>' +
-'<div class="kpi k-used"><div class="label">' + T('Facility used') + '</div><div class="value">' + used.toFixed(1) + '%</div><div class="sub">' + fm0(out) + ' ' + T('of') + ' ' + fm0(lim) + ' - ' + T('free') + ' ' + fm0(lim - out) + '</div><div class="bar"><i style="width:' + Math.min(100, used).toFixed(1) + '%"></i></div></div>' +
+'<div class="kpi k-used"><div class="label">' + T('Facility used') + '</div><div class="value">' + used.toFixed(1) + '%</div><div class="sub" id="limSub">' + fm0(out) + ' ' + T('of') + ' ' + fm0(lim) + ' - ' + (out > lim ? '<span class="neg"><b>' + T('over the limit by') + ' ' + fm0(out - lim) + '</b></span>' : T('free') + ' ' + fm0(lim - out)) + ' <button type="button" class="tiny-btn" id="limBtn"' + (D.limat ? ' title="' + T('limit set on') + ' ' + D.limat + '"' : '') + '>' + T('Edit limit') + '</button></div><div class="bar"><i style="width:' + Math.min(100, used).toFixed(1) + '%"></i></div></div>' +
 '<div class="kpi k-int"><div class="label">' + T('Interest booked in') + ' ' + D.today.substr(0, 4) + '</div><div class="value">' + fm(+D.ytd) + ' <span class="cur">SAR</span></div><div class="sub">' + T('entries 101 posted by the dashboard') + '</div></div>' +
 '<div class="kpi k-due' + (overN ? ' over' : '') + '"><div class="label">' + T('Due within 30 days') + '</div><div class="value">' + dueN + ' <span class="cur">' + T('loans') + '</span></div><div class="sub">' + fm0(dueA) + ' SAR - ' + (overN ? '<span class="neg"><b>' + overN + ' ' + T('overdue') + '</b></span>' : T('none overdue')) + '</div></div>';
+$('limBtn').addEventListener('click', limEdit);
+}
+function limEdit() {
+var s = $('limSub'), i, lim = D.fac ? +D.fac[1] : 0;
+function save() { var v = parseFloat(String(i.value).replace(/,/g, '')); if (isNaN(v) || v <= 0) { toast(T('Enter the facility limit as a positive amount'), true); return; } call({ x01: 'limit', x03: v }, function (d) { if (d) { toast(d.msg || 'Done'); loadList(); } }); }
+s.className = 'sub lim-ed';
+s.innerHTML = '<input type="text" id="limIn" value="' + fm(lim) + '" autocomplete="off"><button type="button" class="tiny-btn" id="limOk">' + T('Save') + '</button><button type="button" class="tiny-btn" id="limNo">' + T('Cancel') + '</button>';
+i = $('limIn'); i.focus(); i.select();
+i.addEventListener('keydown', function (e) { if (e.key === 'Enter') { save(); } else if (e.key === 'Escape') { kpis(); } });
+$('limOk').addEventListener('click', save); $('limNo').addEventListener('click', kpis);
 }
 function sortVal(o, k) { return k === 'p' ? o.p : k === 'int' ? o.tot : k === 'draw' ? o.draw : k === 'due' || k === 'age' ? o.due : k === 'po' ? o.pa : k === 'st' ? o.st : k === 'tot' ? o.p + o.tot : o.code || ''; }
 function drawList() {

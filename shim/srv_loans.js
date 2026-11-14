@@ -102,7 +102,7 @@
             out = { ok: 1, adm: 1, link: 1, close: null, asof: H.today + ' 00:40', today: TODAY, limat: M.limat || null, fac: ['Demo Bank - supplier invoices financing', f2(M.lim || 5600000), '5.0000', 360, 270, 1010201, 1010202, 420402000000, 210204001000], loans: [], ytd: '0.00' };
             for (i = 0; i < M.loans.length; i++) { if (M.loans[i].st !== 'CANCELLED') { out.loans.push(row(M.loans[i])); } }
             for (i = 0; i < M.acc.length; i++) { if (M.acc[i].st === 'POSTED' && M.acc[i].to.substr(0, 4) === TODAY.substr(0, 4)) { y += M.acc[i].amt; } }
-            out.ytd = f2(y); return out;
+            out.ytd = f2(y); var bo = {}, bk = [], yy; for (i = 0; i < M.acc.length; i++) { if (M.acc[i].st === 'POSTED') { yy = M.acc[i].to.substr(0, 4); if (bo[yy] === undefined) { bo[yy] = 0; bk.push(yy); } bo[yy] += M.acc[i].amt; } } bk.sort(); out.byy = []; for (i = 0; i < bk.length; i++) { out.byy.push([+bk[i], f2(bo[bk[i]])]); } return out;
         }
         // demo only: the chart of accounts, the setup of the loan on screen and the preview of its entries, for the approval window (loans_demo.js)
         if (cmd === 'coa') { return { ok: 1, coa: M.coa }; }

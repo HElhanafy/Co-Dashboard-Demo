@@ -150,7 +150,7 @@ function rs(x) { return (+x).toFixed(4).replace(/0{1,2}$/, ''); }
 function agrNum() { var e = $('agIn'), v = e ? parseFloat(String(e.value).replace(/,/g, '')) : NaN; return isNaN(v) || v <= 0 ? null : v; }
 function agrCalc(o, a) { var d = r2(Math.abs(a - o.p)), per = d / o.p * 100; return { diff: d, per: per, yr: per * o.basis / o.term }; }
 function agrRow(o, ro) {
-return '<div class="agr"><div class="filter-group"><label>' + T('Agreement value') + '</label><input type="text" id="agIn" value="' + (has(o.agr) ? o.agr.toFixed(2) : '') + '" placeholder="0.00" autocomplete="off"' + (ro ? ' disabled' : '') + '></div><div class="eq">&minus;</div>' +
+return '<div class="agr"><div class="filter-group"><label>' + T('Agreement value') + '</label><input type="text" id="agIn" value="' + (has(o.agr) ? fm(o.agr) : '') + '" placeholder="0.00" autocomplete="off"' + (ro ? ' disabled' : '') + '></div><div class="eq">&minus;</div>' +
 '<div class="filter-group"><label>' + T('Received in the bank') + '</label><div class="agr-v">' + fm(o.p) + '</div></div><div class="eq" id="agTxt"></div></div>';
 }
 function drawAgr() {
@@ -223,7 +223,7 @@ $('unapprBtn').addEventListener('click', function () { if (confirm(T('Undo the a
 $('rateP').innerHTML = T('Rate used') + ': <b>' + pc(o.fx) + ' ' + T('bank margin') + ' + ' + pc(o.sb) + ' SAIBOR = ' + pc(rate) + ' ' + T('a year') + '</b>';
 $('rateBox').innerHTML = '<span class="note">' + T('No action.') + (o.apby ? ' ' + T('Approved by') + ' ' + esc(o.apby) + ' ' + o.apat + '.' : '') + '</span>';
 }
-if (o.st === 'NEW') { $('agIn').addEventListener('input', autoSb); $('fxIn').addEventListener('input', autoSb); $('sbIn').addEventListener('input', liveRate); }
+if (o.st === 'NEW') { $('agIn').addEventListener('input', autoSb); $('agIn').addEventListener('blur', function () { var a = agrNum(); if (a) { this.value = fm(a); } }); $('fxIn').addEventListener('input', autoSb); $('sbIn').addEventListener('input', liveRate); }
 drawAgr();
 drawMonths();
 drawRepay();
